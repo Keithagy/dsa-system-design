@@ -15,7 +15,7 @@ def two_crystal_balls(threshold: int, n: int) -> int:
             break
         i += jump_dist
 
-    i -= 1  # move back one for walking startpoint
+    i -= jump_dist  # move back one for walking startpoint
 
     while i < n:
         if will_break(threshold, i):
