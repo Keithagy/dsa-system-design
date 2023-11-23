@@ -1,4 +1,4 @@
-package solutions
+package q1768
 
 import "strings"
 

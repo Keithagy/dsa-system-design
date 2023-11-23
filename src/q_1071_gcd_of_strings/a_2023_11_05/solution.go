@@ -1,4 +1,4 @@
-package solutions
+package q1071
 
 import (
 	"strings"
