@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Generic, Optional, TypeVar
+import unittest
 
 T = TypeVar("T")
 
@@ -44,6 +45,39 @@ class LinkedList(Generic[T]):
             self.tail = to_remove.prev
         self.length -= 1
         return to_remove.value
+
+    def insertAt(self, index: int, val: T) -> None:
+        if index < 0 or index > self.length:
+            return
+        i = 0
+        cur = self.head
+        prev = None
+        while i < index:
+            if cur is None:
+                raise Exception(
+                    "Unexpected empty node while traversing list for insertAt operation"
+                )
+            prev = cur
+            cur = cur.next
+            i += 1
+
+        new_node = Node(val)
+
+        new_node.next = cur
+        new_node.prev = prev
+
+        if prev:
+            prev.next = new_node
+        if cur:
+            cur.prev = new_node
+
+        if index == 0:
+            self.head = new_node
+
+        if index == self.length:
+            self.tail = new_node
+
+        self.length += 1
 
     def removeAt(self, index: int) -> Optional[T]:
         if index < 0 or index > self.length - 1:
@@ -100,3 +134,103 @@ class LinkedList(Generic[T]):
                 return None
             retrieved = retrieved.next
         return retrieved.value if retrieved else None
+
+
+class TestLinkedList(unittest.TestCase):
+    def test_append(self):
+        ll = LinkedList()
+        ll.append(1)
+        self.assertEqual(ll.get(0), 1)
+        self.assertEqual(ll.length, 1)
+
+        ll.append(2)
+        self.assertEqual(ll.tail.value, 2)
+        self.assertEqual(ll.length, 2)
+
+    def test_prepend(self):
+        ll = LinkedList()
+        ll.prepend(1)
+        self.assertEqual(ll.get(0), 1)
+        self.assertEqual(ll.length, 1)
+
+        ll.prepend(2)
+        self.assertEqual(ll.head.value, 2)
+        self.assertEqual(ll.length, 2)
+
+    def test_remove(self):
+        ll = LinkedList()
+        ll.append(1)
+        ll.append(2)
+        ll.remove(1)
+        self.assertEqual(ll.length, 1)
+
+        removed = ll.remove(3)
+        self.assertIsNone(removed)
+        self.assertEqual(ll.length, 1)
+
+        ll.remove(2)
+        self.assertIsNone(ll.head)
+
+    def test_insertAt(self):
+        ll = LinkedList()
+        ll.insertAt(0, 1)
+        self.assertEqual(ll.get(0), 1)
+
+        ll.insertAt(1, 2)
+        self.assertEqual(ll.get(1), 2)
+        self.assertEqual(ll.length, 2)
+
+        ll.insertAt(1, 3)
+        self.assertEqual(ll.get(1), 3)
+        self.assertEqual(ll.tail.value, 2)
+        self.assertEqual(ll.length, 3)
+
+    def test_removeAt(self):
+        ll = LinkedList()
+        ll.append(1)
+        ll.append(2)
+        ll.append(3)
+
+        ll.removeAt(1)
+        self.assertEqual(ll.get(1), 3)
+        self.assertEqual(ll.length, 2)
+
+        ll.removeAt(0)
+        self.assertEqual(ll.head.value, 3)
+        self.assertEqual(ll.length, 1)
+
+        ll.removeAt(0)
+        self.assertIsNone(ll.head)
+
+    def test_get(self):
+        ll = LinkedList()
+        ll.append(1)
+        ll.append(2)
+        ll.append(3)
+
+        self.assertEqual(ll.get(0), 1)
+        self.assertEqual(ll.get(1), 2)
+        self.assertEqual(ll.get(2), 3)
+        self.assertIsNone(ll.get(3))
+
+    def test_list_integrity(self):
+        ll = LinkedList()
+        ll.append(1)
+        ll.append(2)
+        ll.prepend(0)
+        ll.removeAt(1)
+        ll.insertAt(1, 1.5)
+
+        self.assertEqual(ll.get(0), 0)
+        self.assertEqual(ll.get(1), 1.5)
+        self.assertEqual(ll.get(2), 2)
+        self.assertEqual(ll.length, 3)
+
+    def test_error_handling(self):
+        ll = LinkedList()
+        ll.insertAt(1, 1)  # Inserting at index 1 in an empty list
+        self.assertEqual(ll.length, 0)
+
+
+if __name__ == "__main__":
+    unittest.main()
