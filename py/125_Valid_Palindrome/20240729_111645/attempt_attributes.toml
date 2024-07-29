@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 2                                                                                                                              # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-07-29T11:16:45.000043+08:00
+attempt_end_time = 2024-07-29T11:25:45.000043+08:00
+reflections = """two-pointer method of processing the string in a stack-like fashion was helpful. I got a clean one-pass, constant-memory solution""" # This is multiline!
