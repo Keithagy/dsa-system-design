@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 1                                                                          # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-07-29T11:45:46.098508+08:00
+attempt_end_time = 2024-07-29T11:56:46.098508+08:00
+reflections = """remember `setdefault()` dict method as an easy way to handle not-in-dict case""" # This is multiline!
