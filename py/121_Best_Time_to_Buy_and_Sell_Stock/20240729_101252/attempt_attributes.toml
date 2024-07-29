@@ -1,0 +1,8 @@
+success = false
+perceived_trickiness = 6 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-07-29T10:12:52.619976+08:00
+attempt_end_time = 2024-07-29T10:34:52.619976+08:00
+reflections = """
+I always have trouble with this one in the practice cycle... greedy algorithms a little bit brain-bendy?
+Important trick I always miss out: i don't have to calculate the buy and sell days, only figure out the max gap whilst still having buy date before sell date!
+""" # This is multiline!
