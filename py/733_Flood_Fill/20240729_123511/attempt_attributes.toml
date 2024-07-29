@@ -1,0 +1,10 @@
+success = true
+perceived_trickiness = 2 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-07-29T12:35:11.619243+08:00
+attempt_end_time = 2024-07-29T13:00:11.619243+08:00
+reflections = """good practice for navigating cardinally within 2d array; important thing to ensure is that your algorithm doesn't go back where it came from.
+
+You can solve this DFS (easiest with in-order recursive traversal) or BFS (easiest with a deque-backed queue).
+note further that if you want to do a recursive BFS like solution, you generally can. You need your internal recursion helper to have a reference to list state, 
+and you need to have a list that is local to each individual scope which would allow you to iterate through each level breadth-first
+""" # This is multiline!
