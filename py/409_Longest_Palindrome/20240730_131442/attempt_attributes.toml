@@ -1,0 +1,5 @@
+success = false
+perceived_trickiness = 5                                                                                                                           # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-07-30T13:14:42.154798+08:00
+attempt_end_time = 2024-07-30T13:41:42.154798+08:00
+reflections = """Solution eventually worked, but clunky; also, completely did not consider using a hash set to iteratively keep track of parity""" # This is multiline!
