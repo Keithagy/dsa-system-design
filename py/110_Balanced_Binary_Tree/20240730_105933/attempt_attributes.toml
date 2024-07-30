@@ -1,0 +1,7 @@
+success = true
+perceived_trickiness = 4 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-07-30T10:59:33.127159+08:00
+attempt_end_time = 2024-07-30T11:18:33.127159+08:00
+reflections = """A better solution exists which does not use memoizing, because it evaluates height AND balancedness in the same step
+Remember the option of multiple return values to denote different pieces of information from a particular step of recursion
+""" # This is multiline!
