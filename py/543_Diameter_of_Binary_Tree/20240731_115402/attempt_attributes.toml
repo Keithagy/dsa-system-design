@@ -1,0 +1,5 @@
+success = false
+perceived_trickiness = 4                                                                                                                                  # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-07-31T11:54:02.631845+08:00
+attempt_end_time = 2024-07-31T12:26:02.631845+08:00
+reflections = """There's some trick I'm not getting here regarding longest path vs longest path through me... don't be too good to use global state :)""" # This is multiline!
