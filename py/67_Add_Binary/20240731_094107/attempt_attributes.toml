@@ -1,0 +1,5 @@
+success = false
+perceived_trickiness = 5                                                                                                                                # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-07-31T09:41:07.916519+08:00
+attempt_end_time = 2024-07-31T11:34:07.916519+08:00
+reflections = """binary questions are their own ballgame... be on the lookout for changes to represent them as ints, and modulo 2 is your friend...?""" # This is multiline!
