@@ -1,0 +1,6 @@
+success = true
+perceived_trickiness = 1 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-07-31T13:10:40.299086+08:00
+attempt_end_time = 2024-07-31T13:13:40.299086+08:00
+reflections = """Simple dfs application... use a stack if want to do iterative, use a queue if want to do iterative breadth-first
+remember that if you want the max height, you can search depth first. If you want min height / shortest path, you do bfs""" # This is multiline!
