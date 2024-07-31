@@ -1,0 +1,6 @@
+success = true
+perceived_trickiness = 1 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-07-31T13:20:55.467473+08:00
+attempt_end_time = 2024-07-31T13:24:55.467473+08:00
+reflections = """Simple, hashset more idiomatic for this problem. 
+If requires constant memory you can do this with an in-place sort, and then iterate through to find repeat. However this would need n log n runtime""" # This is multiline!
