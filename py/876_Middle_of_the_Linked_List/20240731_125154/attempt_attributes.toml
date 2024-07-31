@@ -1,0 +1,9 @@
+success = true
+perceived_trickiness = 2 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-07-31T12:51:54.381264+08:00
+attempt_end_time = 2024-07-31T13:04:54.381264+08:00
+reflections = """Decide when to use fast/slow pointer, when to track iteration counts.
+Generally, tortoise/hare pointer is nicer and easier to handle.
+In this case, you need 2nd middle if even, so you need fast to run out of list.
+If you needed 1st middle in the even case, then you can just write while loop to end one iteration early (`and fast.next.next`)
+""" # This is multiline!
