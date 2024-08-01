@@ -1,0 +1,5 @@
+success = false
+perceived_trickiness = 5                                                                                               # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-01T12:52:27.077979+08:00
+attempt_end_time = 2024-08-01T13:17:27.077979+08:00
+reflections = """You got the right idea, but your handling of odd-node vs even-node lists was not clean. Try again!""" # This is multiline!
