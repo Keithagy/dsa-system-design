@@ -1,0 +1,5 @@
+success = false
+perceived_trickiness = 6                                                                         # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-01T12:42:34.826621+08:00
+attempt_end_time = 2024-08-01T12:50:34.826621+08:00
+reflections = """Skipping bitwise manipulation questions for now... this one has an XOR trick""" # This is multiline!
