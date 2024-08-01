@@ -1,0 +1,7 @@
+success = true
+perceived_trickiness = 2 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-01T08:42:37.515202+08:00
+attempt_end_time = 2024-08-01T08:48:37.515202+08:00
+reflections = """Just keep clear picture of your links.
+Further note, try end recursions "cleanly", which I guess is what theory refers to when it says to preserve the invariants
+""" # This is multiline!
