@@ -1,0 +1,7 @@
+success = false
+perceived_trickiness = 6 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-01T10:13:03.415701+08:00
+attempt_end_time = 2024-08-01T10:59:03.415701+08:00
+reflections = """Stack solution is obvious, recursive solution is probably really nice for this... wouldn't be constant memory though (recursion depth)
+You solution threatens to work.. but you don't properly handle cases where you see more backspaces whilst counting down backspaces
+""" # This is multiline!
