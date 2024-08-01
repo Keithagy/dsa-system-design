@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 1                                                                                                                                                                      # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-01T12:22:09.136298+08:00
+attempt_end_time = 2024-08-01T12:33:09.136298+08:00
+reflections = """straightforward greedy algorithm. Could make it true constant memory if you just store the index of the prefix termination, starting with the length of the first element""" # This is multiline!
