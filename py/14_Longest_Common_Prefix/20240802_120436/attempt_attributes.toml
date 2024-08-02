@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 3                                                                                                                                                                                   # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-02T12:04:36.845268+08:00
+attempt_end_time = 2024-08-02T12:12:36.845268+08:00
+reflections = """More elegant solution that makes use of the prefix property enabling a greedy algorithm to deliver an optimal solution, returning early, being single-pass, and using constant memory.""" # This is multiline!
