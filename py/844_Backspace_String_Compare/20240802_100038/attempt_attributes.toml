@@ -1,0 +1,15 @@
+success = true
+perceived_trickiness = 5 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-02T10:00:38.743907+08:00
+attempt_end_time = 2024-08-02T10:30:38.743907+08:00
+reflections = """That inner loop to find the next valid index is tricky.
+- You need to break if string gets to head, or if confirmed out of backspaces
+
+Overall algorithm pseudocode:
+- For each string, iterate from back
+  - Find next valid index, if exists (this is the inner loop)
+  - If they both have a valid index, return False if they don't index into equal characters
+  - If one of them runs out of valid indexes first, return False
+    - This hinges upon valid index finder correctly skipping over backspaces when it seems them
+- If iteration completes, return True
+""" # This is multiline!
