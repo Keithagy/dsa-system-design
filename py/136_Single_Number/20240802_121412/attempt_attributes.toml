@@ -1,0 +1,13 @@
+success = true
+perceived_trickiness = 3 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-02T12:14:12.517715+08:00
+attempt_end_time = 2024-08-02T12:16:12.517715+08:00
+reflections = """
+Explanation of the XOR approach:
+
+- XOR (exclusive or) operation has the following properties:
+  1. a ^ 0 = a
+  2. a ^ a = 0
+  3. a ^ b ^ a = (a ^ a) ^ b = 0 ^ b = b
+- By XORing all numbers in the array, the duplicate numbers will cancel out (property 2), and we'll be left with the single number (property 3).
+""" # This is multiline!
