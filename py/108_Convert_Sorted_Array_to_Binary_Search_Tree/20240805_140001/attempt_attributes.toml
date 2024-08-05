@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 3                                                                                                                                      # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-05T14:00:01.094903+08:00
+attempt_end_time = 2024-08-05T14:11:01.094903+08:00
+reflections = """Graph questions once again feel comfortable. you're good with this BST stuff! But, you could have used indexes to avoid copying the list.""" # This is multiline!
