@@ -1,0 +1,12 @@
+success = false
+perceived_trickiness = 6 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-05T13:12:53.701192+08:00
+attempt_end_time = 2024-08-05T13:47:53.701192+08:00
+reflections = """Looks easy but actually so easy to get the boundary cases wrong...
+Helpful things to remember with decimal numbers:
+- % 10 gives you last digit
+- // 10 drops the last digit
+- to add digit to num, do num * 10 + digit
+- 
+
+""" # This is multiline!
