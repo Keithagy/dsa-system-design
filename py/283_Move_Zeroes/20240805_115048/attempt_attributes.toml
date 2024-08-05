@@ -1,0 +1,8 @@
+success = false
+perceived_trickiness = 5 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-05T11:50:48.403354+08:00
+attempt_end_time = 2024-08-05T11:50:48.403354+08:00
+reflections = """There's a trick to this...
+This is just 2-pointer, but it's subtle. there isn't really a fast / slow pointer here.
+Revising bubble sort might help you get clearer.
+""" # This is multiline!
