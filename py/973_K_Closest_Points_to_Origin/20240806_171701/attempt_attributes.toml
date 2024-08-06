@@ -1,0 +1,7 @@
+success = true
+perceived_trickiness = 2 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-06T17:17:01.374739+08:00
+attempt_end_time = 2024-08-06T17:31:01.374739+08:00
+reflections = """This was conceptually alright, but it does reveal lack of familiarity with python's heap api, as well as probably not able to roll my own heap from scratch at this point. Time to try again primeagean's course.
+also, my solution turned out to be deeply sub-optimal.
+""" # This is multiline!
