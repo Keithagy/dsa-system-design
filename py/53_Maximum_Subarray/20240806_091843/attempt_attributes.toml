@@ -1,0 +1,8 @@
+success = false
+perceived_trickiness = 5 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-06T09:18:43.105935+08:00
+attempt_end_time = 2024-08-06T09:36:43.105935+08:00
+reflections = """I wasn't even really sure how to start approaching this... definitely needs revision.
+reminder again that with array traversal questions, you often don't need to track indexes.
+for max / min questions (e.g. max profit), what you often need is to single pass through the array, keeping track of the right min/max!!
+""" # This is multiline!
