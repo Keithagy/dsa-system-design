@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 2                                                                                                                                                       # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-06T08:55:53.85619+08:00
+attempt_end_time = 2024-08-06T09:01:53.85619+08:00
+reflections = """Trick for this question lies in the timing of incrementing the 2 pointers. zero pos always increments if seen non zero, so you can probe for the next zero""" # This is multiline!
