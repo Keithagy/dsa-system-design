@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 3                                                                                                                                  # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-06T15:03:37.076194+08:00
+attempt_end_time = 2024-08-06T15:11:37.076194+08:00
+reflections = """Subarray questions, if they actually need you to just provide some property, can be better solved with the right max/min calculation.""" # This is multiline!
