@@ -1,0 +1,7 @@
+success = false
+perceived_trickiness = 4 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-06T15:54:36.189438+08:00
+attempt_end_time = 2024-08-06T16:49:36.189438+08:00
+reflections = """Fundamentals seem week... this is bfs
+upon looking at the answer, it's more of being able to see the multi-pass dynamic programming trick
+""" # This is multiline!
