@@ -1,0 +1,7 @@
+success = false
+perceived_trickiness = 4 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-07T16:24:43.560271+08:00
+attempt_end_time = 2024-08-07T17:02:43.560271+08:00
+reflections = """Wrote up cubic time brute force solution but time limit exceeded.
+best solution from leetcode provides quadratic time complexity
+""" # This is multiline!
