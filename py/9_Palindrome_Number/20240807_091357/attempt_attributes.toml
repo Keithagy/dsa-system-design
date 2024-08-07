@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 2                                                 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-07T09:13:57.501067+08:00
+attempt_end_time = 2024-08-07T09:20:57.501067+08:00
+reflections = """Solved it in both full-reverse and half-reverse ways""" # This is multiline!
