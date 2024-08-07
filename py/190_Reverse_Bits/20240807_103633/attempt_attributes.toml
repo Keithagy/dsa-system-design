@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 3                                                                                                                                # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-07T10:36:33.00019+08:00
+attempt_end_time = 2024-08-07T10:39:33.00019+08:00
+reflections = """Handled much more easily by not trying to find the first set bit.. which you don't need to do if you use the fact that it is a u32.""" # This is multiline!
