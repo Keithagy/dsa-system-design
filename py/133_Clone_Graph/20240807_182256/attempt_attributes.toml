@@ -1,0 +1,7 @@
+success = true
+perceived_trickiness = 3 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-07T18:22:56.419122+08:00
+attempt_end_time = 2024-08-07T19:04:56.419122+08:00
+reflections = """You got it mostly right with a DFS approach. 
+You just wrongly passed the clone into the recursive call when you should have passed the original
+(which is the one with the neighvor references)""" # This is multiline!
