@@ -1,0 +1,7 @@
+success = true
+perceived_trickiness = 2 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-07T10:51:52.928709+08:00
+attempt_end_time = 2024-08-07T10:54:52.928709+08:00
+reflections = """Internalized sweep-through-for-max trick to implementing greedy algos for array property
+I guess you could call this a stateful reduce.
+""" # This is multiline!
