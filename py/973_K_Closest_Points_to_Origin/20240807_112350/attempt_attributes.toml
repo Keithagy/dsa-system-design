@@ -1,0 +1,7 @@
+success = true
+perceived_trickiness = 2 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-07T11:23:50.977437+08:00
+attempt_end_time = 2024-08-07T11:29:50.977437+08:00
+reflections = """top of the heap (most positive value if max heap, most negative value if min heap) can be found at index 0
+in this case you use a min heap with distance reversed. this means that the top of the heap give you the most negative negative distance, i.e the furthest point
+""" # This is multiline!
