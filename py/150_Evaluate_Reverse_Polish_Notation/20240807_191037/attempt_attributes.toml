@@ -1,0 +1,5 @@
+success = false
+perceived_trickiness = 1                                                  # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-07T19:10:37.948966+08:00
+attempt_end_time = 2024-08-07T19:20:37.948966+08:00
+reflections = """application of stack. but be careful of commutativity""" # This is multiline!
