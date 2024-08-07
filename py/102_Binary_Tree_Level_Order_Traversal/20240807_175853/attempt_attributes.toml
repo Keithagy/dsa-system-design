@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 2                                 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-07T17:58:53.106031+08:00
+attempt_end_time = 2024-08-07T18:17:53.106031+08:00
+reflections = """practiced DFS method using recursion""" # This is multiline!
