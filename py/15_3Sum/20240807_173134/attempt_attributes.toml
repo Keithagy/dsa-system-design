@@ -1,0 +1,7 @@
+success = true
+perceived_trickiness = 3 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-07T17:31:34.854095+08:00
+attempt_end_time = 2024-08-07T17:36:34.854095+08:00
+reflections = """Internalized two pointer approach (useful for evluating possibilities)
+Further, sorting first is a good way to skip over duplications via checking on the list traversal
+""" # This is multiline!
