@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 3                                                                                                  # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-08T11:52:19.906798+08:00
+attempt_end_time = 2024-08-08T11:55:19.906798+08:00
+reflections = """Just need to be able to spot the handhold of building up the solution from solution to sub-problem...""" # This is multiline!
