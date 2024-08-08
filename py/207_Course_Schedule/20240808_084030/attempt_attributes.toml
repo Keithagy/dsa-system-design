@@ -1,0 +1,7 @@
+success = true
+perceived_trickiness = 3 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-08T08:40:30.550119+08:00
+attempt_end_time = 2024-08-08T09:20:30.550119+08:00
+reflections = """Basic idea was fast to spot, but implementing correctly (incl. seeing that i needed a path that I pushed/popped off) took a while longer
+Also, the best way to solve this would have been topological sort (kahn's algorithm). try again.
+""" # This is multiline!
