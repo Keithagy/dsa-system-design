@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 3                                                                                                                                                                                                             # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-08T10:27:43.229052+08:00
+attempt_end_time = 2024-08-08T10:44:43.229052+08:00
+reflections = """Successfully did topological sort using Kahn's algorithm. Needed to pay attention to reversing order of cyclicality (topo sort assumes that the graph is of where a node points, not of which nodes point to it)""" # This is multiline!
