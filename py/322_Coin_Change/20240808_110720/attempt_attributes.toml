@@ -1,0 +1,7 @@
+success = false
+perceived_trickiness = 5 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-08T11:07:20.037663+08:00
+attempt_end_time = 2024-08-08T11:27:20.037663+08:00
+reflections = """Not seeing the trick... can't do greedy for this
+the trick is that you have a dp solution based on building up amount from amount-coin for all coin values. it's generalized ways to climb steps
+""" # This is multiline!
