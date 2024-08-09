@@ -1,0 +1,7 @@
+success = false
+perceived_trickiness = 5 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-09T08:54:19.427764+08:00
+attempt_end_time = 2024-08-09T09:10:19.427764+08:00
+reflections = """Learn the tricks and try again
+You can use 2 stacks (1 aux to track min ordering -- you can also use a stack to build leaderboard, clearly!), 
+""" # This is multiline!d
