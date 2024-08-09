@@ -1,0 +1,9 @@
+success = false
+perceived_trickiness = 4 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-09T12:08:36.29855+08:00
+attempt_end_time = 2024-08-09T12:56:36.29855+08:00
+reflections = """I think i'm not that far off... probably better to use BFS, taking the cue of the diagram
+maybe mark all rotten and fresh, use minutes as rot radius, start ranging back from max(m,n), and find the first value of radius for which some orange remains
+or actually just range forward and use grid as bottom up dp
+return when snapshot[i] == snapshot[i-1] (no change == everything that can rot, has rotted. if still have fresh, -1)
+""" # This is multiline!
