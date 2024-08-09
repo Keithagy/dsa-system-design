@@ -1,0 +1,7 @@
+success = true
+perceived_trickiness = 4 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-09T11:22:59.895595+08:00
+attempt_end_time = 2024-08-09T11:30:59.895595+08:00
+reflections = """practice iterative range solution that tracks, through each frame of the stack, the low and high bound relevant.
+The pattern shows up again... (call) stacks for snapshots!
+""" # This is multiline!
