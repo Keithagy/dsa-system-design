@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 2                              # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-10T13:33:43.427021+08:00
+attempt_end_time = 2024-08-10T13:36:43.427021+08:00
+reflections = """XOR trick"""                         # This is multiline!
