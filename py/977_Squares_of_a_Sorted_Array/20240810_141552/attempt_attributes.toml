@@ -1,0 +1,7 @@
+success = true
+perceived_trickiness = 2 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-10T14:15:52.489978+08:00
+attempt_end_time = 2024-08-10T14:24:52.489978+08:00
+reflections = """You also have the option of initializing the result array to the required length, then filling it from the back.
+You can also use the append approach by walking out from the middle (though there is some edge case to figure out there wrt which of 2 middle elements is smaller, how to correctly place starting left/right pointers.
+""" # This is multiline!
