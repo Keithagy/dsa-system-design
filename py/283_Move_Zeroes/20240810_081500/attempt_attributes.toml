@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 2                             # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-10T08:15:00.41064+08:00
+attempt_end_time = 2024-08-10T08:17:00.41064+08:00
+reflections = """Recap sliding window"""             # This is multiline!
