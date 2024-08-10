@@ -1,7 +1,6 @@
 Given an integer array `nums`, find the
 [subarray]{keyword="subarray-nonempty"} with the largest sum, and return
 _its sum_.
-A subarray is a contiguous non-empty sequence of elements within an array.
 
 **Example 1:**
 
