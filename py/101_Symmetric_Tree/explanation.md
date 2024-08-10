@@ -1,8 +1,26 @@
-Certainly! Let's tackle this problem and provide solutions using both recursive and iterative approaches. We'll analyze their time and space complexities, provide visualizations where helpful, and include test cases.
+# Explanation: Symmetric Tree
 
-Let's start with the recursive solution, as it's often more intuitive for tree problems.
+## Analysis of problem & input data
 
-1. Recursive Solution:
+This problem is about determining whether a binary tree is symmetric around its center, which means it's a mirror image of itself. Here are the key aspects to consider:
+
+1. Tree structure: We're dealing with a binary tree, where each node can have up to two children.
+2. Symmetry definition: For a tree to be symmetric, the left subtree should be a mirror image of the right subtree.
+3. Mirror image: Two subtrees are mirror images if:
+   - Their root values are the same
+   - The left subtree of one is a mirror of the right subtree of the other, and vice versa
+4. Input constraints:
+   - The number of nodes is between 1 and 1000
+   - Node values are integers between -100 and 100
+5. Special cases:
+   - An empty tree is considered symmetric
+   - A tree with only a root node is symmetric
+
+The key principle that makes this question relatively simple is the recursive nature of the problem. If we can determine whether two subtrees are mirrors of each other, we can apply this check recursively to solve the entire problem.
+
+## Solutions
+
+### Solution 1: Recursive Approach
 
 ```python
 from typing import Optional
@@ -15,9 +33,6 @@ class TreeNode:
 
 class Solution:
     def isSymmetric(self, root: Optional[TreeNode]) -> bool:
-        if not root:
-            return True
-
         def isMirror(left: Optional[TreeNode], right: Optional[TreeNode]) -> bool:
             # If both nodes are None, they're symmetric
             if not left and not right:
@@ -27,53 +42,28 @@ class Solution:
             if not left or not right:
                 return False
 
-            # Check if the values are the same and if subtrees are mirrors
+            # Check if the values are equal and their subtrees are mirrors
             return (left.val == right.val and
                     isMirror(left.left, right.right) and
                     isMirror(left.right, right.left))
 
-        # Start the recursion with the left and right subtrees of the root
-        return isMirror(root.left, root.right)
-
-# Test cases
-def test_symmetric_tree():
-    # Test case 1: Symmetric tree
-    root1 = TreeNode(1)
-    root1.left = TreeNode(2)
-    root1.right = TreeNode(2)
-    root1.left.left = TreeNode(3)
-    root1.left.right = TreeNode(4)
-    root1.right.left = TreeNode(4)
-    root1.right.right = TreeNode(3)
-
-    # Test case 2: Non-symmetric tree
-    root2 = TreeNode(1)
-    root2.left = TreeNode(2)
-    root2.right = TreeNode(2)
-    root2.left.right = TreeNode(3)
-    root2.right.right = TreeNode(3)
-
-    solution = Solution()
-    print("Test case 1 (Symmetric):", solution.isSymmetric(root1))  # Expected: True
-    print("Test case 2 (Non-symmetric):", solution.isSymmetric(root2))  # Expected: False
-
-test_symmetric_tree()
+        # Start the recursion from the root's left and right children
+        return isMirror(root.left, root.right) if root else True
 
 ```
 
-Explanation of the recursive solution:
+This solution uses a recursive approach to check if the tree is symmetric. Here's the breakdown:
 
-1. We define a helper function `isMirror` that takes two nodes as input.
-2. The base cases are:
-   - If both nodes are None, they're symmetric.
-   - If one node is None and the other isn't, they're not symmetric.
-3. For non-None nodes, we check if their values are equal and recursively check if their subtrees are mirrors of each other.
-4. The main `isSymmetric` function starts the recursion with the left and right subtrees of the root.
+- Time Complexity: O(n), where n is the number of nodes in the tree. We visit each node once.
+- Space Complexity: O(h) in the best case (balanced tree) and O(n) in the worst case (skewed tree), where h is the height of the tree. This space is used by the recursive call stack.
 
-Time Complexity: O(n), where n is the number of nodes in the tree. We visit each node once.
-Space Complexity: O(h) in the best and average case, where h is the height of the tree. This is due to the recursion stack. In the worst case of a skewed tree, it could be O(n).
+Intuitions and invariants:
 
-Now, let's look at an iterative solution using a queue:
+- A tree is symmetric if its left and right subtrees are mirror images of each other.
+- Two subtrees are mirror images if their root values are the same and their respective left and right subtrees are mirror images.
+- The base case is when both nodes are None (symmetric) or one is None and the other isn't (not symmetric).
+
+### Solution 2: Iterative Approach using Queue
 
 ```python
 from typing import Optional
@@ -95,156 +85,130 @@ class Solution:
         while queue:
             left, right = queue.popleft()
 
+            # If both are None, continue to next pair
             if not left and not right:
                 continue
 
-            if not left or not right:
+            # If one is None and the other isn't, or values don't match
+            if not left or not right or left.val != right.val:
                 return False
 
-            if left.val != right.val:
-                return False
-
-            # Add the outer pairs
+            # Add the outer pair
             queue.append((left.left, right.right))
-            # Add the inner pairs
+            # Add the inner pair
             queue.append((left.right, right.left))
 
         return True
+```
 
-# Test cases (same as before)
-def test_symmetric_tree():
-    # Test case 1: Symmetric tree
-    root1 = TreeNode(1)
-    root1.left = TreeNode(2)
-    root1.right = TreeNode(2)
-    root1.left.left = TreeNode(3)
-    root1.left.right = TreeNode(4)
-    root1.right.left = TreeNode(4)
-    root1.right.right = TreeNode(3)
+This solution uses an iterative approach with a queue to check if the tree is symmetric. Here's the breakdown:
 
-    # Test case 2: Non-symmetric tree
-    root2 = TreeNode(1)
-    root2.left = TreeNode(2)
-    root2.right = TreeNode(2)
-    root2.left.right = TreeNode(3)
-    root2.right.right = TreeNode(3)
+- Time Complexity: O(n), where n is the number of nodes in the tree. We visit each node once.
+- Space Complexity: O(w), where w is the maximum width of the tree. In the worst case, this could be O(n/2) for a complete binary tree at the lowest level.
 
-    solution = Solution()
-    print("Test case 1 (Symmetric):", solution.isSymmetric(root1))  # Expected: True
-    print("Test case 2 (Non-symmetric):", solution.isSymmetric(root2))  # Expected: False
+Intuitions and invariants:
 
-test_symmetric_tree()
+- We can use a queue to perform a level-order traversal, comparing pairs of nodes.
+- At each step, we compare the values of the current pair and enqueue their children in a mirrored order.
+- If at any point we find a mismatch or one node is None while the other isn't, the tree is not symmetric.
+
+## Recommendation
+
+I recommend learning and mastering the recursive solution (Solution 1) for this problem. Here's why:
+
+1. Intuitive: The recursive solution directly translates the problem's definition into code, making it easier to understand and remember.
+2. Concise: It requires less code and is more elegant.
+3. Generalizable: The concept of comparing two trees for symmetry can be applied to other tree-related problems.
+4. Interview-friendly: It's easier to write on a whiteboard and explain during an interview.
+
+However, it's also valuable to understand the iterative solution, as it demonstrates how to solve tree problems without recursion, which can be useful in scenarios where stack space is limited.
+
+## Test cases
+
+Here are some test cases to consider:
+
+1. Empty tree:
+
+   ```python
+   assert Solution().isSymmetric(None) == True
+   ```
+
+2. Single node tree:
+
+   ```python
+   assert Solution().isSymmetric(TreeNode(1)) == True
+   ```
+
+3. Symmetric tree (Example 1):
+
+   ```python
+   root = TreeNode(1)
+   root.left = TreeNode(2)
+   root.right = TreeNode(2)
+   root.left.left = TreeNode(3)
+   root.left.right = TreeNode(4)
+   root.right.left = TreeNode(4)
+   root.right.right = TreeNode(3)
+   assert Solution().isSymmetric(root) == True
+   ```
+
+4. Non-symmetric tree (Example 2):
+
+   ```python
+   root = TreeNode(1)
+   root.left = TreeNode(2)
+   root.right = TreeNode(2)
+   root.left.right = TreeNode(3)
+   root.right.right = TreeNode(3)
+   assert Solution().isSymmetric(root) == False
+   ```
+
+5. Tree with negative values:
+
+   ```python
+   root = TreeNode(1)
+   root.left = TreeNode(-2)
+   root.right = TreeNode(-2)
+   root.left.left = TreeNode(3)
+   root.right.right = TreeNode(3)
+   assert Solution().isSymmetric(root) == True
+   ```
+
+## Overview of rejected approaches
+
+1. Comparing inorder traversals:
+   One might think that if the inorder traversal of the left subtree is the reverse of the right subtree, the tree is symmetric. However, this approach fails for trees like [1,2,2,2,null,2], which would have the same inorder traversal for both subtrees ([2,2,2]) but is not symmetric.
+
+2. Comparing level-order traversals:
+   Similarly, comparing level-order traversals of left and right subtrees doesn't work because it doesn't capture the structural symmetry. For example, [1,2,2,3,4,4,3] and [1,2,2,4,3,3,4] would have the same level-order traversals but different structures.
+
+3. Using a single recursive function without pairs:
+   While it's possible to use a single recursive function that traverses the entire tree, it's more complex and less intuitive than comparing pairs of nodes. It would require keeping track of the current level and position, making the solution harder to understand and implement correctly.
+
+These approaches are rejected because they either fail to capture the full structural symmetry of the tree or unnecessarily complicate the solution.
+
+## Visualization(s)
+
+To visualize the recursive solution, we can create a simple diagram showing how the function calls are made:
+
+```mermaid
+graph TD
+    A[isSymmetric root] --> B[isMirror root.left root.right]
+    B --> C[isMirror left.left right.right]
+    B --> D[isMirror left.right right.left]
+    C --> E[isMirror left.left.left right.right.right]
+    C --> F[isMirror left.left.right right.right.left]
+    D --> G[isMirror left.right.left right.left.right]
+    D --> H[isMirror left.right.right right.left.left]
+    style A fill:#f9f,stroke:#333,stroke-width:4px
+    style B fill:#bbf,stroke:#333,stroke-width:2px
+    style C fill:#ddf,stroke:#333,stroke-width:2px
+    style D fill:#ddf,stroke:#333,stroke-width:2px
+    style E fill:#eff,stroke:#333,stroke-width:1px
+    style F fill:#eff,stroke:#333,stroke-width:1px
+    style G fill:#eff,stroke:#333,stroke-width:1px
+    style H fill:#eff,stroke:#333,stroke-width:1px
 
 ```
 
-Explanation of the iterative solution:
-
-1. We use a queue to store pairs of nodes that we need to compare.
-2. We start by adding the pair (root.left, root.right) to the queue.
-3. While the queue is not empty, we:
-   - Pop a pair of nodes from the queue.
-   - If both are None, we continue to the next pair.
-   - If one is None and the other isn't, or if their values are different, we return False.
-   - Otherwise, we add the outer and inner pairs of their children to the queue.
-4. If we've processed all pairs without returning False, the tree is symmetric.
-
-Time Complexity: O(n), where n is the number of nodes in the tree. We visit each node once.
-Space Complexity: O(w), where w is the maximum width of the tree. In the worst case, this could be O(n) for a complete binary tree.
-
-To help visualize the algorithm, let's create a simple React component that demonstrates how the iterative solution works on a symmetric tree:
-
-```tsx
-import React, { useState, useEffect } from "react";
-
-const TreeNode = ({ value, x, y, highlighted }) => (
-  <g transform={`translate(${x},${y})`}>
-    <circle r="20" fill={highlighted ? "yellow" : "white"} stroke="black" />
-    <text textAnchor="middle" dy=".3em">
-      {value}
-    </text>
-  </g>
-);
-
-const TreeEdge = ({ x1, y1, x2, y2 }) => (
-  <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="black" />
-);
-
-const SymmetricTreeVisualization = () => {
-  const [step, setStep] = useState(0);
-  const treeData = [
-    { id: 1, value: 1, x: 200, y: 50 },
-    { id: 2, value: 2, x: 100, y: 100 },
-    { id: 3, value: 2, x: 300, y: 100 },
-    { id: 4, value: 3, x: 50, y: 150 },
-    { id: 5, value: 4, x: 150, y: 150 },
-    { id: 6, value: 4, x: 250, y: 150 },
-    { id: 7, value: 3, x: 350, y: 150 },
-  ];
-
-  const edges = [
-    { from: 1, to: 2 },
-    { from: 1, to: 3 },
-    { from: 2, to: 4 },
-    { from: 2, to: 5 },
-    { from: 3, to: 6 },
-    { from: 3, to: 7 },
-  ];
-
-  const steps = [
-    [2, 3],
-    [4, 7],
-    [5, 6],
-    [4, 7],
-    [5, 6],
-  ];
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setStep((prevStep) => (prevStep + 1) % steps.length);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [step]);
-
-  return (
-    <div>
-      <svg width="400" height="200">
-        {edges.map((edge, index) => {
-          const from = treeData.find((node) => node.id === edge.from);
-          const to = treeData.find((node) => node.id === edge.to);
-          return (
-            <TreeEdge key={index} x1={from.x} y1={from.y} x2={to.x} y2={to.y} />
-          );
-        })}
-        {treeData.map((node) => (
-          <TreeNode
-            key={node.id}
-            value={node.value}
-            x={node.x}
-            y={node.y}
-            highlighted={steps[step].includes(node.id)}
-          />
-        ))}
-      </svg>
-      <p>
-        Step {step + 1}: Comparing nodes {steps[step].join(" and ")}
-      </p>
-    </div>
-  );
-};
-
-export default SymmetricTreeVisualization;
-```
-
-This visualization demonstrates how the iterative algorithm compares pairs of nodes. The yellow highlighted nodes show which pair is being compared at each step.
-
-Recommendation:
-Both the recursive and iterative solutions have their merits:
-
-1. The recursive solution is more intuitive and easier to understand at a glance. It directly mirrors the problem's recursive nature.
-2. The iterative solution can be more efficient in terms of space complexity for very deep trees, as it doesn't risk stack overflow.
-
-For interviews and general understanding, I would recommend learning the recursive solution first. It's more straightforward and often easier to come up with during an interview. However, it's valuable to understand both approaches, as the interviewer might ask for an iterative solution or discuss the trade-offs between the two.
-
-In practice, the choice between recursive and iterative solutions often depends on the specific requirements of the system you're working with (e.g., stack size limitations, performance requirements for very large trees, etc.).
-
-Would you like me to explain any part of these solutions in more detail?
+This diagram shows how the `isMirror` function is called recursively, comparing pairs of nodes from the left and right subtrees. The process continues until we reach leaf nodes or find a mismatch.
