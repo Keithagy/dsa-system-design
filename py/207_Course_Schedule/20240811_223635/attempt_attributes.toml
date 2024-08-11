@@ -1,0 +1,8 @@
+success = true
+perceived_trickiness = 2 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-11T23:04:35.590263+08:00
+attempt_end_time = 2024-08-11T23:33:35.590263+08:00
+reflections = """Still haven't mastered topological sort completely, but some improvement in the retention.
+Key thing to note with the topological sort approach:
+- in-degrees map has to contain every single node. initialize it to be a comprehensive in degree mapping!
+""" # This is multiline!
