@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 2                                   # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-11T16:36:58.220051+08:00
+attempt_end_time = 2024-08-11T16:44:58.220051+08:00
+reflections = """Practiced queue iterative BFS solution""" # This is multiline!
