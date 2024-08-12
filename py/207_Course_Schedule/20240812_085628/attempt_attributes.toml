@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 2                                                                                                            # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-12T09:00:28.113802+08:00
+attempt_end_time = 2024-08-12T08:16:28.113802+08:00
+reflections = """Practice dfs solution. Still don't entirely understand the union find approach, but i think that's fine for now""" # This is multiline!
