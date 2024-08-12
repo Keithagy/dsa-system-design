@@ -2,107 +2,221 @@
 
 ## Analysis of problem & input data
 
-This problem is a classic graph traversal problem, specifically dealing with a 2D grid. Here are the key aspects to consider:
+This problem is a classic graph traversal and connected components problem. The key characteristics and insights are:
 
-1. Grid representation: The input is a 2D binary grid where '1' represents land and '0' represents water.
-2. Connectivity: Islands are formed by connecting adjacent lands horizontally or vertically (not diagonally).
-3. Boundary condition: All edges of the grid are surrounded by water.
-4. Goal: Count the number of distinct islands.
+1. The grid represents a graph where each land cell ('1') is a node, and adjacent land cells are connected.
+2. We need to count the number of disconnected groups of land cells (islands).
+3. The problem can be solved using either Depth-First Search (DFS) or Breadth-First Search (BFS).
+4. The grid can be modified in-place to mark visited cells, which can save space.
+5. The edges of the grid are surrounded by water, simplifying boundary checks.
+6. The input is guaranteed to be a valid 2D grid with at least one cell.
 
-Key principles that make this problem approachable:
+The key principle that makes this question simple is that we can use a flood fill algorithm to mark all connected land cells as visited, and each time we start a new flood fill, we've found a new island.
 
-1. Graph exploration: Each land cell can be considered a node in a graph, with edges to its adjacent land cells.
-2. Connected components: Each island is essentially a connected component in this graph.
-3. Visited tracking: Once a land cell is visited, it doesn't need to be revisited.
-4. In-place modification: The input grid can be modified to mark visited cells, saving space.
+### Test cases
 
-This problem can be pattern-matched to:
+Here are some test cases to consider:
 
-1. Depth-First Search (DFS) on a 2D grid
-2. Breadth-First Search (BFS) on a 2D grid
-3. Union-Find (Disjoint Set) algorithm
+1. Single island:
 
-The key principle that makes this question simple is that we can "sink" (mark as visited) each land cell as we explore it, effectively removing it from future consideration and avoiding double-counting.
+   ```python
+   [["1","1","1"],
+    ["1","1","1"],
+    ["1","1","1"]]
+   ```
+
+   Expected output: 1
+
+2. No islands:
+
+   ```python
+   [["0","0","0"],
+    ["0","0","0"],
+    ["0","0","0"]]
+   ```
+
+   Expected output: 0
+
+3. Multiple small islands:
+
+   ```python
+   [["1","0","1","0","1"],
+    ["0","1","0","1","0"],
+    ["1","0","1","0","1"]]
+   ```
+
+   Expected output: 9
+
+4. Island with hole:
+
+   ```python
+   [["1","1","1"],
+    ["1","0","1"],
+    ["1","1","1"]]
+   ```
+
+   Expected output: 1
+
+5. Single cell island:
+
+   ```python
+   [["1"]]
+   ```
+
+   Expected output: 1
+
+6. Large grid with various island shapes:
+
+   ```python
+   [["1","1","0","0","0"],
+    ["1","1","0","0","0"],
+    ["0","0","1","0","0"],
+    ["0","0","0","1","1"]]
+   ```
+
+   Expected output: 3
+
+Here's the code to run these test cases:
+
+```python
+def numIslands(grid: List[List[str]]) -> int:
+    # Implementation will be added later
+    pass
+
+# Test cases
+test_cases = [
+    [["1","1","1"],
+     ["1","1","1"],
+     ["1","1","1"]],
+
+    [["0","0","0"],
+     ["0","0","0"],
+     ["0","0","0"]],
+
+    [["1","0","1","0","1"],
+     ["0","1","0","1","0"],
+     ["1","0","1","0","1"]],
+
+    [["1","1","1"],
+     ["1","0","1"],
+     ["1","1","1"]],
+
+    [["1"]],
+
+    [["1","1","0","0","0"],
+     ["1","1","0","0","0"],
+     ["0","0","1","0","0"],
+     ["0","0","0","1","1"]]
+]
+
+expected_outputs = [1, 0, 9, 1, 1, 3]
+
+for i, (test_case, expected) in enumerate(zip(test_cases, expected_outputs)):
+    result = numIslands(test_case)
+    print(f"Test case {i + 1}: {'Passed' if result == expected else 'Failed'}")
+    print(f"Expected: {expected}, Got: {result}")
+    print()
+```
 
 ## Solutions
 
-### Solution 1: Depth-First Search (DFS)
+### Overview of solution approaches
+
+#### Solutions worth learning
+
+1. Depth-First Search (DFS) with in-place modification
+2. Breadth-First Search (BFS) with in-place modification
+3. Union-Find (Disjoint Set Union)
+4. DFS with additional visited set
+5. BFS with additional visited set
+
+Count: 5 solutions
+
+#### Rejected solutions
+
+1. Brute force counting of contiguous regions without graph traversal
+2. Using a general-purpose graph library (overkill for this problem)
+3. Dynamic programming (not suitable for this type of problem)
+
+### Worthy Solutions
+
+#### 1. Depth-First Search (DFS) with in-place modification
 
 ```python
 from typing import List
 
-class Solution:
-    def numIslands(self, grid: List[List[str]]) -> int:
-        if not grid:
-            return 0
+def numIslands(grid: List[List[str]]) -> int:
+    if not grid or not grid[0]:
+        return 0
 
-        m, n = len(grid), len(grid[0])
-        islands = 0
+    m, n = len(grid), len(grid[0])
+    islands = 0
 
-        def dfs(i: int, j: int) -> None:
-            # Check if current cell is out of bounds or is water
-            if i < 0 or i >= m or j < 0 or j >= n or grid[i][j] == '0':
-                return
+    def dfs(i: int, j: int) -> None:
+        # Base case: out of bounds or water
+        if i < 0 or i >= m or j < 0 or j >= n or grid[i][j] == '0':
+            return
 
-            # Mark current land cell as visited by changing it to '0'
-            grid[i][j] = '0'
+        # Mark current cell as visited
+        grid[i][j] = '0'
 
-            # Recursively explore adjacent cells
-            dfs(i+1, j)  # down
-            dfs(i-1, j)  # up
-            dfs(i, j+1)  # right
-            dfs(i, j-1)  # left
+        # Recursively visit all adjacent cells
+        dfs(i+1, j)  # down
+        dfs(i-1, j)  # up
+        dfs(i, j+1)  # right
+        dfs(i, j-1)  # left
 
-        # Iterate through each cell in the grid
-        for i in range(m):
-            for j in range(n):
-                if grid[i][j] == '1':
-                    islands += 1  # Found a new island
-                    dfs(i, j)  # Explore and mark all connected land cells
+    for i in range(m):
+        for j in range(n):
+            if grid[i][j] == '1':
+                # Found a new island, start DFS
+                islands += 1
+                dfs(i, j)
 
-        return islands
+    return islands
 ```
 
-Time Complexity: O(m \* n), where m is the number of rows and n is the number of columns in the grid.
-Space Complexity: O(m \* n) in the worst case for the recursion stack (in case of a grid filled with lands).
+Time Complexity: O(m _n), where m is the number of rows and n is the number of columns in the grid.
+Space Complexity: O(m_ n) in the worst case for the recursion stack (in case of a grid filled with land).
 
 Intuition and invariants:
 
-- Each unvisited land cell represents a new island.
-- Once we start exploring from a land cell, we mark all connected land cells as visited.
+- Each cell is visited at most once.
+- DFS explores all connected land cells before returning.
+- Modifying the grid in-place saves space and marks visited cells.
 - The number of times we initiate DFS is equal to the number of islands.
 
-### Solution 2: Breadth-First Search (BFS)
+#### 2. Breadth-First Search (BFS) with in-place modification
 
 ```python
 from typing import List
 from collections import deque
 
-class Solution:
-    def numIslands(self, grid: List[List[str]]) -> int:
-        if not grid:
-            return 0
+def numIslands(grid: List[List[str]]) -> int:
+    if not grid or not grid[0]:
+        return 0
 
-        m, n = len(grid), len(grid[0])
-        islands = 0
+    m, n = len(grid), len(grid[0])
+    islands = 0
 
-        for i in range(m):
-            for j in range(n):
-                if grid[i][j] == '1':
-                    islands += 1  # Found a new island
-                    grid[i][j] = '0'  # Mark as visited
-                    queue = deque([(i, j)])
+    def bfs(i: int, j: int) -> None:
+        queue = deque([(i, j)])
+        while queue:
+            curr_i, curr_j = queue.popleft()
+            for di, dj in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
+                next_i, next_j = curr_i + di, curr_j + dj
+                if 0 <= next_i < m and 0 <= next_j < n and grid[next_i][next_j] == '1':
+                    grid[next_i][next_j] = '0'  # Mark as visited
+                    queue.append((next_i, next_j))
 
-                    # BFS to explore all connected land cells
-                    while queue:
-                        row, col = queue.popleft()
-                        for dr, dc in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
-                            r, c = row + dr, col + dc
-                            if 0 <= r < m and 0 <= c < n and grid[r][c] == '1':
-                                queue.append((r, c))
-                                grid[r][c] = '0'  # Mark as visited
+    for i in range(m):
+        for j in range(n):
+            if grid[i][j] == '1':
+                islands += 1
+                grid[i][j] = '0'  # Mark as visited
+                bfs(i, j)
 
-        return islands
+    return islands
 ```
 
 Time Complexity: O(m \* n)
@@ -110,11 +224,12 @@ Space Complexity: O(min(m, n)) for the queue in the worst case
 
 Intuition and invariants:
 
-- Similar to DFS, but explores land cells level by level.
-- The queue ensures we visit all adjacent land cells before moving to the next level.
-- BFS can be more efficient in terms of stack space compared to DFS for large grids.
+- BFS explores all connected land cells level by level.
+- The queue contains at most min(m, n) elements (width of the grid).
+- In-place modification marks visited cells and saves space.
+- Each cell is enqueued at most once.
 
-### Solution 3: Union-Find (Disjoint Set)
+#### 3. Union-Find (Disjoint Set Union)
 
 ```python
 from typing import List
@@ -146,276 +261,298 @@ class UnionFind:
 
         self.count -= 1  # Decrease the number of components
 
-class Solution:
-    def numIslands(self, grid: List[List[str]]) -> int:
-        if not grid:
-            return 0
+def numIslands(grid: List[List[str]]) -> int:
+    if not grid or not grid[0]:
+        return 0
 
-        m, n = len(grid), len(grid[0])
-        uf = UnionFind(m * n)
-        land_count = 0
+    m, n = len(grid), len(grid[0])
+    uf = UnionFind(m * n)
+    land_count = 0
 
-        for i in range(m):
-            for j in range(n):
-                if grid[i][j] == '1':
-                    land_count += 1
-                    if i > 0 and grid[i-1][j] == '1':
-                        uf.union(i*n + j, (i-1)*n + j)
-                    if j > 0 and grid[i][j-1] == '1':
-                        uf.union(i*n + j, i*n + (j-1))
+    for i in range(m):
+        for j in range(n):
+            if grid[i][j] == '1':
+                land_count += 1
+                for di, dj in [(1, 0), (0, 1)]:  # Only need to check right and down
+                    ni, nj = i + di, j + dj
+                    if ni < m and nj < n and grid[ni][nj] == '1':
+                        uf.union(i * n + j, ni * n + nj)
 
-        return uf.count - (m * n - land_count)
+    return land_count - (m * n - uf.count)
+
 ```
 
-Time Complexity: O(m \* n α(m \* n)), where α is the inverse Ackermann function, which grows very slowly and is effectively constant for all practical values of m and n.
-Space Complexity: O(m \* n) for the UnionFind data structure.
+Time Complexity: O(m _n_ α(m _n)), where α is the inverse Ackermann function (nearly constant in practice)
+Space Complexity: O(m_ n) for the UnionFind data structure
 
 Intuition and invariants:
 
-- Each cell is initially its own set (island).
-- We union adjacent land cells, effectively merging islands.
-- The final number of islands is the number of sets minus the number of water cells.
+- Each land cell is initially its own set (island).
+- We union adjacent land cells, reducing the number of sets.
+- The final number of islands is the number of land cells minus the number of unions performed.
+- Union-Find with path compression and union by rank provides near-constant time operations.
 
-## Recommendation
-
-For this problem, I recommend learning and implementing the DFS solution (Solution 1). Here's why:
-
-1. Simplicity: The DFS solution is the most intuitive and easiest to understand and implement.
-2. Space efficiency: It can be implemented recursively, which is clean and doesn't require explicit stack management.
-3. In-place modification: It directly modifies the input grid, saving space.
-4. Interview performance: It's quick to code in an interview setting and easy to explain.
-
-While the BFS and Union-Find solutions are also valid and have their merits, the DFS solution provides the best balance of simplicity, efficiency, and ease of explanation for this particular problem.
-
-## Test cases
+#### 4. DFS with additional visited set
 
 ```python
-def test_num_islands():
-    solution = Solution()
+from typing import List, Set, Tuple
 
-    # Test case 1: Single island
-    grid1 = [
-        ["1","1","1","1","0"],
-        ["1","1","0","1","0"],
-        ["1","1","0","0","0"],
-        ["0","0","0","0","0"]
-    ]
-    assert solution.numIslands(grid1) == 1
+def numIslands(grid: List[List[str]]) -> int:
+    if not grid or not grid[0]:
+        return 0
 
-    # Test case 2: Multiple islands
-    grid2 = [
-        ["1","1","0","0","0"],
-        ["1","1","0","0","0"],
-        ["0","0","1","0","0"],
-        ["0","0","0","1","1"]
-    ]
-    assert solution.numIslands(grid2) == 3
+    m, n = len(grid), len(grid[0])
+    visited = set()
+    islands = 0
 
-    # Test case 3: No islands
-    grid3 = [
-        ["0","0","0"],
-        ["0","0","0"],
-        ["0","0","0"]
-    ]
-    assert solution.numIslands(grid3) == 0
+    def dfs(i: int, j: int) -> None:
+        if (i, j) in visited or i < 0 or i >= m or j < 0 or j >= n or grid[i][j] == '0':
+            return
 
-    # Test case 4: All islands
-    grid4 = [
-        ["1","1","1"],
-        ["1","1","1"],
-        ["1","1","1"]
-    ]
-    assert solution.numIslands(grid4) == 1
+        visited.add((i, j))
 
-    # Test case 5: Single cell island
-    grid5 = [["1"]]
-    assert solution.numIslands(grid5) == 1
+        for di, dj in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
+            dfs(i + di, j + dj)
 
-    print("All test cases passed!")
+    for i in range(m):
+        for j in range(n):
+            if grid[i][j] == '1' and (i, j) not in visited:
+                islands += 1
+                dfs(i, j)
 
-test_num_islands()
+    return islands
 ```
 
-## Overview of rejected approaches
+Time Complexity: O(m _n)
+Space Complexity: O(m_ n) for the visited set and recursion stack
 
-1. Brute Force Counting:
+Intuition and invariants:
 
-   - Approach: Count each '1' as an island without considering connectivity.
-   - Why it's incorrect: This would count each land cell as a separate island, ignoring the fact that adjacent land cells form a single island.
+- Similar to the in-place DFS, but uses an additional set to track visited cells.
+- Preserves the original grid, which might be required in some scenarios.
+- Each cell is visited at most once.
 
-2. Flood Fill without marking visited cells:
+#### 5. BFS with additional visited set
 
-   - Approach: Explore connected land cells but don't mark them as visited.
-   - Why it's incorrect: This would lead to infinite loops or double-counting of islands, as the same land cells would be explored multiple times.
+```python
+from typing import List, Set, Tuple
+from collections import deque
 
-3. Diagonal Connectivity:
+def numIslands(grid: List[List[str]]) -> int:
+    if not grid or not grid[0]:
+        return 0
 
-   - Approach: Consider diagonally adjacent cells as part of the same island.
-   - Why it's incorrect: The problem specifically states that islands are formed by connecting adjacent lands horizontally or vertically, not diagonally.
+    m, n = len(grid), len(grid[0])
+    visited = set()
+    islands = 0
 
-4. Using a separate visited array:
+    def bfs(i: int, j: int) -> None:
+        queue = deque([(i, j)])
+        visited.add((i, j))
 
-   - Approach: Maintain a separate 2D array to keep track of visited cells instead of modifying the input grid.
-   - Why it's not recommended: While this approach is correct, it uses unnecessary extra space. Modifying the input grid (if allowed) is more space-efficient.
+        while queue:
+            curr_i, curr_j = queue.popleft()
+            for di, dj in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
+                next_i, next_j = curr_i + di, curr_j + dj
+                if (0 <= next_i < m and 0 <= next_j < n and
+                    grid[next_i][next_j] == '1' and (next_i, next_j) not in visited):
+                    visited.add((next_i, next_j))
+                    queue.append((next_i, next_j))
 
-5. Complex data structures:
-   - Approach: Using complex data structures like graphs or trees to represent the grid.
-   - Why it's not recommended: While these approaches might work, they add unnecessary complexity. The 2D grid itself is already an efficient representation for this problem.
+    for i in range(m):
+        for j in range(n):
+            if grid[i][j] == '1' and (i, j) not in visited:
+                islands += 1
+                bfs(i, j)
+
+    return islands
+```
+
+Time Complexity: O(m _n)
+Space Complexity: O(min(m, n)) for the queue and O(m_ n) for the visited set
+
+Intuition and invariants:
+
+- Similar to the in-place BFS, but uses an additional set to track visited cells.
+- Preserves the original grid, which might be required in some scenarios.
+- Each cell is visited and added to the queue at most once.
+
+### Rejected Approaches
+
+1. Brute force counting of contiguous regions without graph traversal:
+
+   - This approach would involve checking each cell and its neighbors repeatedly, leading to a time complexity worse than O(m \* n).
+   - It's more error-prone and harder to implement correctly compared to graph traversal methods.
+
+2. Using a general-purpose graph library:
+
+   - While it would work, it's overkill for this problem and would likely be less efficient in both time and space.
+   - It doesn't demonstrate understanding of the underlying algorithms as well as implementing the solution directly.
+
+3. Dynamic programming:
+   - This problem doesn't have the optimal substructure property that makes DP effective.
+   - The islands can have arbitrary shapes, making it difficult to define a meaningful DP state.
+
+### Final Recommendations
+
+The best solution to learn and implement for a technical coding interview would be the Depth-First Search (DFS) with in-place modification (Solution 1). Here's why:
+
+1. It's the most straightforward to implement and explain.
+2. It has optimal time complexity O(m _n) and space complexity O(m_ n) in the worst case, but often much better in practice.
+3. It demonstrates understanding of graph traversal algorithms.
+4. In-place modification shows awareness of space optimization.
+5. The recursive implementation is clean and easy to understand.
+
+The Breadth-First Search (BFS) solution is also worth knowing, as it can be preferred in some scenarios (e.g., when you need to find the shortest path or when the graph is very deep).
+
+The Union-Find solution, while interesting and powerful for certain graph problems, is a bit overkill for this specific problem and might be harder to implement correctly under interview pressure.
+
+Solutions using an additional visited set (4 and 5) are worth mentioning if asked about preserving the original grid, but they're not the primary recommendation due to the extra space usage.
+
+A common mistake to avoid is trying to implement a solution that doesn't use graph traversal. For example, trying to count islands by scanning the grid row by row and column by column without proper backtracking will fail for complex island shapes.
+
+Another pitfall is forgetting to mark visited cells, which can lead to infinite loops or overcounting islands. Always ensure each cell is processed only once.
 
 ## Visualization(s)
 
-To visualize the DFS process, we can create a simple animation that shows how the algorithm explores and marks islands. Here's a React component that demonstrates this:
+To visualize the DFS algorithm, we can use a simple ASCII representation of the grid and show how the algorithm progresses:
+
+```
+Initial grid:
+1 1 0
+1 0 1
+0 1 1
+
+Step 1: Start DFS at (0,0)
+X X 0  (X represents visited cells)
+X 0 1
+0 1 1
+
+Step 2: Continue DFS
+X X 0
+X 0 1
+0 1 1
+
+Step 3: Start new DFS at (1,2)
+X X 0
+X 0 X
+0 X X
+
+Final result: 2 islands found
+
+X X 0
+X 0 X
+0 X X
+
+```
+
+This ASCII visualization helps to understand how the DFS algorithm works:
+
+1. It starts at the top-left corner (0,0) and marks all connected '1's as visited (X).
+2. Once it can't find any more connected '1's, it moves to the next unvisited '1' (1,2).
+3. It marks all '1's connected to (1,2) as visited.
+4. The process ends when all cells have been checked.
+
+For a more interactive visualization, we could create a simple React component that shows the grid and allows stepping through the DFS process. Here's a basic implementation:
 
 ```tsx
-import React, { useState, useEffect } from "react";
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import React, { useState } from "react";
 
-const initialGrid = [
-  ["1", "1", "0", "0", "0"],
-  ["1", "1", "0", "0", "0"],
-  ["0", "0", "1", "0", "0"],
-  ["0", "0", "0", "1", "1"],
-];
-
-const IslandDFSVisualization = () => {
-  const [grid, setGrid] = useState(initialGrid);
+const IslandVisualization = () => {
+  const [grid, setGrid] = useState([
+    ["1", "1", "0"],
+    ["1", "0", "1"],
+    ["0", "1", "1"],
+  ]);
+  const [step, setStep] = useState(0);
   const [islandCount, setIslandCount] = useState(0);
-  const [currentStep, setCurrentStep] = useState(0);
-  const [isRunning, setIsRunning] = useState(false);
 
-  const resetGrid = () => {
-    setGrid(initialGrid.map((row) => [...row]));
-    setIslandCount(0);
-    setCurrentStep(0);
-    setIsRunning(false);
-  };
+  const steps = [
+    { row: 0, col: 0 },
+    { row: 0, col: 1 },
+    { row: 1, col: 0 },
+    { row: 1, col: 2 },
+    { row: 2, col: 1 },
+    { row: 2, col: 2 },
+  ];
 
-  const dfs = (i, j, visitedCells) => {
-    if (
-      i < 0 ||
-      i >= grid.length ||
-      j < 0 ||
-      j >= grid[0].length ||
-      grid[i][j] === "0"
-    ) {
-      return visitedCells;
-    }
-
-    visitedCells.push([i, j]);
-    grid[i][j] = "0";
-
-    dfs(i + 1, j, visitedCells);
-    dfs(i - 1, j, visitedCells);
-    dfs(i, j + 1, visitedCells);
-    dfs(i, j - 1, visitedCells);
-
-    return visitedCells;
-  };
-
-  const runDFS = () => {
-    setIsRunning(true);
-    let islands = 0;
-    const allVisitedCells = [];
-
-    for (let i = 0; i < grid.length; i++) {
-      for (let j = 0; j < grid[0].length; j++) {
-        if (grid[i][j] === "1") {
-          islands++;
-          const visitedCells = dfs(i, j, []);
-          allVisitedCells.push(...visitedCells);
+  const nextStep = () => {
+    if (step < steps.length) {
+      const newGrid = [...grid];
+      const { row, col } = steps[step];
+      if (newGrid[row][col] === "1") {
+        newGrid[row][col] = "X";
+        setGrid(newGrid);
+        if (step === 0 || step === 3) {
+          setIslandCount((prev) => prev + 1);
         }
       }
+      setStep((prev) => prev + 1);
     }
-
-    setIslandCount(islands);
-
-    let step = 0;
-    const interval = setInterval(() => {
-      if (step < allVisitedCells.length) {
-        const [i, j] = allVisitedCells[step];
-        setGrid((prevGrid) => {
-          const newGrid = prevGrid.map((row) => [...row]);
-          newGrid[i][j] = "2"; // Mark as visited
-          return newGrid;
-        });
-        setCurrentStep(step + 1);
-        step++;
-      } else {
-        clearInterval(interval);
-        setIsRunning(false);
-      }
-    }, 200);
   };
 
   return (
-    <Card>
-      <CardHeader>Number of Islands DFS Visualization</CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-5 gap-1 mb-4">
-          {grid.map((row, i) =>
-            row.map((cell, j) => (
-              <div
-                key={`${i}-${j}`}
-                className={`w-8 h-8 border ${
-                  cell === "1"
-                    ? "bg-blue-500"
-                    : cell === "2"
-                      ? "bg-red-500"
-                      : "bg-gray-200"
-                }`}
-              />
-            )),
-          )}
-        </div>
-        <div className="mb-4">
-          <p>Islands found: {islandCount}</p>
-          <p>Current step: {currentStep}</p>
-        </div>
-        <div className="flex space-x-2">
-          <Button onClick={runDFS} disabled={isRunning}>
-            Run DFS
-          </Button>
-          <Button onClick={resetGrid} disabled={isRunning}>
-            Reset
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-4">Island Count Visualization</h2>
+      <div className="grid grid-cols-3 gap-2 mb-4">
+        {grid.map((row, i) =>
+          row.map((cell, j) => (
+            <div
+              key={`${i}-${j}`}
+              className={`w-12 h-12 flex items-center justify-center border ${
+                cell === "1"
+                  ? "bg-blue-500"
+                  : cell === "X"
+                    ? "bg-red-500"
+                    : "bg-gray-200"
+              }`}
+            >
+              {cell}
+            </div>
+          )),
+        )}
+      </div>
+      <button
+        onClick={nextStep}
+        disabled={step >= steps.length}
+        className="bg-green-500 text-white px-4 py-2 rounded disabled:bg-gray-400"
+      >
+        Next Step
+      </button>
+      <p className="mt-4">Islands found: {islandCount}</p>
+      <p>
+        Step: {step} / {steps.length}
+      </p>
+    </div>
   );
 };
 
-export default IslandDFSVisualization;
+export default IslandVisualization;
 ```
 
-This visualization demonstrates how the DFS algorithm explores the grid, marking land cells as visited (red) as it goes. The blue cells represent unvisited land, and gray cells represent water. The component allows you to run the DFS algorithm step by step, showing how islands are discovered and marked.
+This React component provides an interactive visualization of the island counting process:
 
-To use this visualization:
+1. It starts with the initial grid.
+2. Each click on "Next Step" simulates a step in the DFS process.
+3. Cells are color-coded: blue for land ('1'), red for visited land ('X'), and gray for water ('0').
+4. The island count updates as new islands are discovered.
 
-1. The grid is initially displayed with land (blue) and water (gray) cells.
-2. Click "Run DFS" to start the visualization.
-3. Watch as the algorithm explores the grid, turning land cells red as they are visited.
-4. The island count and current step are updated in real-time.
-5. Once complete, you can reset the grid to its initial state and run the visualization again.
+This visualization helps to understand:
 
-This visual representation helps to understand how the DFS algorithm systematically explores connected land cells to identify and count distinct islands. It illustrates the key concepts of the algorithm:
+1. How the DFS algorithm traverses the grid.
+2. When new islands are discovered.
+3. The final count of islands.
 
-1. Starting from an unvisited land cell (blue).
-2. Exploring all connected land cells in depth-first manner.
-3. Marking visited cells (changing them to red) to avoid revisiting.
-4. Counting each disconnected group of land cells as a separate island.
+Key takeaways from this visualization:
 
-This visualization can be particularly helpful for understanding:
+1. The algorithm visits each cell exactly once.
+2. It's efficient because it marks cells as visited, preventing redundant checks.
+3. The number of times we start a new search (changing island count) equals the number of islands.
 
-1. How the algorithm avoids double-counting islands by marking visited cells.
-2. The recursive nature of DFS, as it explores all connected cells before backtracking.
-3. How the algorithm naturally handles different island shapes and sizes.
+Understanding these visualizations can help in grasping the core concepts of the problem and its solution:
 
-To further enhance understanding, we could add additional features to the visualization:
+1. Graph representation: The grid is essentially an undirected graph where each cell is a node, and adjacent land cells are connected.
+2. Connected components: Each island is a connected component in this graph.
+3. DFS/BFS traversal: These algorithms efficiently explore all cells of an island once it's discovered.
 
-1. Speed control: Allow users to adjust the speed of the visualization.
-2. Step-by-step mode: Enable users to step through the algorithm one cell at a time.
-3. Custom grid input: Allow users to create their own grid configurations.
-4. Comparison view: Show side-by-side visualizations of DFS and BFS approaches.
-
-These enhancements would provide a more interactive and comprehensive learning experience for users trying to understand the Number of Islands problem and its solutions.
+By visualizing the process, it becomes clear why graph traversal algorithms are so effective for this problem. They naturally group connected land cells into islands, which is exactly what we need to count.
