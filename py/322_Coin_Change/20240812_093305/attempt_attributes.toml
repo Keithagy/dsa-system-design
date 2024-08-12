@@ -1,0 +1,5 @@
+success = false
+perceived_trickiness = 6                                                                                                                                 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-12T09:33:05.890039+08:00
+attempt_end_time = 2024-08-12T10:01:05.890039+08:00
+reflections = """Dynamic programming... need to practice more to wrap your mind around the whole recurrence relation thing. Time to be a student here""" # This is multiline!
