@@ -2,17 +2,18 @@
 
 ## Analysis of problem & input data
 
-This problem is a classic dynamic programming question that falls under the category of "minimization problems." The key aspects to consider are:
+This problem is a classic example of the "Coin Change" problem, which is a type of dynamic programming problem. The key characteristics and insights are:
 
-1. We're dealing with a combination problem where order doesn't matter (e.g., 5+1+5 is the same as 5+5+1).
-2. We can use each coin denomination an infinite number of times.
-3. We're looking for the minimum number of coins needed.
-4. The problem has an optimal substructure: the optimal solution for a larger amount can be constructed from optimal solutions of smaller amounts.
-5. There are overlapping subproblems: we might need to calculate the minimum coins for the same amount multiple times.
+1. We're dealing with an optimization problem - finding the minimum number of coins.
+2. The problem has an optimal substructure - the solution to a larger amount can be built from solutions to smaller amounts.
+3. There are overlapping subproblems - we may need to calculate the solution for the same subamount multiple times.
+4. We have an infinite supply of each coin denomination.
+5. The order of coin selection doesn't matter - only the total count.
+6. The input constraints are relatively small, allowing for polynomial time solutions.
 
-The key principle that makes this question solvable is that we can build up the solution for larger amounts from the solutions of smaller amounts. For each amount from 1 to the target amount, we can consider using each coin denomination and choose the one that leads to the minimum number of coins.
+The key principle that makes this question approachable is that for any amount A, the minimum number of coins needed is 1 (the coin itself, if it exists in the set) plus the minimum number of coins needed for (A - coin value). This recursive relationship forms the basis of our dynamic programming approach.
 
-## Test cases
+### Test cases
 
 Here are some test cases to consider:
 
@@ -23,7 +24,7 @@ Here are some test cases to consider:
    # Expected output: 3
    ```
 
-2. No solution possible:
+2. Impossible case:
 
    ```python
    coins = [2], amount = 3
@@ -44,25 +45,32 @@ Here are some test cases to consider:
    # Expected output: 20
    ```
 
-5. Large coins with small amount:
+5. Single coin denomination:
 
    ```python
-   coins = [186, 419, 83, 408], amount = 6249
-   # Expected output: 20
+   coins = [5], amount = 15
+   # Expected output: 3
    ```
 
-6. Multiple optimal solutions:
+6. Multiple valid solutions:
 
    ```python
    coins = [1, 4, 5], amount = 8
    # Expected output: 2 (4+4 or 5+1+1+1)
    ```
 
+7. Large coin values:
+
+   ```python
+   coins = [186, 419, 83, 408], amount = 6249
+   # Expected output: 20
+   ```
+
 Here's the executable Python code for these test cases:
 
 ```python
 def coinChange(coins: List[int], amount: int) -> int:
-    # Placeholder for the actual implementation
+    # Implementation goes here
     pass
 
 # Test cases
@@ -71,14 +79,19 @@ test_cases = [
     ([2], 3),
     ([1], 0),
     ([1, 2, 5], 100),
-    ([186, 419, 83, 408], 6249),
-    ([1, 4, 5], 8)
+    ([5], 15),
+    ([1, 4, 5], 8),
+    ([186, 419, 83, 408], 6249)
 ]
 
-for i, (coins, amount) in enumerate(test_cases, 1):
+expected_outputs = [3, -1, 0, 20, 3, 2, 20]
+
+for i, (coins, amount) in enumerate(test_cases):
     result = coinChange(coins, amount)
-    print(f"Test case {i}: coins = {coins}, amount = {amount}")
-    print(f"Result: {result}\n")
+    print(f"Test case {i+1}: {'Passed' if result == expected_outputs[i] else 'Failed'}")
+    print(f"Input: coins = {coins}, amount = {amount}")
+    print(f"Output: {result}")
+    print(f"Expected: {expected_outputs[i]}\n")
 ```
 
 ## Solutions
@@ -88,16 +101,16 @@ for i, (coins, amount) in enumerate(test_cases, 1):
 #### Solutions worth learning
 
 1. Bottom-up Dynamic Programming (Tabulation)
-2. Top-down Dynamic Programming (Memoization)
+2. Top-down Dynamic Programming (Recursion with Memoization)
 3. BFS (Breadth-First Search)
 
 Count: 3 solutions
 
 #### Rejected solutions
 
-1. Greedy approach (always choose the largest coin possible)
-2. Brute force recursion without memoization
-3. Sorting the coins and using binary search
+1. Greedy Algorithm
+2. Brute Force (Recursive without memoization)
+3. Integer Linear Programming
 
 ### Worthy Solutions
 
@@ -118,10 +131,10 @@ def coinChange(coins: List[int], amount: int) -> int:
         # For each coin, check if it can contribute to current amount
         for coin in coins:
             if coin <= i:
-                # Update dp[i] with minimum of current value and 1 + dp[i - coin]
-                dp[i] = min(dp[i], 1 + dp[i - coin])
+                # Update dp[i] if using this coin leads to fewer total coins
+                dp[i] = min(dp[i], dp[i - coin] + 1)
 
-    # Return -1 if no solution, otherwise return the minimum coins for amount
+    # Return the result, or -1 if no solution found
     return dp[amount] if dp[amount] <= amount else -1
 ```
 
@@ -130,51 +143,57 @@ Space Complexity: O(amount)
 
 Intuition and invariants:
 
-- We build up solutions for smaller amounts to solve for larger amounts.
+- We build up the solution from smaller subproblems to larger ones.
 - dp[i] represents the minimum number of coins needed to make amount i.
-- The invariant is that dp[i] always contains the optimal solution for amount i.
-- We consider using each coin for each amount, ensuring we explore all possibilities.
-- By using min(), we always keep the minimum number of coins for each amount.
+- For each amount, we consider using each coin and choose the minimum.
+- The final answer is stored in dp[amount].
+- We use amount + 1 as an impossible value because we know we need at most 'amount' coins (if all coins are 1).
 
-#### 2. Top-down Dynamic Programming (Memoization)
+#### 2. Top-down Dynamic Programming (Recursion with Memoization)
 
 ```python
 from typing import List
-from functools import lru_cache
 
 def coinChange(coins: List[int], amount: int) -> int:
-    @lru_cache(None)
-    def dfs(remaining):
-        # Base case: exact amount reached
+    # Memoization dictionary to store computed results
+    memo = {}
+
+    def dp(remaining):
+        # Base cases
         if remaining == 0:
             return 0
-        # Base case: amount went below 0
         if remaining < 0:
             return float('inf')
 
-        # Try each coin and take the minimum
+        # Check if we've already computed this subproblem
+        if remaining in memo:
+            return memo[remaining]
+
+        # Compute the minimum coins needed for this amount
         min_coins = float('inf')
         for coin in coins:
-            result = dfs(remaining - coin)
+            result = dp(remaining - coin)
             if result != float('inf'):
                 min_coins = min(min_coins, result + 1)
 
+        # Memoize the result before returning
+        memo[remaining] = min_coins
         return min_coins
 
-    result = dfs(amount)
+    result = dp(amount)
     return result if result != float('inf') else -1
 ```
 
 Time Complexity: O(amount \* len(coins))
-Space Complexity: O(amount)
+Space Complexity: O(amount) for memoization and recursion stack
 
 Intuition and invariants:
 
-- We use recursion to break down the problem into smaller subproblems.
-- The memoization (@lru_cache) ensures we don't recalculate the same subproblems.
-- We explore all possible coin combinations recursively.
-- The invariant is that dfs(remaining) always returns the minimum coins needed for the remaining amount.
-- We use float('inf') to represent impossible solutions, which get filtered out.
+- We solve the problem recursively, breaking it down into smaller subproblems.
+- We use memoization to avoid redundant computations.
+- For each amount, we try all possible coins and choose the minimum.
+- We use float('inf') to represent impossible solutions.
+- The base case is when the remaining amount is 0.
 
 #### 3. BFS (Breadth-First Search)
 
@@ -194,13 +213,15 @@ def coinChange(coins: List[int], amount: int) -> int:
 
         for coin in coins:
             next_amount = current_amount + coin
+
             if next_amount == amount:
                 return coins_used + 1
+
             if next_amount < amount and next_amount not in visited:
                 visited.add(next_amount)
                 queue.append((next_amount, coins_used + 1))
 
-    return -1
+    return -1  # If we can't reach the target amount
 ```
 
 Time Complexity: O(amount \* len(coins))
@@ -208,114 +229,99 @@ Space Complexity: O(amount)
 
 Intuition and invariants:
 
-- We treat the problem as a graph, where each node is an amount and edges are coins.
-- BFS ensures we find the shortest path (minimum number of coins) first.
-- We use a queue to keep track of amounts to explore and the number of coins used.
-- The visited set prevents us from exploring the same amount multiple times.
-- The invariant is that when we reach the target amount, we've used the minimum number of coins.
+- We treat the problem as a graph where nodes are amounts and edges are coin denominations.
+- We perform a breadth-first search from 0 to the target amount.
+- The first time we reach the target amount is guaranteed to be the shortest path (minimum coins).
+- We use a visited set to avoid revisiting the same amounts.
+- Each step in the BFS represents adding one coin.
 
 ### Rejected Approaches
 
-1. Greedy Approach: Always choosing the largest coin possible doesn't work because it doesn't guarantee the optimal solution. For example, with coins [1, 3, 4] and amount 6, greedy would choose 4+1+1 (3 coins), but the optimal is 3+3 (2 coins).
+1. Greedy Algorithm:
 
-2. Brute Force Recursion without Memoization: This would work correctly but is extremely inefficient, potentially recalculating the same subproblems many times. The time complexity would be exponential.
+   - While tempting due to its simplicity, a greedy approach of always choosing the largest possible coin doesn't work for all cases.
+   - Example: coins = [1, 5, 11], amount = 15. Greedy would give 5 coins (11 + 1 + 1 + 1 + 1), but optimal is 3 coins (5 + 5 + 5).
 
-3. Sorting and Binary Search: While sorting the coins could potentially speed up some operations, it doesn't fundamentally change the problem's nature or provide a significant advantage in solving it optimally.
+2. Brute Force (Recursive without memoization):
+
+   - This approach would work correctly but is extremely inefficient.
+   - It recalculates the same subproblems multiple times, leading to exponential time complexity.
+
+3. Integer Linear Programming:
+   - While this could solve the problem, it's overkill and not typically expected in coding interviews.
+   - It requires specialized solvers and knowledge beyond standard programming techniques.
 
 ### Final Recommendations
 
-The Bottom-up Dynamic Programming (Tabulation) approach is recommended as the best solution to learn for this problem. Here's why:
+The Bottom-up Dynamic Programming (Tabulation) approach is the best one to learn and use in an interview setting. Here's why:
 
 1. It's the most efficient in terms of both time and space complexity.
-2. It's iterative, which often performs better than recursive solutions in practice.
-3. It's more intuitive to understand and explain in an interview setting.
-4. It clearly demonstrates understanding of dynamic programming principles.
+2. It's iterative, which is often easier to understand and explain than recursive solutions.
+3. It avoids the potential stack overflow issues that could occur with recursive solutions for large inputs.
+4. It's a classic example of how to apply dynamic programming, which is a crucial concept in algorithm design.
 
-The Top-down DP (Memoization) approach is also worth knowing as it can be easier to come up with initially and can be quickly optimized with memoization.
+The Top-down Dynamic Programming (Recursion with Memoization) approach is also worth knowing, as it can be more intuitive for some people and is a good way to introduce the concept of memoization.
 
-The BFS approach, while correct, is less common for this problem and might be harder to come up with or explain in an interview setting. However, it's a good demonstration of problem-solving skills if you can recognize the problem as a shortest path in a graph.
+The BFS approach, while interesting, is less common and might be harder to come up with in an interview setting. However, it's a good example of how graph algorithms can be applied to non-graph problems.
 
-The greedy approach might seem tempting due to its simplicity, but it's crucial to recognize why it fails for this problem. Being able to provide a counterexample (like the one given above) demonstrates good problem-solving skills.
-
-Remember, in an interview, it's often valuable to start with a simpler solution (even if suboptimal) and then optimize. Starting with the recursive solution and improving it to the memoized version, then recognizing how it can be transformed into the bottom-up solution, would be an excellent approach to showcase your problem-solving process.
+Avoid the greedy approach, as it's incorrect for this problem and could lead you astray in an interview. Also, avoid the brute force recursive approach without memoization, as it's inefficient and doesn't demonstrate understanding of dynamic programming concepts.
 
 ## Visualization(s)
 
-To visualize the bottom-up dynamic programming approach, let's create a simple React component that shows how the dp array is filled:
+To visualize the Bottom-up Dynamic Programming approach, let's create a simple table showing how the dp array is filled for a small example:
 
 ```tsx
-import React, { useState, useEffect } from "react";
+import React from "react";
 
 const CoinChangeVisualization = () => {
-  const [coins, setCoins] = useState([1, 2, 5]);
-  const [amount, setAmount] = useState(11);
-  const [dp, setDp] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const coins = [1, 2, 5];
+  const amount = 11;
+  const dp = Array(amount + 1).fill(amount + 1);
+  dp[0] = 0;
 
-  useEffect(() => {
-    const newDp = Array(amount + 1).fill(amount + 1);
-    newDp[0] = 0;
-    setDp(newDp);
-    setCurrentIndex(0);
-  }, [coins, amount]);
+  const steps = [];
 
-  const nextStep = () => {
-    if (currentIndex <= amount) {
-      const newDp = [...dp];
-      for (const coin of coins) {
-        if (coin <= currentIndex) {
-          newDp[currentIndex] = Math.min(
-            newDp[currentIndex],
-            1 + newDp[currentIndex - coin],
-          );
-        }
+  for (let i = 1; i <= amount; i++) {
+    for (const coin of coins) {
+      if (coin <= i) {
+        dp[i] = Math.min(dp[i], dp[i - coin] + 1);
       }
-      setDp(newDp);
-      setCurrentIndex(currentIndex + 1);
     }
-  };
+    steps.push([...dp]);
+  }
 
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">Coin Change DP Visualization</h2>
-      <div className="mb-4">
-        <span className="font-bold">Coins:</span> {coins.join(", ")}
-      </div>
-      <div className="mb-4">
-        <span className="font-bold">Target Amount:</span> {amount}
-      </div>
-      <button
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4"
-        onClick={nextStep}
-        disabled={currentIndex > amount}
-      >
-        Next Step
-      </button>
-      <div className="grid grid-cols-12 gap-2">
-        {dp.map((value, index) => (
-          <div
-            key={index}
-            className={`border p-2 text-center ${
-              index === currentIndex - 1 ? "bg-yellow-200" : ""
-            } ${index < currentIndex ? "bg-green-100" : ""}`}
-          >
-            <div className="text-sm font-bold">{index}</div>
-            <div>{value > amount ? "∞" : value}</div>
-          </div>
-        ))}
-      </div>
-      <div className="mt-4">
-        <span className="font-bold">Current Step:</span> {currentIndex}/
-        {amount + 1}
-      </div>
-      <div className="mt-2">
-        <span className="font-bold">Result:</span>{" "}
-        {currentIndex > amount
-          ? dp[amount] > amount
-            ? "No solution"
-            : dp[amount]
-          : "In progress..."}
-      </div>
+      <p className="mb-4">
+        Coins: {coins.join(", ")}, Amount: {amount}
+      </p>
+      <table className="border-collapse border border-gray-400">
+        <thead>
+          <tr>
+            <th className="border border-gray-400 px-2 py-1">Amount</th>
+            {steps[0].map((_, index) => (
+              <th key={index} className="border border-gray-400 px-2 py-1">
+                {index}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {steps.map((step, stepIndex) => (
+            <tr key={stepIndex}>
+              <td className="border border-gray-400 px-2 py-1 font-bold">
+                {stepIndex + 1}
+              </td>
+              {step.map((value, index) => (
+                <td key={index} className="border border-gray-400 px-2 py-1">
+                  {value === amount + 1 ? "∞" : value}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
@@ -323,4 +329,4 @@ const CoinChangeVisualization = () => {
 export default CoinChangeVisualization;
 ```
 
-This visualization shows how the dp array is filled step by step. Each cell represents an amount from 0 to the target amount. The value in each cell is the minimum number of coins needed to make that amount. The yellow cell indicates the current amount being processed, and green cells are amounts that have been processed. Clicking "Next Step" advances the algorithm by one step.
+This visualization shows how the dp array is filled step by step. Each row represents the state of the dp array after considering all coins for that amount. The final row shows the minimum number of coins needed for each amount from 0 to 11. The value in dp[11] (which is 3) is the final answer.
