@@ -2,256 +2,293 @@
 
 ## Analysis of problem & input data
 
-This problem presents several key characteristics that guide us towards an optimal solution:
+This problem is a classic example of a grid-based simulation with spreading effect, which can be effectively solved using a breadth-first search (BFS) approach. The key characteristics and insights of this problem are:
 
-1. Grid-based problem: The input is a 2D grid, which often suggests traversal or search algorithms.
+1. Grid representation: The problem uses a 2D grid to represent the state of oranges.
+2. Discrete time steps: The rotting process occurs in discrete time steps (minutes).
+3. 4-directional spread: Rotting spreads only in four directions (up, down, left, right).
+4. Simultaneous spread: All rotten oranges spread rot to their neighbors simultaneously.
+5. Termination conditions: The process ends when either all oranges are rotten or no more oranges can be reached.
 
-2. State propagation: The rotting process spreads from rotten oranges to fresh ones, indicating a spreading or infection-like pattern.
-
-3. Time-based progression: The question asks for the minimum time, which suggests we need to track the progression of the rotting process over time.
-
-4. 4-directional adjacency: The rotting only occurs in four directions (up, down, left, right), which limits the spreading pattern.
-
-5. Multiple starting points: There can be multiple rotten oranges at the beginning, each acting as a source of rot.
-
-6. Termination conditions: We need to either find the time when all oranges are rotten, or determine if it's impossible.
-
-7. Small grid size: The constraints (1 <= m, n <= 10) indicate that the grid is relatively small, which means computational complexity might not be a significant concern.
-
-The key principle that simplifies this question is that it's essentially a multi-source breadth-first search (BFS) problem. BFS is ideal because:
-
-- It naturally models the simultaneous spreading of rot from all sources.
-- It guarantees the shortest path (or in this case, the minimum time) to reach each cell.
-- The level-by-level expansion of BFS corresponds perfectly to the minute-by-minute progression of rot.
-
-## Solutions
-
-### Solution 1: Multi-source BFS with Queue
-
-```python
-from collections import deque
-from typing import List
-
-class Solution:
-    def orangesRotting(self, grid: List[List[int]]) -> int:
-        rows, cols = len(grid), len(grid[0])
-        queue = deque()
-        fresh_oranges = 0
-
-        # Step 1: Initialize the queue with all rotten oranges and count fresh oranges
-        for r in range(rows):
-            for c in range(cols):
-                if grid[r][c] == 2:
-                    queue.append((r, c, 0))  # (row, col, time)
-                elif grid[r][c] == 1:
-                    fresh_oranges += 1
-
-        # Step 2: Perform BFS
-        max_time = 0
-        directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]  # right, down, left, up
-
-        while queue and fresh_oranges > 0:
-            r, c, time = queue.popleft()
-            max_time = max(max_time, time)
-
-            for dr, dc in directions:
-                nr, nc = r + dr, c + dc
-                if 0 <= nr < rows and 0 <= nc < cols and grid[nr][nc] == 1:
-                    grid[nr][nc] = 2  # Mark as rotten
-                    fresh_oranges -= 1
-                    queue.append((nr, nc, time + 1))
-
-        # Step 3: Check if all oranges are rotten
-        return max_time if fresh_oranges == 0 else -1
-```
-
-#### Explanation
-
-- We use a queue to perform BFS, starting with all initially rotten oranges.
-- Each element in the queue is a tuple (row, col, time) representing the position and the time at which the orange at that position became rotten.
-- We keep track of the number of fresh oranges and decrement it as oranges rot.
-- The BFS continues until either all fresh oranges are rotten or we can't rot any more oranges.
-- The maximum time encountered during BFS is our answer, unless there are still fresh oranges left.
-
-#### Time Complexity: O(m \* n), where m and n are the dimensions of the grid
-
-- We potentially visit each cell once.
-
-#### Space Complexity: O(m \* n)
-
-- In the worst case, the queue might contain all cells of the grid.
-
-### Solution 2: In-place BFS with Queue (Space Optimized)
-
-```python
-from collections import deque
-from typing import List
-
-class Solution:
-    def orangesRotting(self, grid: List[List[int]]) -> int:
-        rows, cols = len(grid), len(grid[0])
-        queue = deque()
-        fresh_oranges = 0
-
-        # Step 1: Initialize the queue with all rotten oranges and count fresh oranges
-        for r in range(rows):
-            for c in range(cols):
-                if grid[r][c] == 2:
-                    queue.append((r, c))
-                elif grid[r][c] == 1:
-                    fresh_oranges += 1
-
-        # Step 2: Perform BFS
-        minutes = 0
-        directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]  # right, down, left, up
-
-        while queue and fresh_oranges > 0:
-            minutes += 1
-            for _ in range(len(queue)):
-                r, c = queue.popleft()
-
-                for dr, dc in directions:
-                    nr, nc = r + dr, c + dc
-                    if 0 <= nr < rows and 0 <= nc < cols and grid[nr][nc] == 1:
-                        grid[nr][nc] = 2  # Mark as rotten
-                        fresh_oranges -= 1
-                        queue.append((nr, nc))
-
-        # Step 3: Check if all oranges are rotten
-        return minutes if fresh_oranges == 0 else -1
-```
-
-#### Explanation
-
-- This solution is similar to Solution 1, but it optimizes space usage by not storing the time in the queue.
-- Instead, we process all oranges at the current time level before moving to the next minute.
-- We use the grid itself to keep track of rotten oranges, avoiding the need for an additional visited set.
-
-#### Time Complexity: O(m \* n), where m and n are the dimensions of the grid
-
-- We potentially visit each cell once.
-
-#### Space Complexity: O(min(m\*n, k)), where k is the number of rotten oranges
-
-- The queue only contains the rotten oranges at the current time level.
-
-## Recommendation
-
-I recommend learning and implementing Solution 2 (In-place BFS with Queue) for the following reasons:
-
-1. Space Efficiency: It optimizes space usage by not storing time in the queue and using the grid for marking.
-2. Time Efficiency: It maintains the optimal time complexity of O(m \* n).
-3. Simplicity: The code is straightforward and easy to understand.
-4. Practical Application: This approach can be adapted to similar problems where you need to track the spread of something through a grid over time.
-
-While Solution 1 is also correct and intuitive, Solution 2 demonstrates how to optimize space usage in BFS problems, which is a valuable skill in algorithm design.
+The key principle that makes this question conceptually simple is that BFS naturally models the simultaneous spread of rot from multiple sources, with each level of the BFS representing one time step.
 
 ## Test cases
 
+### Test cases
+
+1. Normal case (from Example 1):
+
+   ```python
+   grid1 = [[2,1,1],[1,1,0],[0,1,1]]
+   # Expected output: 4
+   ```
+
+2. Impossible case (from Example 2):
+
+   ```python
+   grid2 = [[2,1,1],[0,1,1],[1,0,1]]
+   # Expected output: -1
+   ```
+
+3. Already finished case (from Example 3):
+
+   ```python
+   grid3 = [[0,2]]
+   # Expected output: 0
+   ```
+
+4. Single fresh orange:
+
+   ```python
+   grid4 = [[1]]
+   # Expected output: -1
+   ```
+
+5. No fresh oranges:
+
+   ```python
+   grid5 = [[2,2,2],[2,2,2],[2,2,2]]
+   # Expected output: 0
+   ```
+
+6. Complex case with multiple rotten sources:
+
+   ```python
+   grid6 = [[2,1,1,1,2],[1,1,0,1,1],[0,1,1,1,0]]
+   # Expected output: 2
+   ```
+
+### Executable Python code for tests
+
 ```python
-def test_oranges_rotting():
-    solution = Solution()
+def orangesRotting(grid: List[List[int]]) -> int:
+    # Implementation goes here
+    pass
 
-    # Test case 1: Normal case
-    assert solution.orangesRotting([[2,1,1],[1,1,0],[0,1,1]]) == 4
+# Test cases
+test_cases = [
+    ([[2,1,1],[1,1,0],[0,1,1]], 4),
+    ([[2,1,1],[0,1,1],[1,0,1]], -1),
+    ([[0,2]], 0),
+    ([[1]], -1),
+    ([[2,2,2],[2,2,2],[2,2,2]], 0),
+    ([[2,1,1,1,2],[1,1,0,1,1],[0,1,1,1,0]], 2)
+]
 
-    # Test case 2: Impossible case
-    assert solution.orangesRotting([[2,1,1],[0,1,1],[1,0,1]]) == -1
-
-    # Test case 3: Already all rotten
-    assert solution.orangesRotting([[0,2]]) == 0
-
-    # Test case 4: Empty grid
-    assert solution.orangesRotting([[]]) == 0
-
-    # Test case 5: No fresh oranges
-    assert solution.orangesRotting([[0,2,2],[0,2,2],[0,2,2]]) == 0
-
-    # Test case 6: All fresh oranges
-    assert solution.orangesRotting([[1,1,1],[1,1,1],[1,1,1]]) == -1
-
-    # Test case 7: Complex case
-    assert solution.orangesRotting([[2,1,1],[1,1,1],[0,1,2]]) == 2
-
-    print("All test cases passed!")
-
-test_oranges_rotting()
+for i, (grid, expected) in enumerate(test_cases):
+    result = orangesRotting(grid)
+    print(f"Test case {i+1}: {'Passed' if result == expected else 'Failed'}")
+    if result != expected:
+        print(f"  Expected: {expected}")
+        print(f"  Got: {result}")
 ```
 
-## Overview of rejected approaches
+## Solutions
 
-1. Depth-First Search (DFS):
+### Overview of solution approaches
 
-   - While DFS could potentially solve this problem, it's not optimal because it doesn't naturally model the simultaneous spreading of rot from multiple sources.
-   - DFS would also make it harder to keep track of the minimum time, as it explores paths to their full depth before backtracking.
+#### Solutions worth learning
 
-2. Brute Force Simulation:
+1. BFS with queue (optimal)
+2. DFS with recursion
+3. In-place BFS simulation
 
-   - An approach that simulates the rotting process minute by minute, checking all cells in each iteration, would work but would be less efficient.
-   - Time complexity would be O((m\*n)^2) in the worst case, which is not optimal.
+Count: 3 solutions
 
-3. Union-Find:
+#### Rejected solutions
 
-   - While Union-Find is great for connected components problems, it doesn't naturally handle the time progression aspect of this problem.
-   - It would be challenging to determine the minimum time using Union-Find alone.
+1. Brute force simulation
+2. Dijkstra's algorithm
+3. Union-Find
 
-4. Dynamic Programming:
-   - DP is typically used when we have overlapping subproblems and optimal substructure, which isn't the case here.
-   - The rotting process depends on the current state of neighboring cells, making it difficult to formulate a DP solution.
+### Worthy Solutions
 
-These approaches are either incorrect for this specific problem or significantly less efficient than the BFS approach, which is why they are not recommended.
-
-## Visualization(s)
-
-To visualize the BFS process, we can create a simple animation using ASCII characters. Here's a function that can be added to the Solution class to print the grid state at each minute:
+#### 1. BFS with queue (optimal)
 
 ```python
-def visualize_rotting_process(self, grid: List[List[int]]) -> None:
-    original_grid = [row[:] for row in grid]
+from collections import deque
+from typing import List
+
+def orangesRotting(grid: List[List[int]]) -> int:
     rows, cols = len(grid), len(grid[0])
     queue = deque()
     fresh_oranges = 0
 
+    # Initialize queue with rotten oranges and count fresh oranges
     for r in range(rows):
         for c in range(cols):
             if grid[r][c] == 2:
-                queue.append((r, c))
+                queue.append((r, c, 0))  # (row, col, time)
             elif grid[r][c] == 1:
                 fresh_oranges += 1
 
-    directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
-    minutes = 0
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # up, down, left, right
+    max_time = 0
 
-    print(f"Initial state (Minute 0):")
-    self.print_grid(grid)
-
+    # BFS
     while queue and fresh_oranges > 0:
-        minutes += 1
-        for _ in range(len(queue)):
-            r, c = queue.popleft()
-            for dr, dc in directions:
+        r, c, time = queue.popleft()
+        max_time = max(max_time, time)
+
+        for dr, dc in directions:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < rows and 0 <= nc < cols and grid[nr][nc] == 1:
+                grid[nr][nc] = 2  # Mark as rotten
+                fresh_oranges -= 1
+                queue.append((nr, nc, time + 1))
+
+    return max_time if fresh_oranges == 0 else -1
+```
+
+Time Complexity: O(m \* n), where m is the number of rows and n is the number of columns in the grid.
+Space Complexity: O(m \* n) in the worst case when all oranges are rotten.
+
+Intuition and invariants:
+
+- BFS naturally models the simultaneous spread of rot.
+- The queue stores the coordinates of rotten oranges and the time they became rotten.
+- We process all oranges that rot at the same time before moving to the next time step.
+- The maximum time in the queue represents the total time for the process.
+- Keeping track of fresh oranges allows early termination and detection of impossible cases.
+
+#### 2. DFS with recursion
+
+```python
+from typing import List
+
+def orangesRotting(grid: List[List[int]]) -> int:
+    rows, cols = len(grid), len(grid[0])
+    fresh_oranges = 0
+    max_time = 0
+
+    def dfs(r: int, c: int, time: int) -> None:
+        nonlocal fresh_oranges, max_time
+        if r < 0 or r >= rows or c < 0 or c >= cols or grid[r][c] != 1:
+            return
+
+        grid[r][c] = 2  # Mark as rotten
+        fresh_oranges -= 1
+        max_time = max(max_time, time)
+
+        # Spread to neighbors
+        for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+            dfs(r + dr, c + dc, time + 1)
+
+    # Count fresh oranges and start DFS from rotten oranges
+    for r in range(rows):
+        for c in range(cols):
+            if grid[r][c] == 1:
+                fresh_oranges += 1
+            elif grid[r][c] == 2:
+                grid[r][c] = 0  # Mark as visited
+                dfs(r, c, 0)
+
+    return max_time if fresh_oranges == 0 else -1
+```
+
+Time Complexity: O(m \* n), where m is the number of rows and n is the number of columns in the grid.
+Space Complexity: O(m \* n) in the worst case due to recursive call stack.
+
+Intuition and invariants:
+
+- DFS simulates the spread of rot from each rotten orange.
+- We keep track of the maximum time reached during DFS.
+- The recursive nature of DFS models the spread of rot over time.
+- We need to manually ensure all rotten oranges are processed as starting points.
+
+#### 3. In-place BFS simulation
+
+```python
+from typing import List
+
+def orangesRotting(grid: List[List[int]]) -> int:
+    rows, cols = len(grid), len(grid[0])
+    fresh_oranges = 0
+    rotten = set()
+
+    # Initialize rotten set and count fresh oranges
+    for r in range(rows):
+        for c in range(cols):
+            if grid[r][c] == 2:
+                rotten.add((r, c))
+            elif grid[r][c] == 1:
+                fresh_oranges += 1
+
+    minutes = 0
+    while rotten and fresh_oranges > 0:
+        new_rotten = set()
+        for r, c in rotten:
+            for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                 nr, nc = r + dr, c + dc
                 if 0 <= nr < rows and 0 <= nc < cols and grid[nr][nc] == 1:
                     grid[nr][nc] = 2
                     fresh_oranges -= 1
-                    queue.append((nr, nc))
+                    new_rotten.add((nr, nc))
+        rotten = new_rotten
+        minutes += 1 if new_rotten else 0
 
-        print(f"\nAfter Minute {minutes}:")
-        self.print_grid(grid)
-
-    if fresh_oranges > 0:
-        print("\nImpossible to rot all oranges!")
-    else:
-        print(f"\nAll oranges rotted in {minutes} minutes!")
-
-def print_grid(self, grid: List[List[int]]) -> None:
-    for row in grid:
-        print(" ".join(["🟩" if cell == 0 else "🍊" if cell == 1 else "🦠" for cell in row]))
-
-# Usage:
-solution = Solution()
-grid = [[2,1,1],[1,1,0],[0,1,1]]
-solution.visualize_rotting_process(grid)
+    return minutes if fresh_oranges == 0 else -1
 ```
 
-This visualization will print the state of the grid at each minute, using emojis to represent empty cells (🟩), fresh oranges (🍊), and rotten oranges (🦠). This helps in understanding how the rotting process spreads over time.
+Time Complexity: O(m \* n), where m is the number of rows and n is the number of columns in the grid.
+Space Complexity: O(m \* n) in the worst case when all oranges are rotten.
+
+Intuition and invariants:
+
+- This approach simulates BFS without using a queue.
+- We use sets to keep track of rotten oranges at each time step.
+- The grid is modified in-place to mark oranges as they rot.
+- Each iteration of the outer while loop represents one minute.
+
+### Rejected Approaches
+
+1. Brute force simulation: Repeatedly scanning the entire grid to spread rot would be inefficient, with a time complexity of O((m \* n)^2) in the worst case.
+
+2. Dijkstra's algorithm: While it could work, it's overkill for this problem as all edges (connections between adjacent cells) have the same weight of 1. BFS is more efficient for uniform-weight graphs.
+
+3. Union-Find: This data structure is typically used for disjoint set problems and doesn't naturally model the time-based spread of rot.
+
+### Final Recommendations
+
+The BFS with queue approach is the most recommended solution for this problem. It naturally models the simultaneous spread of rot from multiple sources, with each level of the BFS representing one time step. It's intuitive, efficient, and directly maps to the problem statement.
+
+The DFS approach, while correct, is less intuitive for this problem because it doesn't naturally represent the simultaneous spread from all rotten oranges. It could be confusing in an interview setting.
+
+The in-place BFS simulation is a space-optimized version of BFS, but it modifies the input grid, which might not be desirable in all scenarios.
+
+Approaches like brute force simulation or using more complex algorithms like Dijkstra's are either inefficient or unnecessary for this specific problem.
+
+## Visualization(s)
+
+To visualize the BFS approach, we can use a simple ASCII representation of the grid at each time step. Here's a visualization of the process for the grid in Example 1:
+
+```
+Initial state:
+2 1 1
+1 1 0
+0 1 1
+
+After 1 minute:
+2 2 1
+2 1 0
+0 1 1
+
+After 2 minutes:
+2 2 2
+2 2 0
+0 1 1
+
+After 3 minutes:
+2 2 2
+2 2 0
+0 2 1
+
+After 4 minutes:
+2 2 2
+2 2 0
+0 2 2
+
+Process complete in 4 minutes.
+```
+
+This visualization helps to understand how the rot spreads over time, always to adjacent fresh oranges in the four cardinal directions.
