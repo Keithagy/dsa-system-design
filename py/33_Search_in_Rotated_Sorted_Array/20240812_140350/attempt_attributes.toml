@@ -1,0 +1,7 @@
+success = false
+perceived_trickiness = 5 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-12T14:03:50.690376+08:00
+attempt_end_time = 2024-08-12T14:15:50.690376+08:00
+reflections = """I was on the wrong track to begin with my trying to back out the pivot.
+I guess I should have discounted the back-out-pivot approach upon realizing that there are k possible pivots to try, and that would up the runtime to k log n
+Another way to have done this could have been: I know I need to halve the problem space each iteration, so what if i just half the space anyway and see how i can connect from here to there?""" # This is multiline!
