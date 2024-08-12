@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 3                                                                                                                                        # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-12T22:54:03.231334+08:00
+attempt_end_time = 2024-08-12T23:04:03.231334+08:00
+reflections = """I was able to think through it this time... binary search is about closing the search window (min to max of search space) around the target""" # This is multiline!
