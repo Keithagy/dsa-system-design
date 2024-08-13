@@ -1,0 +1,9 @@
+success = true
+perceived_trickiness = 6 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-13T12:23:22.537144+08:00
+attempt_end_time = 2024-08-13T13:05:22.537144+08:00
+reflections = """bottom up DP is a bit trickier:
+Only append new combinations if the new candidate is greater than or equal to the last element in the existing combination. Else, you end up retreading solutions you would have covered in earlier subtargets. This works because you consider candidates in ascending order.
+
+But it's just easier to range over candidates first,
+""" # This is multiline!
