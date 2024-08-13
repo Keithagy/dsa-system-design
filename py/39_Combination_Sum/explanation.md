@@ -2,19 +2,21 @@
 
 ## Analysis of problem & input data
 
-This problem is a classic backtracking problem with several key characteristics:
+This problem is a classic example of a combination search problem with the following key characteristics:
 
-1. **Distinct integers**: The input array `candidates` contains distinct integers, which simplifies our solution as we don't need to handle duplicates in the input.
+1. Unbounded Knapsack-like problem: We can use each number in the candidates array an unlimited number of times.
+2. Distinct integers: All elements in the candidates array are unique.
+3. Sum to target: We need to find all combinations that sum up exactly to the target.
+4. Unique combinations: The output should not contain duplicate combinations.
+5. Order doesn't matter: We can return the combinations in any order.
 
-2. **Unlimited use of numbers**: We can use the same number from `candidates` an unlimited number of times. This is crucial for our approach, as it allows us to consider the same number multiple times in our combinations.
+Key principles that make this problem solvable:
 
-3. **Target sum**: We need to find all unique combinations that sum up to the target. This suggests a sum-based approach where we keep track of the current sum as we build our combinations.
+1. Recursive nature: We can build combinations by repeatedly choosing or not choosing each candidate.
+2. Backtracking: We can use backtracking to explore all possible combinations efficiently.
+3. Sorting can optimize: Although not necessary, sorting the candidates can help prune the search space early.
 
-4. **Unique combinations**: The order of numbers within a combination doesn't matter, but the frequency of numbers does. This hints at using a sorted approach to avoid duplicates.
-
-5. **Constraints**: The constraints are relatively small (candidates.length <= 30, target <= 40), which suggests that a backtracking solution would be efficient enough.
-
-The key principle that makes this question approachable is that we can build our solution incrementally, making choices at each step whether to include a number or not, and backtrack when we exceed the target sum.
+The constraints (1 <= candidates.length <= 30, 2 <= candidates[i] <= 40, 1 <= target <= 40) suggest that a brute force approach might be feasible, but more efficient solutions exist.
 
 ### Test cases
 
@@ -44,7 +46,7 @@ Here are some test cases to consider:
    # Expected output: []
    ```
 
-4. All numbers can be used:
+4. All candidates can be used:
 
    ```python
    candidates = [1, 2, 3]
@@ -52,35 +54,35 @@ Here are some test cases to consider:
    # Expected output: [[1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 2], [1, 1, 2, 2], [1, 2, 3], [2, 2, 2], [3, 3]]
    ```
 
-5. Large numbers:
+5. Large target, small candidates:
 
    ```python
-   candidates = [8, 10, 15, 20]
-   target = 40
-   # Expected output: [[8, 8, 8, 8, 8], [8, 8, 8, 16], [8, 16, 16], [10, 10, 10, 10], [10, 10, 20], [10, 15, 15], [20, 20]]
+   candidates = [2, 3]
+   target = 20
+   # Expected output: [[2, 2, 2, 2, 2, 2, 2, 2, 2, 2], [2, 2, 2, 2, 2, 2, 2, 3, 3], [2, 2, 2, 2, 3, 3, 3, 3], [2, 2, 3, 3, 3, 3, 3, 3], [3, 3, 3, 3, 3, 3, 3, 3]]
    ```
 
 Here's the executable Python code for these test cases:
 
 ```python
-def combinationSum(candidates: List[int], target: int) -> List[List[int]]:
-    # Implementation goes here
+def combination_sum(candidates, target):
+    # Implementation will be added later
     pass
 
-# Test cases
 test_cases = [
     ([2, 3, 6, 7], 7),
     ([2, 3, 5], 8),
     ([2], 1),
     ([1, 2, 3], 6),
-    ([8, 10, 15, 20], 40)
+    ([2, 3], 20)
 ]
 
 for i, (candidates, target) in enumerate(test_cases, 1):
-    result = combinationSum(candidates, target)
     print(f"Test case {i}:")
-    print(f"Input: candidates = {candidates}, target = {target}")
-    print(f"Output: {result}")
+    print(f"Candidates: {candidates}")
+    print(f"Target: {target}")
+    result = combination_sum(candidates, target)
+    print(f"Result: {result}")
     print()
 ```
 
@@ -90,170 +92,163 @@ for i, (candidates, target) in enumerate(test_cases, 1):
 
 #### Solutions worth learning
 
-1. Backtracking with sorting (most optimal and elegant)
-2. Dynamic Programming (bottom-up)
-3. Dynamic Programming (top-down with memoization)
+1. Backtracking (DFS) with sorting
+2. Dynamic Programming (Bottom-up)
+3. Dynamic Programming (Top-down with memoization)
 
 Count: 3 solutions
 
 #### Rejected solutions
 
 1. Brute Force (generating all possible combinations)
-2. Greedy Approach (always choosing the largest possible candidate)
+2. BFS (Breadth-First Search)
+3. Bitmask approach
 
 ### Worthy Solutions
 
-#### 1. Backtracking with sorting
+#### 1. Backtracking (DFS) with sorting
 
 ```python
 from typing import List
 
-def combinationSum(candidates: List[int], target: int) -> List[List[int]]:
+def combination_sum(candidates: List[int], target: int) -> List[List[int]]:
     def backtrack(start: int, target: int, path: List[int]):
         if target == 0:
             # We've found a valid combination
             result.append(path[:])
             return
         if target < 0:
-            # Our sum has exceeded the target, so we backtrack
+            # Our combination exceeds the target, so we stop exploring this path
             return
 
         for i in range(start, len(candidates)):
-            # We include candidates[i] in our path
-            path.append(candidates[i])
-            # We continue to use candidates[i] and onwards (hence i, not i+1)
-            backtrack(i, target - candidates[i], path)
-            # We backtrack by removing candidates[i] from our path
-            path.pop()
+            # We can use the same number multiple times, so we don't increment 'i'
+            # We reduce the target by the current candidate
+            backtrack(i, target - candidates[i], path + [candidates[i]])
 
+    candidates.sort()  # Sorting helps to prune the search space
     result = []
-    candidates.sort()  # Sort to handle candidates in ascending order
     backtrack(0, target, [])
     return result
 ```
 
-Time Complexity: O(2^n), where n is the number of candidates. In the worst case, each candidate can be either included or excluded.
-Space Complexity: O(target/min(candidates)), which is the maximum depth of the recursion tree.
+Time Complexity: O(2^target), where target is the target sum. In the worst case, we have a candidate of 1 and we need to generate all combinations.
+Space Complexity: O(target/min(candidates)) for the recursion stack.
 
-Key intuitions and invariants:
+Intuitions and invariants:
 
-- Sorting the candidates allows us to handle them in ascending order, which helps in pruning the search space.
-- The backtracking approach builds the solution incrementally, exploring all possible combinations.
-- We can reuse the same number multiple times, so we pass `i` instead of `i+1` in the recursive call.
-- The base cases (target == 0 and target < 0) help us identify valid combinations and when to stop exploring.
+- Sorting the candidates allows us to break early if a candidate is larger than the remaining target.
+- We can reuse the same number, so we don't increment the start index in the recursive call.
+- The path parameter keeps track of the current combination being built.
+- We use backtracking to explore all possible combinations efficiently.
 
-#### 2. Dynamic Programming (bottom-up)
+#### 2. Dynamic Programming (Bottom-up)
 
 ```python
 from typing import List
 
-def combinationSum(candidates: List[int], target: int) -> List[List[int]]:
-    # Initialize dp table: dp[i] will store all combinations that sum up to i
+def combination_sum(candidates: List[int], target: int) -> List[List[int]]:
+    # dp[i] will store all combinations that sum up to i
     dp = [[] for _ in range(target + 1)]
 
-    # Sort candidates to ensure we build solutions in order
-    candidates.sort()
-
-    for i in range(1, target + 1):
-        for num in candidates:
-            # If the current number is too large, break the loop
-            if num > i:
-                break
-
-            # If the current number equals i, it forms a combination by itself
-            if num == i:
-                dp[i].append([num])
-            else:
-                # Combine current number with all combinations that sum up to i-num
-                for comb in dp[i - num]:
-                    # Only add combinations where num is not smaller than the last element
-                    # This ensures we don't generate duplicate combinations
-                    if not comb or num >= comb[-1]:
-                        dp[i].append(comb + [num])
+    for c in candidates:
+        for i in range(c, target + 1):
+            # If i == c, we can form a combination with just this candidate
+            if i == c:
+                dp[i].append([c])
+            # For i > c, we can append this candidate to all combinations that sum up to i-c
+            for comb in dp[i - c]:
+                dp[i].append(comb + [c])
 
     return dp[target]
 ```
 
-Time Complexity: O(target \* len(candidates) \* x), where x is the average length of combinations.
-Space Complexity: O(target \* y), where y is the total number of combinations.
+Time Complexity: O(target _len(candidates)_ average_combination_length)
+Space Complexity: O(target \* number_of_combinations)
 
-Key intuitions and invariants:
+Intuitions and invariants:
 
-- We build solutions for smaller targets and use them to construct solutions for larger targets.
-- By sorting candidates, we can ensure we don't generate duplicate combinations.
-- The condition `num >= comb[-1]` helps maintain the order and avoid duplicates.
+- We build up solutions for smaller targets to construct solutions for larger targets.
+- For each candidate and each possible sum, we consider whether adding this candidate can form new combinations.
+- The final answer is stored in dp[target].
 
-#### 3. Dynamic Programming (top-down with memoization)
+#### 3. Dynamic Programming (Top-down with memoization)
 
 ```python
-from typing import List, Tuple
-from functools import lru_cache
+from typing import List, Dict, Tuple
 
-def combinationSum(candidates: List[int], target: int) -> List[List[int]]:
-    candidates.sort()  # Sort candidates to ensure order
+def combination_sum(candidates: List[int], target: int) -> List[List[int]]:
+    memo: Dict[Tuple[int, int], List[List[int]]] = {}
 
-    @lru_cache(maxsize=None)
-    def dp(target: int, index: int) -> List[Tuple[int, ...]]:
+    def dfs(start: int, target: int) -> List[List[int]]:
         if target == 0:
-            return [()]
-        if target < 0 or index == len(candidates):
+            return [[]]
+        if start == len(candidates) or target < 0:
             return []
 
-        # Don't include the current candidate
-        result = dp(target, index + 1)
+        if (start, target) in memo:
+            return memo[(start, target)]
+
+        result = []
 
         # Include the current candidate
-        with_current = dp(target - candidates[index], index)
-        result += tuple((candidates[index],) + comb for comb in with_current)
+        for comb in dfs(start, target - candidates[start]):
+            result.append([candidates[start]] + comb)
 
+        # Exclude the current candidate
+        result.extend(dfs(start + 1, target))
+
+        memo[(start, target)] = result
         return result
 
-    # Convert tuples back to lists
-    return [list(comb) for comb in dp(target, 0)]
+    return dfs(0, target)
 ```
 
-Time Complexity: O(2^n), where n is the number of candidates. However, memoization can significantly reduce this in practice.
-Space Complexity: O(target \* len(candidates)) for the memoization cache.
+Time Complexity: O(2^N _T), where N is the number of candidates and T is the target.
+Space Complexity: O(N_ T) for the memoization dictionary and recursion stack.
 
-Key intuitions and invariants:
+Intuitions and invariants:
 
-- We use memoization to avoid recomputing subproblems.
-- The recursive structure allows us to make decisions about including or excluding each candidate.
-- Sorting candidates helps maintain order and avoid duplicate combinations.
+- We use memoization to avoid redundant computations.
+- At each step, we have two choices: include the current candidate or exclude it.
+- The base cases are when we reach the target (return an empty combination) or when we've exhausted all candidates or exceeded the target (return no combinations).
 
 ### Rejected Approaches
 
-1. Brute Force: Generating all possible combinations and checking their sum would be inefficient, with a time complexity of O(2^n \* n), where n is the length of candidates.
+1. Brute Force: Generating all possible combinations would be extremely inefficient, with a time complexity of O(2^N \* N), where N is the length of candidates.
 
-2. Greedy Approach: Always choosing the largest possible candidate might seem intuitive, but it doesn't guarantee finding all valid combinations. For example, with candidates [2, 3, 6, 7] and target 7, a greedy approach might only find [7] and miss [2, 2, 3].
+2. BFS (Breadth-First Search): While BFS could work, it would be less efficient than DFS for this problem. BFS would require more memory to store all partial combinations at each level.
+
+3. Bitmask approach: This would not work efficiently because we can use each number multiple times, which is not easily representable with bitmasks.
 
 ### Final Recommendations
 
-The backtracking solution (Solution 1) is the most recommended approach for this problem in an interview setting. Here's why:
+The backtracking (DFS) approach with sorting is the recommended solution for this problem in an interview setting. It's intuitive, efficient, and demonstrates a good understanding of recursion and backtracking.
 
-1. It's intuitive and directly solves the problem without requiring extra space beyond the recursion stack.
-2. It's efficient, especially when combined with sorting to prune the search space.
-3. It demonstrates a good understanding of recursion and backtracking, which are important concepts in coding interviews.
-4. It's relatively easy to explain and implement compared to the dynamic programming solutions.
+The dynamic programming solutions, while interesting, are generally overkill for this problem and may be harder to come up with and implement correctly under interview pressure.
 
-The dynamic programming solutions, while interesting, are more complex and might be overkill for this specific problem. They're worth knowing but might be harder to come up with and explain in an interview setting.
+The key insights to communicate are:
 
-A common mistake to avoid is trying to use a greedy approach, which won't work for all cases. Another pitfall is forgetting to handle the case where the same number can be used multiple times, which is a key aspect of this problem.
+1. The ability to reuse numbers leads to a recursive/backtracking approach.
+2. Sorting can optimize the search process.
+3. Building combinations incrementally allows us to stop early when we exceed the target.
+
+Remember to discuss the time and space complexity, and be prepared to optimize the solution (e.g., by sorting the candidates to enable early termination).
 
 ## Visualization(s)
 
-To visualize the backtracking process, let's consider a simple example with candidates [2, 3, 6, 7] and target 7. Here's a tree representation of the backtracking process:
+To visualize the backtracking process, we can use a tree structure:
 
 ```
-                    []
-                /   |   \   \
-               2    3    6   7
-             / | \  |
-            2  3 6  3
-           /
-          2
-         /
-        1 (backtrack)
+                   []
+                 /  |  \
+               [2] [3] [6] [7]
+              /  |  \
+          [2,2][2,3][2,6][2,7]
+           /   |
+      [2,2,2][2,2,3]
+       /
+  [2,2,2,2]
 ```
 
-This tree shows how the algorithm explores different combinations. When it reaches a sum of 7 ([2,2,3] or [7]), it adds that combination to the result. When it exceeds 7, it backtracks. The sorting of candidates helps prune branches early (e.g., after trying 6, we don't need to try 7 in that branch).
+This tree represents the exploration process for the input `[2,3,6,7]` with target 7. Each node represents a partial combination, and we explore deeper until we either reach the target or exceed it.
