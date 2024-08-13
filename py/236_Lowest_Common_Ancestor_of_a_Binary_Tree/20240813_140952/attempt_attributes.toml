@@ -1,0 +1,6 @@
+success = true
+perceived_trickiness = 3 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-13T14:15:52.1608+08:00
+attempt_end_time = 2024-08-13T14:40:52.1608+08:00
+reflections = """tree search usuing a global variable to track state.
+Bubbling-up approach mentioned in explanation is worth learning!""" # This is multiline!
