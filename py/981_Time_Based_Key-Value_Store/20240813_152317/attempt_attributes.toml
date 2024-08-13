@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 4                                                     # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-13T15:23:17.245623+08:00
+attempt_end_time = 2024-08-13T15:59:17.245623+08:00
+reflections = """Need to look at example implelentation for binary search""" # This is multiline!
