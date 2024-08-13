@@ -1,0 +1,6 @@
+success = true
+perceived_trickiness = 4 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-13T13:10:31.058513+08:00
+attempt_end_time = 2024-08-13T13:32:31.058513+08:00
+reflections = """Recursively building the answer >> backtracking (not DP because no same-structure subproblem to leverage)
+Can use range-based swapping to manipulate nums in place, copying out solutions only, to reduce memory use from n*n! to n""" # This is multiline!
