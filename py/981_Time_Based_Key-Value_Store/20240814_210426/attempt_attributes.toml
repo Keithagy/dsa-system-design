@@ -1,0 +1,13 @@
+success = true
+perceived_trickiness = 3 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-14T21:04:26.122873+08:00
+attempt_end_time = 2024-08-14T21:19:26.122873+08:00
+reflections = """I was able to correctly modify the binary search template to get the correct answer.
+Remember:
+In the template, left and right are the minimum + maximum allowed values of the index respectively.
+In other words, you can allow the index to shoot well beyond valid indices for the list, if you're prepared (or need to) handle it in the return value, e.g. because you need to calculate an offset.
+
+After the loop ends, left will be the smallest k such that predicate(k) is true. Do with that what you need to.
+
+If the predicate is true, then you want to test if a smaller k exists for which the predicate is true. So, you move right to k.
+""" # This is multiline!
