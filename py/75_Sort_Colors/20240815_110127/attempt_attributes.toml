@@ -1,0 +1,10 @@
+success = true
+perceived_trickiness = 3 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-15T11:01:27.927461+08:00
+attempt_end_time = 2024-08-15T11:33:27.927461+08:00
+reflections = """Time to strengthen knowledge of sorting algorithms. Learn:
+- Mergesort
+- Bubblesort (just remember you are looking ahead one)
+- Quicksort allocating (simple and fast to write if allocations allowed)
+- Quicksort in-place (this should be your bread and butter)
+- Counting sort (easy O(n) sort if allocations are allowed)""" # This is multiline!
