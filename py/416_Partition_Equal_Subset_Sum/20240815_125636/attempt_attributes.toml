@@ -1,0 +1,33 @@
+success = false
+perceived_trickiness = 6 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-15T12:56:36.742388+08:00
+attempt_end_time = 2024-08-15T12:06:36.742388+08:00
+reflections = """I thought I knew but i was tricked
+Solution centers around dynamic programming to answer the following question:
+In order for these subset arrays to exist, I need to be able to make HALF the sum of the array, with some of its elements.
+Then, it is implied that with the remainder of the elements, I can also make half the sum of the array (call this the target sum).
+
+Suppose you have coins 1,5,11.
+If you can make 12 with those coins, then you can make 16 with 1,5,11,4.
+
+You can only make 0 with no coins.
+You can only make 5 with one coin of 5.
+  You know this by asking the question "Can I make k with coin 5" for `0..k..16`.
+  You can answer this question considering if you can make 0 with no coins.
+You can make 0,2,5,7 with coins 5,2.
+  You know this by asking the same question for all k, of coin 2!
+  Then, you use the answers you got for coin 5.
+  If you can make 0 with coin 5 (by using no coins), then you can make 2 with coin 2.
+  If you can make 5 with coin 5 (by using coin 5), then you can make 7 with coin 2.
+There's your DP table.
+Since you can compute a given set of coins based on previous subset of coins (less the latest coin), you only need a 1D array.
+However you need to keep track of which elements are for this set, and which elements are for the previous set.
+E.g You can't make 7 with 1,5,11, so you can't make 9 with 1,5,11,2.
+    But, if you range forward, then it would seem like you can, because you correctly identify that you can make 7 with 1,5,11,2.
+    So, you need to range backwards if you are working with a 1-dimensional DP array.
+
+If you want to memoize (top-down) instead of tabulate (bottom-up), then all you're doing is identifying the recurrence relation driven by the actions (include or exclude the latest coin).
+The question you answer in both situations is the same:
+  Can I sum to k with the first n coins?
+  I want to know the answer for k == sum[nums] // 2.
+""" # This is multiline!
