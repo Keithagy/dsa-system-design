@@ -265,6 +265,11 @@ def accountsMerge(accounts: List[List[str]]) -> List[List[str]]:
     for account in accounts:
         name = account[0]
         for email in account[1:]:
+      # This approach is correct, and here's why:
+      # Connectivity: By connecting all emails in an account to the first email (account[1]), we ensure that all emails in the account are connected in the graph. This is sufficient to create a connected component for all emails belonging to the same person.
+      # Bidirectional Edges: The line graph[email].add(account[1]) ensures that the connection is bidirectional. This means that even if an email appears as a non-first email in one account and as a first email in another, they will still be connected.
+      # Transitive Closure: Due to the nature of graph traversal (whether DFS or BFS), if two accounts share any email, they will end up in the same connected component. This is because the traversal will follow all connections, regardless of whether an email was the first in its original account or not.
+      # Efficiency: This approach is more efficient than connecting every email to every other email within an account, as it reduces the number of edges in the graph while still maintaining full connectivity.
             graph[account[1]].add(email)
             graph[email].add(account[1])
             email_to_name[email] = name
