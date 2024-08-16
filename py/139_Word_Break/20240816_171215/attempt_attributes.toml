@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 3                                                              # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-16T17:12:15.153816+08:00
+attempt_end_time = 2024-08-16T17:19:15.153816+08:00
+reflections = """I think I tend to do recusion with memo (top-down DP) more easily""" # This is multiline!
