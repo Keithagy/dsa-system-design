@@ -1,0 +1,5 @@
+success = false
+perceived_trickiness = 3                                                                                                      # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-17T15:24:43.437428+08:00
+attempt_end_time = 2024-08-17T15:45:43.437428+08:00
+reflections = """I psyched myself out for this one... Could have actually explored the approach of expanding from centers.""" # This is multiline!
