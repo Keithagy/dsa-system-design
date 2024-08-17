@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 1                                                                                                 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-17T14:21:37.853429+08:00
+attempt_end_time = 2024-08-17T14:45:37.853429+08:00
+reflections = """I did it... i succesfully did top-down DP within time limit from scratch... consider take or skip...""" # This is multiline!
