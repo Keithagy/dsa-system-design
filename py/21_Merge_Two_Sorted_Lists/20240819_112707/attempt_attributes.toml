@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 1                                                    # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-19T11:27:07.917867+08:00
+attempt_end_time = 2024-08-19T11:34:07.917867+08:00
+reflections = """Straight forward question but use as recursion practice""" # This is multiline!
