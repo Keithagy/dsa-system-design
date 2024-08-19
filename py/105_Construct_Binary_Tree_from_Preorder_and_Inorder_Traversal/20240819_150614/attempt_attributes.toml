@@ -1,0 +1,10 @@
+success = false
+perceived_trickiness = 6 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-19T15:06:14.07068+08:00
+attempt_end_time = 2024-08-19T15:33:14.07068+08:00
+reflections = """Two key principles:
+- In the preorder array, first element is always the root of the current subtree.
+- In the inorder array, elements to the left of the root belong to the left subtree, 
+  and elements to the right belong to the right subtree.
+Additional idea: the array representations are always grouped by region (depending on the subtree being traversed in whatever order.
+""" # This is multiline!
