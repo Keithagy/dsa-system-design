@@ -1,80 +1,101 @@
-Certainly! Let's explore different solutions to determine if a binary tree is height-balanced. We'll start with a simple recursive approach and then optimize it.
+## Explanation: Balanced Binary Tree
 
-Solution 1: Simple Recursive Approach
+### Analysis of problem & input data
 
-This solution calculates the height of each subtree and checks if the difference is more than 1.
+This problem is about determining if a given binary tree is height-balanced. The key characteristics and insights are:
+
+1. Definition of height-balanced: For every node in the tree, the depth of its left and right subtrees should not differ by more than one.
+2. This is a recursive property: If a tree is balanced, its subtrees must also be balanced.
+3. The problem involves tree traversal and height calculation.
+4. The input can be an empty tree, which is considered balanced by definition.
+5. The number of nodes can be up to 5000, so the solution needs to be efficient.
+
+The key principle that makes this question simple is the recursive nature of the problem. We can leverage the fact that a tree is balanced if and only if:
+
+1. Its left subtree is balanced
+2. Its right subtree is balanced
+3. The difference in heights of its left and right subtrees is at most 1
+
+This problem is a classic example of how a seemingly complex property of a tree can be verified using a bottom-up recursive approach, where we combine information from subtrees to make a decision about the whole tree.
+
+### Test cases
+
+1. Balanced tree: `[3,9,20,null,null,15,7]`
+2. Unbalanced tree: `[1,2,2,3,3,null,null,4,4]`
+3. Empty tree: `[]`
+4. Single node tree: `[1]`
+5. Left-heavy unbalanced tree: `[1,2,null,3,null,4,null,5]`
+6. Right-heavy unbalanced tree: `[1,null,2,null,3,null,4,null,5]`
+7. Large balanced tree with 5000 nodes (not shown due to size)
+
+Here's the Python code to set up these test cases:
 
 ```python
-from typing import Optional
-
 class TreeNode:
     def __init__(self, val=0, left=None, right=None):
         self.val = val
         self.left = left
         self.right = right
 
-class Solution:
-    def isBalanced(self, root: Optional[TreeNode]) -> bool:
-        def height(node: Optional[TreeNode]) -> int:
-            if not node:
-                return 0
-
-            # Recursively calculate the height of left and right subtrees
-            left_height = height(node.left)
-            right_height = height(node.right)
-
-            # If any subtree is unbalanced, return -1
-            if left_height == -1 or right_height == -1 or abs(left_height - right_height) > 1:
-                return -1
-
-            # Return the height of the current node
-            return max(left_height, right_height) + 1
-
-        # The tree is balanced if the height function doesn't return -1
-        return height(root) != -1
+def create_tree(arr):
+    if not arr:
+        return None
+    root = TreeNode(arr[0])
+    queue = [root]
+    i = 1
+    while queue and i < len(arr):
+        node = queue.pop(0)
+        if i < len(arr) and arr[i] is not None:
+            node.left = TreeNode(arr[i])
+            queue.append(node.left)
+        i += 1
+        if i < len(arr) and arr[i] is not None:
+            node.right = TreeNode(arr[i])
+            queue.append(node.right)
+        i += 1
+    return root
 
 # Test cases
-def test_is_balanced():
-    # Test case 1: Balanced tree
-    root1 = TreeNode(3)
-    root1.left = TreeNode(9)
-    root1.right = TreeNode(20)
-    root1.right.left = TreeNode(15)
-    root1.right.right = TreeNode(7)
-    assert Solution().isBalanced(root1) == True
+test_cases = [
+    [3,9,20,None,None,15,7],
+    [1,2,2,3,3,None,None,4,4],
+    [],
+    [1],
+    [1,2,None,3,None,4,None,5],
+    [1,None,2,None,3,None,4,None,5]
+]
 
-    # Test case 2: Unbalanced tree
-    root2 = TreeNode(1)
-    root2.left = TreeNode(2)
-    root2.right = TreeNode(2)
-    root2.left.left = TreeNode(3)
-    root2.left.right = TreeNode(3)
-    root2.left.left.left = TreeNode(4)
-    root2.left.left.right = TreeNode(4)
-    assert Solution().isBalanced(root2) == False
+trees = [create_tree(case) for case in test_cases]
 
-    # Test case 3: Empty tree
-    root3 = None
-    assert Solution().isBalanced(root3) == True
+# Function to be implemented
+def is_balanced(root: TreeNode) -> bool:
+    pass
 
-    print("All test cases passed!")
-
-test_is_balanced()
-
+# Run tests
+for i, tree in enumerate(trees):
+    print(f"Test case {i+1}: {is_balanced(tree)}")
 ```
 
-Explanation:
+### Solutions
 
-1. We define a helper function `height` that calculates the height of a subtree.
-2. If we encounter an unbalanced subtree (height difference > 1), we return -1.
-3. The main `isBalanced` function checks if the `height` function returns -1.
+#### Overview of solution approaches
 
-Time Complexity: O(n), where n is the number of nodes in the tree. We visit each node once.
-Space Complexity: O(h), where h is the height of the tree, due to the recursive call stack.
+##### Solutions worth learning
 
-Solution 2: Optimized Bottom-up Approach
+1. Bottom-up recursive approach (optimal)
+2. Top-down recursive approach
+3. Iterative approach using stack
 
-This solution improves on the first one by avoiding redundant calculations.
+Count: 3 solutions
+
+##### Rejected solutions
+
+1. Brute force approach of calculating depth for each node separately
+2. Approaches that modify the tree structure
+
+#### Worthy Solutions
+
+##### Bottom-up recursive approach
 
 ```python
 from typing import Optional, Tuple
@@ -85,316 +106,253 @@ class TreeNode:
         self.left = left
         self.right = right
 
-class Solution:
-    def isBalanced(self, root: Optional[TreeNode]) -> bool:
-        def dfs(node: Optional[TreeNode]) -> Tuple[bool, int]:
-            if not node:
-                return True, 0
+def is_balanced(root: Optional[TreeNode]) -> bool:
+    def dfs(node: Optional[TreeNode]) -> Tuple[bool, int]:
+        if not node:
+            return True, 0  # Base case: empty tree is balanced with height 0
 
-            # Check left and right subtrees
-            left_balanced, left_height = dfs(node.left)
-            if not left_balanced:
-                return False, 0
+        left_balanced, left_height = dfs(node.left)
+        if not left_balanced:
+            return False, 0  # Short-circuit if left subtree is unbalanced
 
-            right_balanced, right_height = dfs(node.right)
-            if not right_balanced:
-                return False, 0
+        right_balanced, right_height = dfs(node.right)
+        if not right_balanced:
+            return False, 0  # Short-circuit if right subtree is unbalanced
 
-            # Check if current node is balanced
-            is_balanced = abs(left_height - right_height) <= 1
-            height = max(left_height, right_height) + 1
+        # Check if current node is balanced
+        is_current_balanced = abs(left_height - right_height) <= 1
+        current_height = max(left_height, right_height) + 1
 
-            return is_balanced, height
+        return is_current_balanced, current_height
 
-        return dfs(root)[0]
-
-# Test cases
-def test_is_balanced():
-    # Test case 1: Balanced tree
-    root1 = TreeNode(3)
-    root1.left = TreeNode(9)
-    root1.right = TreeNode(20)
-    root1.right.left = TreeNode(15)
-    root1.right.right = TreeNode(7)
-    assert Solution().isBalanced(root1) == True
-
-    # Test case 2: Unbalanced tree
-    root2 = TreeNode(1)
-    root2.left = TreeNode(2)
-    root2.right = TreeNode(2)
-    root2.left.left = TreeNode(3)
-    root2.left.right = TreeNode(3)
-    root2.left.left.left = TreeNode(4)
-    root2.left.left.right = TreeNode(4)
-    assert Solution().isBalanced(root2) == False
-
-    # Test case 3: Empty tree
-    root3 = None
-    assert Solution().isBalanced(root3) == True
-
-    print("All test cases passed!")
-
-test_is_balanced()
-
+    return dfs(root)[0]  # Return only the balance status, not the height
 ```
 
-Explanation:
+Time Complexity: O(n), where n is the number of nodes in the tree
+Space Complexity: O(h), where h is the height of the tree (due to recursion stack)
 
-1. We use a depth-first search (DFS) approach that returns both the balance status and the height of each subtree.
-2. We check the balance condition at each node and propagate the result up the tree.
-3. If we find an unbalanced subtree, we immediately return False without continuing the traversal.
+- This solution uses a depth-first search (DFS) approach, traversing the tree in a post-order manner.
+- The key intuition is to combine the balance check with height calculation in a single pass.
+- We use a tuple to return two pieces of information: whether the subtree is balanced and its height.
+- The algorithm leverages the fact that we can make a decision about a node's balance using only information from its immediate children.
+- Short-circuiting is used to stop unnecessary computations once an unbalanced subtree is found.
+- The height difference check `abs(left_height - right_height) <= 1` encapsulates the definition of a balanced tree.
 
-Time Complexity: O(n), where n is the number of nodes in the tree. We visit each node once.
-Space Complexity: O(h), where h is the height of the tree, due to the recursive call stack.
+##### Top-down recursive approach
 
-Recommendation:
-I recommend learning and using the optimized bottom-up approach (Solution 2) for the following reasons:
+```python
+from typing import Optional
 
-1. It's more efficient as it avoids redundant calculations.
-2. It stops as soon as an unbalanced subtree is found, potentially saving time for large unbalanced trees.
-3. It demonstrates a good understanding of tree traversal and how to propagate information up a tree.
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
 
-Visualization:
-To help understand the algorithm, let's create a simple visualization of how the bottom-up approach works on a small tree.
+def is_balanced(root: Optional[TreeNode]) -> bool:
+    def height(node: Optional[TreeNode]) -> int:
+        if not node:
+            return 0
+        return 1 + max(height(node.left), height(node.right))
+
+    def check_balance(node: Optional[TreeNode]) -> bool:
+        if not node:
+            return True  # An empty tree is balanced
+
+        left_height = height(node.left)
+        right_height = height(node.right)
+
+        if abs(left_height - right_height) > 1:
+            return False
+
+        return check_balance(node.left) and check_balance(node.right)
+
+    return check_balance(root)
+```
+
+Time Complexity: O(n^2) in the worst case, where n is the number of nodes
+Space Complexity: O(h), where h is the height of the tree (due to recursion stack)
+
+- This approach separates the height calculation and balance checking into two separate recursive functions.
+- The `height` function calculates the height of a subtree.
+- The `check_balance` function checks if the current node is balanced and recursively checks its children.
+- This solution is intuitive and closely follows the problem definition.
+- It's less efficient than the bottom-up approach because it may recalculate heights of the same subtrees multiple times.
+- The balance condition `abs(left_height - right_height) <= 1` is checked for each node explicitly.
+
+##### Iterative approach using stack
+
+```python
+from typing import Optional, Tuple
+from collections import namedtuple
+
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+def is_balanced(root: Optional[TreeNode]) -> bool:
+    NodeInfo = namedtuple('NodeInfo', ['node', 'state', 'height'])
+    stack = [NodeInfo(root, 0, 0)]
+
+    while stack:
+        info = stack[-1]
+
+        if not info.node:
+            stack.pop()
+            continue
+
+        if info.state == 0:  # Pre-order: push right child
+            stack[-1] = NodeInfo(info.node, 1, info.height)
+            stack.append(NodeInfo(info.node.right, 0, 0))
+        elif info.state == 1:  # In-order: push left child
+            stack[-1] = NodeInfo(info.node, 2, info.height)
+            stack.append(NodeInfo(info.node.left, 0, 0))
+        else:  # Post-order: process node
+            left_height = stack[-2].height if len(stack) > 1 and stack[-2].node == info.node.left else 0
+            right_height = stack[-3].height if len(stack) > 2 and stack[-3].node == info.node.right else 0
+
+            if abs(left_height - right_height) > 1:
+                return False
+
+            current_height = max(left_height, right_height) + 1
+            stack.pop()
+            if stack:
+                stack[-1] = NodeInfo(stack[-1].node, stack[-1].state, current_height)
+
+    return True
+```
+
+Time Complexity: O(n), where n is the number of nodes in the tree
+Space Complexity: O(h), where h is the height of the tree (due to the stack)
+
+- This solution uses an iterative approach with a stack to simulate the recursive process.
+- We use a named tuple `NodeInfo` to keep track of each node's state and height.
+- The algorithm performs a post-order traversal, processing each node after its children.
+- We use the stack to maintain the state of each node (0 for pre-order, 1 for in-order, 2 for post-order).
+- The balance check is performed when a node is in its post-order state.
+- This approach avoids the function call overhead of recursion and can be beneficial in languages with limited recursion depth.
+
+#### Rejected Approaches
+
+1. Brute force approach: Calculate the depth for each node separately and then check balance. This would result in O(n^2) time complexity and is inefficient for large trees.
+
+2. Modifying tree structure: Any approach that modifies the original tree structure is not acceptable as it changes the input data.
+
+3. BFS (Breadth-First Search) approach: While BFS can be used to traverse the tree, it doesn't naturally lend itself to efficient height calculation and balance checking for this problem.
+
+#### Final Recommendations
+
+The bottom-up recursive approach is the best solution to learn and use in an interview setting. It offers:
+
+1. Optimal time complexity of O(n)
+2. Clear and concise implementation
+3. Efficient use of recursion to solve the problem in a single pass
+4. Demonstrates understanding of tree structures and post-order traversal
+
+This solution effectively combines height calculation with balance checking, avoiding redundant computations. It's also easier to explain and implement under interview pressure compared to the iterative approach.
+
+### Visualization(s)
+
+To visualize the bottom-up recursive approach, we can use a simple ASCII art representation:
+
+```
+       3
+      / \
+     9  20
+       /  \
+      15   7
+
+Step 1: Check leaf nodes (9, 15, 7)
+   9  -> (True, 1)
+   15 -> (True, 1)
+   7  -> (True, 1)
+
+Step 2: Check node 20
+   20 -> max(1, 1) + 1 = 2, |1-1| <= 1
+      -> (True, 2)
+
+Step 3: Check root node 3
+   3  -> max(1, 2) + 1 = 3, |1-2| <= 1
+      -> (True, 3)
+
+Final result: Tree is balanced
+```
+
+This visualization shows how the algorithm works bottom-up, calculating heights and checking balance at each level.
 
 ```tsx
-import React, { useState } from "react";
+import React from "react";
 
-const TreeNode = ({ value, left, right, isBalanced, height }) => (
-  <div className="flex flex-col items-center">
-    <div
-      className={`w-12 h-12 rounded-full flex items-center justify-center border-2 ${isBalanced ? "border-green-500" : "border-red-500"}`}
-    >
-      {value}
-    </div>
-    <div className="text-xs mt-1">H: {height}</div>
-    {(left || right) && (
-      <div className="flex mt-4">
-        {left && <div className="mr-4">{left}</div>}
-        {right && <div className="ml-4">{right}</div>}
-      </div>
-    )}
-  </div>
-);
-
-const BalancedTreeVisualization = () => {
-  const [step, setStep] = useState(0);
-
-  const steps = [
-    { node: 7, height: 1, isBalanced: true },
-    { node: 15, height: 1, isBalanced: true },
-    { node: 20, height: 2, isBalanced: true },
-    { node: 9, height: 1, isBalanced: true },
-    { node: 3, height: 3, isBalanced: true },
-  ];
-
-  const renderTree = (currentStep) => (
-    <TreeNode
-      value={3}
-      left={
-        currentStep >= 4 ? (
-          <TreeNode value={9} isBalanced={true} height={1} />
-        ) : null
-      }
-      right={
-        currentStep >= 3 ? (
-          <TreeNode
-            value={20}
-            isBalanced={true}
-            height={2}
-            left={
-              currentStep >= 2 ? (
-                <TreeNode value={15} isBalanced={true} height={1} />
-              ) : null
-            }
-            right={
-              currentStep >= 1 ? (
-                <TreeNode value={7} isBalanced={true} height={1} />
-              ) : null
-            }
-          />
-        ) : null
-      }
-      isBalanced={currentStep === 4}
-      height={currentStep === 4 ? 3 : null}
-    />
-  );
+const TreeNode = ({ value, left, right, x, y, level }) => {
+  const radius = 20;
+  const verticalSpacing = 80;
+  const horizontalSpacing = 40 / (level + 1);
 
   return (
-    <div className="flex flex-col items-center">
-      <div className="mb-4">{renderTree(step)}</div>
-      <div className="mt-4">
-        <button
-          className="px-4 py-2 bg-blue-500 text-white rounded mr-2"
-          onClick={() => setStep(Math.max(0, step - 1))}
-          disabled={step === 0}
-        >
-          Previous
-        </button>
-        <button
-          className="px-4 py-2 bg-blue-500 text-white rounded"
-          onClick={() => setStep(Math.min(steps.length - 1, step + 1))}
-          disabled={step === steps.length - 1}
-        >
-          Next
-        </button>
-      </div>
-      <div className="mt-4 text-center">
-        {step < steps.length && (
-          <p>
-            Checking node {steps[step].node}: Height = {steps[step].height},
-            {steps[step].isBalanced ? " Balanced" : " Unbalanced"}
-          </p>
-        )}
-      </div>
-    </div>
+    <g>
+      <circle cx={x} cy={y} r={radius} fill="lightblue" stroke="black" />
+      <text x={x} y={y} textAnchor="middle" dominantBaseline="central">
+        {value}
+      </text>
+      {left && (
+        <>
+          <line
+            x1={x}
+            y1={y + radius}
+            x2={x - horizontalSpacing}
+            y2={y + verticalSpacing - radius}
+            stroke="black"
+          />
+          <TreeNode
+            {...left}
+            x={x - horizontalSpacing}
+            y={y + verticalSpacing}
+            level={level + 1}
+          />
+        </>
+      )}
+      {right && (
+        <>
+          <line
+            x1={x}
+            y1={y + radius}
+            x2={x + horizontalSpacing}
+            y2={y + verticalSpacing - radius}
+            stroke="black"
+          />
+          <TreeNode
+            {...right}
+            x={x + horizontalSpacing}
+            y={y + verticalSpacing}
+            level={level + 1}
+          />
+        </>
+      )}
+    </g>
+  );
+};
+
+const BalancedTreeVisualization = () => {
+  const tree = {
+    value: 3,
+    left: { value: 9 },
+    right: {
+      value: 20,
+      left: { value: 15 },
+      right: { value: 7 },
+    },
+  };
+
+  return (
+    <svg width="300" height="300" viewBox="0 0 300 300">
+      <TreeNode {...tree} x={150} y={40} level={0} />
+    </svg>
   );
 };
 
 export default BalancedTreeVisualization;
 ```
 
-This visualization demonstrates how the bottom-up approach works:
-
-1. We start from the leaf nodes and work our way up.
-2. At each step, we calculate the height and check if the node is balanced.
-3. The final step shows the root node, confirming that the entire tree is balanced.
-
-You can use the "Previous" and "Next" buttons to step through the algorithm's execution.
-
-This visual representation helps to understand how the algorithm traverses the tree and makes decisions about balance at each node. It's particularly useful for seeing how information (height and balance status) propagates up the tree.
-
-## Why would left height or right height ever be -1, as with your first solution?
-
-You're right to question that. Let me clarify this point, as it's an important detail in the implementation.
-
-In the first solution I provided, the `height` function returns -1 as a special signal to indicate that the subtree is unbalanced. This is not actually the height of the tree, but rather a convention used in this particular implementation. Let's break it down:
-
-1. Normal case: The height function returns the actual height of a subtree (0 for empty trees, 1 for leaf nodes, etc.).
-
-2. Unbalanced case: If at any point we detect that the tree is unbalanced (either because the difference in height between left and right subtrees is greater than 1, or because one of the subtrees is already unbalanced), we return -1.
-
-3. Propagation: This -1 then propagates up the tree, effectively short-circuiting the computation once we know the tree is unbalanced.
-
-Here's a simplified version of the relevant part of the code to illustrate this:
-
-```python
-def height(node):
-    if not node:
-        return 0
-
-    left_height = height(node.left)
-    if left_height == -1:
-        return -1  # Left subtree is unbalanced
-
-    right_height = height(node.right)
-    if right_height == -1:
-        return -1  # Right subtree is unbalanced
-
-    if abs(left_height - right_height) > 1:
-        return -1  # Current node is unbalanced
-
-    return max(left_height, right_height) + 1  # Normal case
-```
-
-This approach has a couple of advantages:
-
-1. Early termination: Once we detect an unbalanced subtree, we can immediately stop checking and return false, potentially saving time.
-
-2. Combined operation: We're using a single function to both calculate height and check balance, which can be more efficient than separate operations.
-
-However, you're right to point out that this might not be the most intuitive implementation. The second solution I provided (the optimized bottom-up approach) avoids this potential confusion by returning a tuple `(is_balanced, height)` instead of using -1 as a special signal.
-
-If you prefer a more straightforward approach that doesn't use -1 as a special case, you could modify the first solution like this:
-
-```python
-def isBalanced(self, root: Optional[TreeNode]) -> bool:
-    def height(node: Optional[TreeNode]) -> Optional[int]:
-        if not node:
-            return 0
-
-        left_height = height(node.left)
-        if left_height is None:
-            return None  # Propagate unbalanced signal
-
-        right_height = height(node.right)
-        if right_height is None:
-            return None  # Propagate unbalanced signal
-
-        if abs(left_height - right_height) > 1:
-            return None  # Signal unbalanced tree
-
-        return max(left_height, right_height) + 1
-
-    return height(root) is not None
-```
-
-In this version, we use `None` instead of -1 to signal an unbalanced tree, which might be clearer. The main `isBalanced` function then just needs to check if the result is not `None`.
-
-Thank you for bringing up this point. It's a great example of how seemingly small implementation details can affect the clarity and intuitiveness of an algorithm.
-
-## Analysis of memoizing solution
-
-Thank you for sharing your solution. Let's analyze it and compare it with the previously recommended Solution 2.
-
-Your Solution Analysis:
-
-1. Approach:
-   Your solution uses a top-down recursive approach with memoization for the height calculation.
-
-2. Time Complexity:
-
-   - Without memoization, this would be O(n^2) in the worst case, where n is the number of nodes.
-   - With memoization, it improves to O(n), as each node's height is calculated only once.
-
-3. Space Complexity:
-
-   - O(n) for the memoization dictionary.
-   - O(h) for the recursion stack, where h is the height of the tree.
-   - Overall, O(n) in the worst case.
-
-4. Pros:
-
-   - Memoization optimizes repeated height calculations.
-   - The code is relatively straightforward and easy to understand.
-   - Separating the height calculation into its own method improves readability.
-
-5. Cons:
-   - Still performs unnecessary calculations for unbalanced trees.
-   - Uses extra space for memoization.
-   - The `height_memo` is a class variable, which could lead to issues if multiple trees are processed without clearing the memo.
-
-Comparison with Solution 2 (Bottom-up Approach):
-
-1. Time Complexity:
-   Both solutions now have O(n) time complexity.
-
-2. Space Complexity:
-
-   - Your solution: O(n) due to memoization.
-   - Solution 2: O(h) only for the recursion stack.
-
-3. Early Termination:
-   Solution 2 can terminate early when it finds an unbalanced subtree, potentially saving time for large unbalanced trees. Your solution always traverses the entire tree.
-
-4. Memory Usage:
-   Solution 2 uses less memory as it doesn't require memoization.
-
-5. Clarity:
-   Both solutions are clear, but Solution 2 combines balance checking and height calculation, which might be more efficient.
-
-Recommendation:
-While your solution is a valid and optimized approach, I would still recommend Solution 2 (the bottom-up approach) for the following reasons:
-
-1. Memory Efficiency: It uses less memory as it doesn't require memoization.
-2. Early Termination: It can stop as soon as an unbalanced subtree is found, which is more efficient for unbalanced trees.
-3. Simplicity: It combines height calculation and balance checking in a single traversal, which is conceptually simpler and more efficient.
-4. No Global State: It doesn't use class-level memoization, making it safer for processing multiple trees.
-
-However, your solution is still a good approach, especially if you're dealing with trees where you might need to reuse height calculations frequently. If you decide to use your solution, consider these improvements:
-
-1. Make `height_memo` an instance variable instead of a class variable.
-2. Clear the memo between different tree processings.
-3. Consider adding an early termination condition in `isBalanced` to stop if a subtree is found to be unbalanced.
-
-Both solutions have their merits, and the choice between them might depend on specific use cases and constraints. Your solution demonstrates a good understanding of optimization techniques like memoization, which is valuable in many scenarios.
+This React component creates a visual representation of the balanced binary tree from Example 1. The tree is drawn using SVG, with each node represented by a circle containing its value. The layout of the tree is adjusted dynamically based on the depth of each node.
