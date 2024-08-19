@@ -1,0 +1,11 @@
+success = true
+perceived_trickiness = 3 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-19T16:06:44.015586+08:00
+attempt_end_time = 2024-08-19T16:17:44.015586+08:00
+reflections = """Learnt principle of recursively building tree top-down via 2 principles:
+- root of subtree is always first element of a given preorder traversal
+- in an inorder traversal, all elements left/right of the root are in the left/tree subtree
+
+irrelevant properties to this question:
+- In-order traversal of a BST gives a monotonically increasing list
+""" # This is multiline!
