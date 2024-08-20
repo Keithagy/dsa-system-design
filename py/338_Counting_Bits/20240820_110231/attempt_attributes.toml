@@ -1,0 +1,5 @@
+success = false
+perceived_trickiness = 4                                                                                                  # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-20T11:02:31.969901+08:00
+attempt_end_time = 2024-08-20T11:27:31.969901+08:00
+reflections = """This one is tricky... The key is actually to remember to compare the stubs... new power of 2 is 1 + 0""" # This is multiline!
