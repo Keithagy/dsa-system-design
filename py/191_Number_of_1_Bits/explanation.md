@@ -1,145 +1,221 @@
-Certainly! I'll provide multiple solutions to the "Number of 1 Bits" problem, explain their time and space complexities, and recommend the best approach. I'll use Python with type hints and provide test cases. Let's start with the solutions:
+## Explanation: Number of 1 Bits
 
-1. Bit Manipulation Approach
+### Analysis of problem & input data
+
+This problem, also known as the "Hamming Weight" problem, is a classic bit manipulation question. The key characteristics to note are:
+
+1. The input is a positive integer, which we need to treat as its binary representation.
+2. We need to count the number of set bits (1s) in this binary representation.
+3. The input range is from 1 to 2^31 - 1, which means we're dealing with 32-bit integers.
+
+The principle that makes this question simple is the bitwise AND operation. When you AND a number with 1, it isolates the least significant bit. This allows us to check each bit of the number systematically.
+
+Another key insight is that we can use bit shifting to move through the bits of the number efficiently. Right-shifting by 1 is equivalent to dividing by 2 in binary.
+
+Lastly, there's a clever trick in bit manipulation where `n & (n-1)` always turns off the rightmost set bit. This leads to a very efficient solution.
+
+### Test cases
+
+1. Edge cases:
+
+   - n = 1 (binary: 1)
+   - n = 0 (binary: 0) - although not in the given range, it's a good edge case to consider
+   - n = 2^31 - 1 (binary: 11111111111111111111111111111111)
+
+2. Normal cases:
+
+   - n = 11 (binary: 1011)
+   - n = 128 (binary: 10000000)
+
+3. Challenging inputs:
+   - n = 2147483645 (binary: 1111111111111111111111111111101)
+
+Here's the Python code for these test cases:
 
 ```python
-from typing import List
+def test_hamming_weight(func):
+    test_cases = [
+        (1, 1),
+        (0, 0),
+        (2**31 - 1, 31),
+        (11, 3),
+        (128, 1),
+        (2147483645, 30)
+    ]
+    for n, expected in test_cases:
+        result = func(n)
+        print(f"Input: {n}, Expected: {expected}, Got: {result}, {'Pass' if result == expected else 'Fail'}")
 
-def hammingWeight(n: int) -> int:
+# You would call this function with your implementation, e.g.:
+# test_hamming_weight(hamming_weight)
+```
+
+### Solutions
+
+#### Overview of solution approaches
+
+##### Solutions worth learning
+
+1. Bit Manipulation (AND with 1 and right shift)
+2. Brian Kernighan's Algorithm
+3. Lookup Table / Divide and Conquer
+
+Count: 3 solutions
+
+##### Rejected solutions
+
+1. Converting to string and counting '1's
+2. Recursion (not optimal for large numbers)
+
+#### Worthy Solutions
+
+##### Bit Manipulation (AND with 1 and right shift)
+
+```python
+def hamming_weight(n: int) -> int:
     count = 0
     while n:
-        # Increment count if the least significant bit is 1
-        count += n & 1
-        # Right shift n by 1 bit
-        n >>= 1
+        count += n & 1  # Check the least significant bit
+        n >>= 1  # Right shift by 1 (equivalent to n //= 2)
     return count
-
-# Test cases
-test_cases: List[int] = [11, 128, 2147483645]
-for test_case in test_cases:
-    result = hammingWeight(test_case)
-    print(f"Input: {test_case}, Output: {result}")
-
 ```
 
-Explanation:
+- Time Complexity: O(1) - We always iterate 32 times for a 32-bit integer
+- Space Complexity: O(1) - We only use a single variable for counting
 
-- Time Complexity: O(1) - The loop runs at most 32 times for a 32-bit integer.
-- Space Complexity: O(1) - We only use a constant amount of extra space.
+- Intuitions and invariants:
+  - `n & 1` isolates the least significant bit
+  - Right shifting by 1 moves us to the next bit
+  - The loop continues until all bits have been checked (n becomes 0)
 
-This solution uses bit manipulation to count the number of set bits. It's efficient and works well for all positive integers within the given constraints.
-
-2. Built-in Function Approach
-
-```python
-from typing import List
-
-def hammingWeight(n: int) -> int:
-    # Convert integer to binary string and count '1's
-    return bin(n).count('1')
-
-# Test cases
-test_cases: List[int] = [11, 128, 2147483645]
-for test_case in test_cases:
-    result = hammingWeight(test_case)
-    print(f"Input: {test_case}, Output: {result}")
-
-```
-
-Explanation:
-
-- Time Complexity: O(1) - The `bin()` function and `count()` method both operate in constant time for 32-bit integers.
-- Space Complexity: O(1) - The space used by the binary string is constant for 32-bit integers.
-
-This solution uses Python's built-in `bin()` function to convert the integer to a binary string and then counts the occurrences of '1'. It's concise and easy to understand.
-
-3. Brian Kernighan's Algorithm
+##### Brian Kernighan's Algorithm
 
 ```python
-from typing import List
-
-def hammingWeight(n: int) -> int:
+def hamming_weight(n: int) -> int:
     count = 0
     while n:
-        # n & (n - 1) clears the least significant set bit
-        n &= (n - 1)
+        n &= (n - 1)  # Turn off the rightmost set bit
         count += 1
     return count
-
-# Test cases
-test_cases: List[int] = [11, 128, 2147483645]
-for test_case in test_cases:
-    result = hammingWeight(test_case)
-    print(f"Input: {test_case}, Output: {result}")
-
 ```
 
-Explanation:
+- Time Complexity: O(1) - In the worst case, we iterate the number of set bits times (max 32 for a 32-bit integer)
+- Space Complexity: O(1) - We only use a single variable for counting
 
-- Time Complexity: O(k), where k is the number of set bits. In the worst case, it's O(1) for 32-bit integers.
-- Space Complexity: O(1) - We only use a constant amount of extra space.
+- Intuitions and invariants:
+  - `n & (n - 1)` always turns off the rightmost set bit
+  - The loop continues until all set bits have been turned off (n becomes 0)
+  - The number of iterations equals the number of set bits
 
-This algorithm, known as Brian Kernighan's algorithm, is very efficient. It only iterates as many times as there are set bits in the number.
+##### Lookup Table / Divide and Conquer
 
-Recommendation:
-For learning purposes, I recommend the Brian Kernighan's Algorithm (Solution 3). Here's why:
+```python
+def hamming_weight(n: int) -> int:
+    # Precomputed lookup table for 8-bit integers
+    bit_count = [0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4] * 16
 
-1. Efficiency: It's the most efficient in terms of the number of operations, especially for numbers with few set bits.
-2. Learning Value: It introduces an interesting bit manipulation technique that can be applied to other problems.
-3. Interview Impression: Knowing this algorithm can impress interviewers, as it shows a deep understanding of bit manipulation.
+    count = 0
+    while n:
+        count += bit_count[n & 0xf]  # Count bits in the lowest 4 bits
+        n >>= 4  # Move to the next 4 bits
+    return count
+```
 
-To help visualize how Brian Kernighan's algorithm works, let's create a simple React component that demonstrates the process step by step.
+- Time Complexity: O(1) - We always perform 8 iterations for a 32-bit integer
+- Space Complexity: O(1) - We use a fixed-size lookup table
+
+- Intuitions and invariants:
+  - We can precompute the bit counts for all 8-bit integers (0-255)
+  - We can process the 32-bit integer in 4-bit chunks
+  - The total count is the sum of counts for each 4-bit chunk
+
+#### Rejected Approaches
+
+1. Converting to string and counting '1's:
+
+   ```python
+   def hamming_weight(n: int) -> int:
+       return bin(n).count('1')
+   ```
+
+   This approach works but is not optimal for large numbers and doesn't demonstrate understanding of bit manipulation.
+
+2. Recursion:
+
+   ```python
+   def hamming_weight(n: int) -> int:
+       if n == 0:
+           return 0
+       return (n & 1) + hamming_weight(n >> 1)
+   ```
+
+   This approach works but can lead to stack overflow for large numbers and is less efficient than iterative solutions.
+
+#### Final Recommendations
+
+For a technical coding interview, I recommend learning and using Brian Kernighan's Algorithm. It's efficient, demonstrates a deep understanding of bit manipulation, and is elegant in its simplicity. The Bit Manipulation approach with AND and right shift is also good to know as it's straightforward and easy to explain. The Lookup Table approach, while efficient, might be overkill for this problem and takes more time to implement in an interview setting.
+
+### Visualization(s)
+
+To visualize Brian Kernighan's Algorithm, let's use a simple React component:
 
 ```tsx
-import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import React, { useState, useEffect } from "react";
 
 const BrianKernighanVisualization = () => {
   const [number, setNumber] = useState(11);
-  const [steps, setSteps] = useState([]);
+  const [binaryString, setBinaryString] = useState("");
   const [count, setCount] = useState(0);
+  const [step, setStep] = useState(0);
 
-  const visualizeAlgorithm = () => {
-    let n = number;
-    let newSteps = [];
-    let newCount = 0;
+  useEffect(() => {
+    setBinaryString(number.toString(2).padStart(8, "0"));
+    setCount(0);
+    setStep(0);
+  }, [number]);
 
-    while (n) {
-      newSteps.push(n.toString(2).padStart(8, "0"));
-      n &= n - 1;
-      newCount++;
-    }
+  const nextStep = () => {
+    if (number === 0) return;
 
-    setSteps(newSteps);
-    setCount(newCount);
+    const newNumber = number & (number - 1);
+    setNumber(newNumber);
+    setBinaryString(newNumber.toString(2).padStart(8, "0"));
+    setCount(count + 1);
+    setStep(step + 1);
   };
 
   return (
-    <div className="p-4 max-w-md mx-auto">
-      <h2 className="text-2xl font-bold mb-4">
-        Brian Kernighan's Algorithm Visualization
-      </h2>
+    <div className="p-4 max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl">
+      <h2 className="text-xl font-bold mb-4">Brian Kernighan's Algorithm</h2>
       <div className="mb-4">
-        <Input
+        <label
+          className="block text-gray-700 text-sm font-bold mb-2"
+          htmlFor="number-input"
+        >
+          Enter a number (0-255):
+        </label>
+        <input
+          id="number-input"
           type="number"
+          min="0"
+          max="255"
           value={number}
-          onChange={(e) => setNumber(parseInt(e.target.value))}
-          className="mr-2"
+          onChange={(e) => setNumber(parseInt(e.target.value) || 0)}
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         />
-        <Button onClick={visualizeAlgorithm}>Visualize</Button>
       </div>
       <div className="mb-4">
-        {steps.map((step, index) => (
-          <div key={index} className="mb-2">
-            <span className="font-mono">{step}</span>
-            {index < steps.length - 1 && (
-              <span className="ml-2 text-green-600">→ Clear rightmost 1</span>
-            )}
-          </div>
-        ))}
+        <p className="text-lg font-semibold">Binary: {binaryString}</p>
+        <p className="text-lg font-semibold">Count: {count}</p>
+        <p className="text-lg font-semibold">Step: {step}</p>
       </div>
-      <div className="font-bold">Number of 1 bits: {count}</div>
+      <button
+        onClick={nextStep}
+        disabled={number === 0}
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+      >
+        Next Step
+      </button>
     </div>
   );
 };
@@ -147,15 +223,4 @@ const BrianKernighanVisualization = () => {
 export default BrianKernighanVisualization;
 ```
 
-This React component provides an interactive visualization of Brian Kernighan's algorithm. Users can input a number, and the component will show the step-by-step process of clearing the least significant set bit in each iteration.
-
-To use this visualization:
-
-1. Enter a positive integer in the input field.
-2. Click the "Visualize" button.
-3. Observe how the binary representation changes in each step as the rightmost 1 is cleared.
-4. The final count of 1 bits is displayed at the bottom.
-
-This visualization helps to understand how the algorithm efficiently counts the number of set bits by iteratively clearing the least significant set bit.
-
-In conclusion, while all three solutions are valid, Brian Kernighan's Algorithm offers the best balance of efficiency and educational value. The bit manipulation approach is also excellent and more straightforward, making it a good alternative in many situations. The built-in function approach, while concise, doesn't demonstrate as much understanding of the underlying concepts but can be useful in practical Python programming where built-in functions are preferred for readability and maintainability.
+This visualization allows you to input a number and step through Brian Kernighan's Algorithm, showing how the binary representation changes and how the count of set bits increases with each step.
