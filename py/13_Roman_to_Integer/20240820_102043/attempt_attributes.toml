@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 2                                                                                                      # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-20T10:20:43.973734+08:00
+attempt_end_time = 2024-08-20T10:32:43.973734+08:00
+reflections = """Lookahead strategy is most intuitive, and gives you answer in single pass and constant mem. So it's good!""" # This is multiline!
