@@ -1,7 +1,5 @@
-Given the `head` of a singly linked list, return `true` *if it is a*
-[*palindrome*]{keyword="palindrome-sequence"} *or* `false` *otherwise*.
-
- 
+Given the `head` of a singly linked list, return `true` _if it is a_
+[_palindrome_]{keyword="palindrome-sequence"} _or_ `false` _otherwise_.
 
 **Example 1:**
 
@@ -17,13 +15,9 @@ Given the `head` of a singly linked list, return `true` *if it is a*
     Input: head = [1,2]
     Output: false
 
- 
-
 **Constraints:**
 
--   The number of nodes in the list is in the range `[1, 10`^`5`^`]`.
--   `0 <= Node.val <= 9`
-
- 
+- The number of nodes in the list is in the range `[1, 10`^`5`^`]`.
+- `0 <= Node.val <= 9`
 
 **Follow up:** Could you do it in `O(n)` time and `O(1)` space?
