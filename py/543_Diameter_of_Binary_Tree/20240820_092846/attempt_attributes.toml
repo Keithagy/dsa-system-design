@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 2                                                                          # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-20T09:28:46.712502+08:00
+attempt_end_time = 2024-08-20T09:50:46.712502+08:00
+reflections = """tracking tree-level state whilst recursing through nodes tracking local state""" # This is multiline!
