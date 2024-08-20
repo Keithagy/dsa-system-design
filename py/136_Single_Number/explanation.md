@@ -1,64 +1,79 @@
-Thank you for providing the problem description. I'll present different solutions to the "Single Number" problem, explain their complexities, and recommend the best approach. Let's start with the solutions:
+## Explanation: Single Number
 
-1. Brute Force Approach (Not Recommended)
+### Analysis of problem & input data
+
+This problem presents a unique challenge in finding a single element that appears only once in an array where every other element appears twice. The key characteristics of this problem are:
+
+1. The array is non-empty.
+2. All elements appear twice except for one.
+3. We need to find the element that appears only once.
+4. The solution must have linear time complexity O(n) and constant space complexity O(1).
+
+The constraints on time and space complexity are crucial here, as they rule out some straightforward approaches like sorting or using a hash map.
+
+The key principle that makes this question simple is the property of XOR (exclusive or) operation:
+
+1. XOR of a number with itself is 0.
+2. XOR of a number with 0 is the number itself.
+3. XOR is commutative and associative.
+
+These properties of XOR allow us to cancel out all the pairs of numbers that appear twice, leaving us with the single number that appears only once.
+
+### Test cases
+
+1. Basic case: `[2,2,1]` → Output: `1`
+2. Multiple pairs: `[4,1,2,1,2]` → Output: `4`
+3. Single element: `[1]` → Output: `1`
+4. Negative numbers: `[-1,-1,-2]` → Output: `-2`
+5. Large numbers: `[100000,100000,99999]` → Output: `99999`
+6. Mixed positive and negative: `[-1,1,1,-2,-2]` → Output: `-1`
+
+Here's the executable Python code for these test cases:
 
 ```python
 def single_number(nums: List[int]) -> int:
-    for i in range(len(nums)):
-        is_unique = True
-        for j in range(len(nums)):
-            if i != j and nums[i] == nums[j]:
-                is_unique = False
-                break
-        if is_unique:
-            return nums[i]
-    return -1  # This line should never be reached given the problem constraints
+    # Implementation will be added here
+    pass
+
+# Test cases
+test_cases = [
+    [2,2,1],
+    [4,1,2,1,2],
+    [1],
+    [-1,-1,-2],
+    [100000,100000,99999],
+    [-1,1,1,-2,-2]
+]
+
+for i, case in enumerate(test_cases, 1):
+    result = single_number(case)
+    print(f"Test case {i}: {case} → Output: {result}")
 ```
 
-Time Complexity: O(n^2) - We have nested loops, each iterating through the array.
-Space Complexity: O(1) - We only use a constant amount of extra space.
+### Solutions
 
-This approach is not recommended as it doesn't meet the linear runtime complexity requirement.
+#### Overview of solution approaches
 
-2. Sorting Approach (Not Recommended)
+##### Solutions worth learning
 
-```python
-def single_number(nums: List[int]) -> int:
-    nums.sort()  # Sort the array
-    for i in range(0, len(nums) - 1, 2):
-        if nums[i] != nums[i + 1]:
-            return nums[i]
-    return nums[-1]  # If we reached here, the last element is the single one
-```
+1. XOR approach (Bit Manipulation)
+2. Math approach (Set operations)
 
-Time Complexity: O(n log n) - Dominated by the sorting operation.
-Space Complexity: O(1) or O(n) depending on the sorting algorithm used.
+Count: 2 solutions
 
-This approach is not recommended as it doesn't meet the linear runtime complexity requirement.
+##### Rejected solutions
 
-3. Hash Table Approach (Not Recommended for this specific problem)
+1. Sorting approach
+2. Hash Map approach
+3. Brute Force approach
+
+#### Worthy Solutions
+
+##### XOR approach (Bit Manipulation)
 
 ```python
-from collections import defaultdict
+from typing import List
 
-def single_number(nums: List[int]) -> int:
-    count = defaultdict(int)
-    for num in nums:
-        count[num] += 1
-    for num, freq in count.items():
-        if freq == 1:
-            return num
-    return -1  # This line should never be reached given the problem constraints
-```
-
-Time Complexity: O(n) - We iterate through the array twice.
-Space Complexity: O(n) - In the worst case, we store n/2 + 1 elements in the hash table.
-
-While this approach meets the linear runtime complexity requirement, it doesn't satisfy the constant extra space requirement.
-
-4. XOR Approach (Recommended Solution)
-
-```python
 def single_number(nums: List[int]) -> int:
     result = 0
     for num in nums:
@@ -66,99 +81,124 @@ def single_number(nums: List[int]) -> int:
     return result
 ```
 
-Time Complexity: O(n) - We iterate through the array once.
-Space Complexity: O(1) - We only use a single variable to store the result.
+Time Complexity: O(n), where n is the length of the input array.
+Space Complexity: O(1), as we only use a single variable regardless of input size.
 
-This is the recommended solution as it meets both the linear runtime complexity and constant extra space requirements.
+Intuitions and invariants:
 
-Explanation of the XOR approach:
+- XOR of a number with itself is 0.
+- XOR of a number with 0 is the number itself.
+- XOR is commutative and associative, so the order of operations doesn't matter.
+- By XORing all numbers, pairs cancel out, leaving only the single number.
 
-- XOR (exclusive or) operation has the following properties:
-  1. a ^ 0 = a
-  2. a ^ a = 0
-  3. a ^ b ^ a = (a ^ a) ^ b = 0 ^ b = b
-- By XORing all numbers in the array, the duplicate numbers will cancel out (property 2), and we'll be left with the single number (property 3).
+The algorithm leverages the XOR operation to efficiently cancel out all pairs of numbers, leaving only the single number that appears once. This approach is elegant and optimal for this problem, satisfying both the time and space complexity requirements.
 
-Let's create a visualization to help explain the XOR approach:
+##### Math approach (Set operations)
+
+```python
+from typing import List
+
+def single_number(nums: List[int]) -> int:
+    return 2 * sum(set(nums)) - sum(nums)
+```
+
+Time Complexity: O(n), where n is the length of the input array.
+Space Complexity: O(n) in the worst case, as we create a set from the input array.
+
+Intuitions and invariants:
+
+- Set eliminates duplicates, keeping only unique elements.
+- Sum of set gives sum of all unique numbers.
+- Multiplying this sum by 2 accounts for each number appearing twice.
+- Subtracting the sum of the original array leaves only the single number.
+
+While this approach is mathematically elegant and easy to understand, it doesn't strictly meet the constant space requirement. However, it's worth learning for its clever use of set properties and arithmetic.
+
+#### Rejected Approaches
+
+1. Sorting approach: Sorting the array and then finding the element without a pair would take O(n log n) time, violating the linear time requirement.
+
+2. Hash Map approach: Using a hash map to count occurrences would take O(n) time but O(n) space, violating the constant space requirement.
+
+3. Brute Force approach: Checking each element against all others would take O(n^2) time, violating the linear time requirement.
+
+These approaches, while potentially correct, are not optimal for this specific problem due to their time or space complexity.
+
+#### Final Recommendations
+
+The XOR approach is the best solution to learn for this problem. It elegantly satisfies both the time and space complexity requirements, leveraging a clever bit manipulation technique. This solution demonstrates a deep understanding of bitwise operations and their applications in algorithmic problem-solving, making it highly valuable in a technical interview setting.
+
+### Visualization(s)
+
+To visualize the XOR approach, let's create a simple React component that demonstrates how XOR cancels out pairs and leaves the single number:
 
 ```tsx
 import React, { useState } from "react";
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 const XORVisualization = () => {
-  const [step, setStep] = useState(0);
-  const nums = [4, 1, 2, 1, 2];
-  const results = nums.reduce(
-    (acc, num) => [...acc, acc[acc.length - 1] ^ num],
-    [0],
-  );
+  const [numbers, setNumbers] = useState([4, 1, 2, 1, 2]);
+  const [currentStep, setCurrentStep] = useState(0);
 
-  const binaryString = (num) => num.toString(2).padStart(8, "0");
+  const xorOperation = (a, b) => a ^ b;
+
+  const reset = () => {
+    setCurrentStep(0);
+  };
+
+  const nextStep = () => {
+    setCurrentStep((prev) => Math.min(prev + 1, numbers.length));
+  };
+
+  const result = numbers.reduce(xorOperation, 0);
 
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader>XOR Approach Visualization</CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div>Input: [{nums.join(", ")}]</div>
-          <div className="flex justify-between items-center">
-            <button
-              onClick={() => setStep(Math.max(0, step - 1))}
-              className="px-4 py-2 bg-blue-500 text-white rounded"
-              disabled={step === 0}
-            >
-              Previous
-            </button>
-            <span>
-              Step {step + 1} of {nums.length + 1}
-            </span>
-            <button
-              onClick={() => setStep(Math.min(nums.length, step + 1))}
-              className="px-4 py-2 bg-blue-500 text-white rounded"
-              disabled={step === nums.length}
-            >
-              Next
-            </button>
+    <div className="p-4 max-w-md mx-auto">
+      <h2 className="text-2xl font-bold mb-4">XOR Approach Visualization</h2>
+      <div className="mb-4">
+        <Input
+          type="text"
+          value={numbers.join(", ")}
+          onChange={(e) => setNumbers(e.target.value.split(",").map(Number))}
+          placeholder="Enter numbers separated by commas"
+          className="w-full p-2 border rounded"
+        />
+      </div>
+      <div className="mb-4">
+        <p className="font-semibold">Current XOR Result:</p>
+        <p className="text-3xl font-bold">
+          {numbers.slice(0, currentStep).reduce(xorOperation, 0)}
+        </p>
+      </div>
+      <div className="flex space-x-2 mb-4">
+        <Button onClick={reset} className="bg-red-500 text-white">
+          Reset
+        </Button>
+        <Button
+          onClick={nextStep}
+          disabled={currentStep >= numbers.length}
+          className="bg-blue-500 text-white"
+        >
+          Next Step
+        </Button>
+      </div>
+      <div>
+        {numbers.map((num, index) => (
+          <div
+            key={index}
+            className={`p-2 mb-2 ${index < currentStep ? "bg-green-200" : "bg-gray-200"} rounded`}
+          >
+            {num}
           </div>
-          <div className="space-y-2">
-            <div>Current: {binaryString(results[step])}</div>
-            {step < nums.length && (
-              <>
-                <div>XOR</div>
-                <div>Next num: {binaryString(nums[step])}</div>
-                <div>Result: {binaryString(results[step + 1])}</div>
-              </>
-            )}
-          </div>
-          {step === nums.length && (
-            <div className="font-bold">
-              Final result: {results[step]} (Single number)
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+        ))}
+      </div>
+      <p className="mt-4 font-semibold">Final Result: {result}</p>
+    </div>
   );
 };
 
 export default XORVisualization;
 ```
 
-This visualization allows you to step through the XOR process, showing how each number in the input array affects the result. You can see how the duplicate numbers cancel out, leaving only the single number at the end.
-
-Now, let's provide some test cases:
-
-```python
-def test_single_number():
-    assert single_number([2,2,1]) == 1
-    assert single_number([4,1,2,1,2]) == 4
-    assert single_number([1]) == 1
-    assert single_number([1,3,1,-1,3]) == -1
-    print("All test cases passed!")
-
-test_single_number()
-```
-
-These test cases cover the examples provided in the problem description and add an additional case with negative numbers.
-
-In conclusion, the XOR approach (Solution 4) is the recommended solution for this problem. It satisfies both the linear time complexity and constant space complexity requirements. It's also elegant and efficient, leveraging the properties of the XOR operation to solve the problem in a single pass through the array.
+This visualization allows users to input their own set of numbers and step through the XOR process, helping to build intuition for how the algorithm works.
