@@ -1,0 +1,6 @@
+success = true
+perceived_trickiness = 2 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-20T15:05:19.808354+08:00
+attempt_end_time = 2024-08-20T15:52:19.808354+08:00
+reflections = """backtracking is straightforward, but your addition of a memoization approach was incorrect.
+You can't memoize based just on coords and word index. memo also depends on state of the path, which you do not include.""" # This is multiline!
