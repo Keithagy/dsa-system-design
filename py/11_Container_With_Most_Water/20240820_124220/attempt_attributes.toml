@@ -1,0 +1,17 @@
+success = true
+perceived_trickiness = 4 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-20T12:42:20.038585+08:00
+attempt_end_time = 2024-08-20T13:06:20.038585+08:00
+reflections = """Needed a hint.
+The key principle that makes this question simple is the realization that we can start with the widest possible container (using the first and last elements)
+and then systematically move inwards, always moving the pointer that points to the shorter line. 
+This approach guarantees that we don't miss the optimal solution because:
+
+1. If we move the pointer with the taller height, we might decrease the width without any chance of increasing the height (as the height is limited by the shorter line).
+2. By moving the shorter height pointer, we at least have a chance of finding a taller line that could increase the area, despite the decreased width.
+
+vs. stock question, the key difference lies in how you calculate the result.
+In the stock question, the result increases monotonically with array index. Every time you see a new low, you can assume you have explored the best possible price for all highs seen before (since you cannot buy for a retroactive sale).
+In this question, however, seeing a new high does not mean you automatically move the previous wall, because it remains to be seen whether the gain in height is worth the loss in width, given that height is determined by minimum of both walls.
+In these types of questions where you iterate through an array to find a list-level result property, the monotonicity of the result increment with respect to the index can give you a hint about whether you should go from front to back, or back to front, or close in from both sides, or walk about from middle.
+""" # This is multiline!
