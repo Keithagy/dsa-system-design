@@ -1,0 +1,7 @@
+success = true
+perceived_trickiness = 2 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-20T09:52:46.305757+08:00
+attempt_end_time = 2024-08-20T09:55:46.305757+08:00
+reflections = """Basic linked list traversal trick:
+If odd nodes, fast-slow pointer loop ends with fast at last and slow at middle
+If even nodes, the same ends with fast PAST last and slow at SECOND middle""" # This is multiline!
