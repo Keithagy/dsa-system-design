@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 3                                                                                  # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-21T09:07:25.281239+08:00
+attempt_end_time = 2024-08-21T09:19:25.281239+08:00
+reflections = """If you mask for a particular location, you are going to get back e.g. 4/16/0, not 1/0""" # This is multiline!
