@@ -1,273 +1,327 @@
-# Explanation: 01 Matrix
+## Explanation: 01 Matrix
 
-## Analysis of problem & input data
+### Analysis of problem & input data
 
-This problem involves finding the distance to the nearest 0 for each cell in a binary matrix. Several key aspects of the problem are worth noting:
+This problem is a classic example of a distance-based matrix traversal, which can be efficiently solved using graph traversal algorithms. The key characteristics of this problem are:
 
-1. The input is a binary matrix, containing only 0s and 1s.
-2. We need to calculate distances for all cells, not just the 1s.
-3. The distance is defined as the Manhattan distance (L1 norm) between cells.
-4. The problem has a spatial relationship - we're dealing with adjacent cells in a 2D grid.
-5. There's a guarantee of at least one 0 in the matrix, ensuring a valid solution always exists.
-6. The matrix can be large (up to 10^4 x 10^4), so efficiency is crucial.
+1. Binary matrix input: The input is a matrix containing only 0s and 1s.
+2. Distance calculation: We need to find the Manhattan distance from each cell to the nearest 0.
+3. Multi-source problem: There can be multiple 0s in the matrix, each acting as a source.
 
-The key principle that makes this question approachable is that the distance to the nearest 0 for any cell can be built up from the distances of its neighbors. This suggests both dynamic programming and graph traversal approaches could be effective.
+The key principle that makes this question simple is the realization that this is essentially a multi-source breadth-first search (BFS) problem. BFS guarantees that we always find the shortest path first, which in this case translates to the shortest distance to a 0.
 
-Solution approaches include:
+Pattern-matching wise, this problem falls into the category of:
 
-1. Multi-source BFS (Breadth-First Search)
-2. Dynamic Programming (two-pass)
-3. Brute Force with optimization
-   (3 in total)
+- Graph traversal problems
+- Matrix traversal problems
+- Distance calculation problems
 
-## Solutions
+The optimal solution leverages the fact that BFS explores all cells at a given distance before moving to cells at a greater distance, naturally giving us the shortest distance to a 0 for each cell.
 
-### Multi-source BFS
+### Test cases
+
+1. Edge case: Single cell matrix
+   Input: [[0]]
+   Output: [[0]]
+
+2. Edge case: Matrix with all 0s
+   Input: [[0,0],[0,0]]
+   Output: [[0,0],[0,0]]
+
+3. Edge case: Matrix with all 1s except one 0
+   Input: [[1,1,1],[1,0,1],[1,1,1]]
+   Output: [[2,1,2],[1,0,1],[2,1,2]]
+
+4. General case: Mixed 0s and 1s
+   Input: [[0,0,0],[0,1,0],[1,1,1]]
+   Output: [[0,0,0],[0,1,0],[1,2,1]]
+
+5. Larger matrix case:
+   Input: [[1,1,1,1],[1,1,1,1],[1,1,1,0],[1,1,1,1],[1,1,1,1]]
+   Output: [[4,3,2,1],[3,2,1,1],[2,1,1,0],[3,2,1,1],[4,3,2,1]]
+
+Here's the Python code for these test cases:
+
+```python
+def test_update_matrix(func):
+    test_cases = [
+        ([[0]], [[0]]),
+        ([[0,0],[0,0]], [[0,0],[0,0]]),
+        ([[1,1,1],[1,0,1],[1,1,1]], [[2,1,2],[1,0,1],[2,1,2]]),
+        ([[0,0,0],[0,1,0],[1,1,1]], [[0,0,0],[0,1,0],[1,2,1]]),
+        ([[1,1,1,1],[1,1,1,1],[1,1,1,0],[1,1,1,1],[1,1,1,1]],
+         [[4,3,2,1],[3,2,1,1],[2,1,1,0],[3,2,1,1],[4,3,2,1]])
+    ]
+
+    for i, (input_matrix, expected_output) in enumerate(test_cases):
+        result = func(input_matrix)
+        assert result == expected_output, f"Test case {i+1} failed. Expected {expected_output}, but got {result}"
+    print("All test cases passed!")
+
+# Usage:
+# test_update_matrix(update_matrix)
+```
+
+### Solutions
+
+#### Overview of solution approaches
+
+##### Solutions worth learning
+
+1. Multi-source BFS (optimal)
+2. Dynamic Programming (DP) with two passes
+3. DFS with memoization
+
+Count: 3 solutions
+
+##### Rejected solutions
+
+1. Brute Force approach (checking distance to every 0 for each cell)
+2. Single-source BFS from each 1 (inefficient for large matrices)
+
+#### Worthy Solutions
+
+##### Multi-source BFS
 
 ```python
 from collections import deque
 from typing import List
 
-class Solution:
-    def updateMatrix(self, mat: List[List[int]]) -> List[List[int]]:
-        m, n = len(mat), len(mat[0])
-        queue = deque()
-        visited = set()
+def update_matrix(mat: List[List[int]]) -> List[List[int]]:
+    m, n = len(mat), len(mat[0])
+    queue = deque()
+    visited = set()
 
-        # Initialize queue with all 0s and mark them as visited
-        for i in range(m):
-            for j in range(n):
-                if mat[i][j] == 0:
-                    queue.append((i, j))
-                    visited.add((i, j))
-
-        # BFS to update distances
-        while queue:
-            x, y = queue.popleft()
-            for dx, dy in [(1, 0), (-1, 0), (0, 1), (0, -1)]:  # 4-directional
-                nx, ny = x + dx, y + dy
-                if 0 <= nx < m and 0 <= ny < n and (nx, ny) not in visited:
-                    mat[nx][ny] = mat[x][y] + 1  # Update distance
-                    queue.append((nx, ny))
-                    visited.add((nx, ny))
-
-        return mat
-```
-
-Time Complexity: O(mn), where m and n are the dimensions of the matrix. Each cell is processed at most once.
-Space Complexity: O(mn) in the worst case, for the queue and visited set.
-
-Key intuitions and invariants:
-
-- Start BFS from all 0 cells simultaneously (multi-source).
-- The first time we reach a cell, it's guaranteed to be the shortest path due to BFS properties.
-- We're essentially building a wavefront that expands from all 0s concurrently.
-- The distance increases by 1 for each step away from a 0.
-
-### Dynamic Programming (two-pass)
-
-```python
-from typing import List
-
-class Solution:
-    def updateMatrix(self, mat: List[List[int]]) -> List[List[int]]:
-        m, n = len(mat), len(mat[0])
-
-        # First pass: check for left and top
-        for i in range(m):
-            for j in range(n):
-                if mat[i][j] != 0:
-                    top = mat[i - 1][j] if i > 0 else float('inf')
-                    left = mat[i][j - 1] if j > 0 else float('inf')
-                    mat[i][j] = min(top, left) + 1
-
-        # Second pass: check for bottom and right
-        for i in range(m - 1, -1, -1):
-            for j in range(n - 1, -1, -1):
-                if mat[i][j] != 0:
-                    bottom = mat[i + 1][j] if i < m - 1 else float('inf')
-                    right = mat[i][j + 1] if j < n - 1 else float('inf')
-                    mat[i][j] = min(mat[i][j], bottom + 1, right + 1)
-
-        return mat
-```
-
-Time Complexity: O(mn), where m and n are the dimensions of the matrix. We make two passes over the matrix.
-Space Complexity: O(1), as we modify the input matrix in-place.
-
-Key intuitions and invariants:
-
-- The distance to the nearest 0 can be calculated by considering the minimum distance from four directions.
-- We can break this down into two passes: top-left to bottom-right, and then bottom-right to top-left.
-- In each pass, we're effectively propagating distance information from two directions.
-- This approach works because the Manhattan distance is separable in x and y directions.
-
-### Brute Force with optimization
-
-```python
-from typing import List
-
-class Solution:
-    def updateMatrix(self, mat: List[List[int]]) -> List[List[int]]:
-        m, n = len(mat), len(mat[0])
-
-        def find_nearest_zero(i: int, j: int) -> int:
+    # Initialize queue with all 0s and mark them as visited
+    for i in range(m):
+        for j in range(n):
             if mat[i][j] == 0:
-                return 0
+                queue.append((i, j))
+                visited.add((i, j))
 
-            min_dist = float('inf')
-            for x in range(m):
-                for y in range(n):
-                    if mat[x][y] == 0:
-                        dist = abs(x - i) + abs(y - j)
-                        if dist < min_dist:
-                            min_dist = dist
-                        if min_dist <= 1:  # Early termination
-                            return min_dist
-            return min_dist
+    # BFS
+    while queue:
+        x, y = queue.popleft()
+        for dx, dy in [(1, 0), (-1, 0), (0, 1), (0, -1)]:  # 4-directional
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < m and 0 <= ny < n and (nx, ny) not in visited:
+                mat[nx][ny] = mat[x][y] + 1
+                queue.append((nx, ny))
+                visited.add((nx, ny))
 
-        return [[find_nearest_zero(i, j) for j in range(n)] for i in range(m)]
+    return mat
 ```
 
-Time Complexity: O(m^2 \* n^2) in the worst case, but often better due to early termination.
-Space Complexity: O(1) if we don't count the output matrix.
+Time Complexity: O(m _n), where m and n are the dimensions of the matrix
+Space Complexity: O(m_ n) for the queue and visited set in the worst case
 
-Key intuitions and invariants:
+- Intuition:
 
-- For each cell, we search the entire matrix for the nearest 0.
-- We can optimize by terminating early if we find a 0 at distance 1.
-- This approach is straightforward but inefficient for large matrices.
+  - Start BFS from all 0 cells simultaneously
+  - Each step of BFS represents increasing distance from 0
+  - First time a cell is visited gives its shortest distance to a 0
 
-## Recommendation
+- Invariants:
+  - Cells in the queue are always processed in order of increasing distance from 0
+  - Each cell is visited only once, ensuring optimal distance calculation
 
-The Multi-source BFS approach is the best one to learn and present in an interview setting. It's efficient, elegant, and demonstrates a good understanding of graph algorithms and their application to matrix problems. It has optimal time complexity and is relatively easy to explain and implement.
-
-The Dynamic Programming solution is also excellent and worth learning. It's very efficient and shows a deep understanding of how to break down the problem into subproblems. In an interview, you could discuss both approaches, starting with BFS and then mentioning DP as an alternative that uses constant extra space.
-
-The Brute Force approach, while correct, is not recommended for large matrices due to its high time complexity. However, it's worth mentioning in an interview as a starting point to demonstrate your problem-solving process.
-
-## Test cases
+##### Dynamic Programming (DP) with two passes
 
 ```python
-# Test case 1
-mat1 = [[0,0,0],[0,1,0],[0,0,0]]
-expected1 = [[0,0,0],[0,1,0],[0,0,0]]
+from typing import List
 
-# Test case 2
-mat2 = [[0,0,0],[0,1,0],[1,1,1]]
-expected2 = [[0,0,0],[0,1,0],[1,2,1]]
+def update_matrix(mat: List[List[int]]) -> List[List[int]]:
+    m, n = len(mat), len(mat[0])
+    MAX_DIST = m + n  # Maximum possible distance in the matrix
 
-# Test case 3 (edge case: single cell)
-mat3 = [[0]]
-expected3 = [[0]]
+    # First pass: check for left and top
+    for i in range(m):
+        for j in range(n):
+            if mat[i][j] != 0:
+                top = mat[i - 1][j] if i > 0 else MAX_DIST
+                left = mat[i][j - 1] if j > 0 else MAX_DIST
+                mat[i][j] = min(top, left) + 1
 
-# Test case 4 (edge case: all 1s except one 0)
-mat4 = [[1,1,1],[1,0,1],[1,1,1]]
-expected4 = [[2,1,2],[1,0,1],[2,1,2]]
+    # Second pass: check for bottom and right
+    for i in range(m - 1, -1, -1):
+        for j in range(n - 1, -1, -1):
+            if mat[i][j] != 0:
+                bottom = mat[i + 1][j] if i < m - 1 else MAX_DIST
+                right = mat[i][j + 1] if j < n - 1 else MAX_DIST
+                mat[i][j] = min(mat[i][j], bottom + 1, right + 1)
 
-# Test case 5 (larger matrix)
-mat5 = [
-    [1,1,1,1,1],
-    [1,1,1,1,1],
-    [1,1,1,0,1],
-    [1,1,1,1,1],
-    [1,1,1,1,1]
-]
-expected5 = [
-    [4,3,2,3,4],
-    [3,2,1,2,3],
-    [2,1,0,1,2],
-    [3,2,1,2,3],
-    [4,3,2,3,4]
-]
-
-solution = Solution()
-assert solution.updateMatrix(mat1) == expected1
-assert solution.updateMatrix(mat2) == expected2
-assert solution.updateMatrix(mat3) == expected3
-assert solution.updateMatrix(mat4) == expected4
-assert solution.updateMatrix(mat5) == expected5
-
-print("All test cases passed!")
+    return mat
 ```
 
-## Overview of rejected approaches
+Time Complexity: O(m \* n)
+Space Complexity: O(1) (in-place modification)
 
-1. Dijkstra's Algorithm: While this would work, it's overkill for this problem. The edges in our implicit graph all have weight 1, so BFS is more efficient and simpler.
+- Intuition:
 
-2. Floyd-Warshall Algorithm: This all-pairs shortest path algorithm would be extremely inefficient (O(n^3) for n cells) and unnecessary given the structure of the problem.
+  - Distance to nearest 0 can be calculated by considering distances from four directions
+  - Two passes ensure we consider all directions efficiently
 
-3. DFS (Depth-First Search): While DFS could be used, it's not as efficient as BFS for finding shortest paths in unweighted graphs. DFS might explore unnecessarily long paths before finding the optimal solution.
+- Invariants:
+  - After first pass, each cell contains minimum distance considering only left and top neighbors
+  - After second pass, each cell contains global minimum distance considering all four directions
 
-4. Union-Find: This data structure is typically used for disjoint set problems and doesn't directly apply to finding distances in a matrix.
+##### DFS with memoization
 
-These approaches are either overkill, inefficient, or not well-suited to the specific characteristics of this problem, which is why they were not included in the main solution approaches.
+```python
+from typing import List, Tuple
 
-## Visualization(s)
+def update_matrix(mat: List[List[int]]) -> List[List[int]]:
+    m, n = len(mat), len(mat[0])
+    memo = {}
 
-For the Multi-source BFS approach, we can visualize the process using a simple React component:
+    def dfs(i: int, j: int) -> int:
+        if (i, j) in memo:
+            return memo[(i, j)]
+        if mat[i][j] == 0:
+            return 0
+
+        min_dist = float('inf')
+        for di, dj in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
+            ni, nj = i + di, j + dj
+            if 0 <= ni < m and 0 <= nj < n:
+                min_dist = min(min_dist, dfs(ni, nj) + 1)
+
+        memo[(i, j)] = min_dist
+        return min_dist
+
+    for i in range(m):
+        for j in range(n):
+            mat[i][j] = dfs(i, j)
+
+    return mat
+```
+
+Time Complexity: O(m _n)
+Space Complexity: O(m_ n) for memoization
+
+- Intuition:
+
+  - For each cell, recursively explore all directions to find the nearest 0
+  - Memoization prevents redundant calculations
+
+- Invariants:
+  - Once a cell's distance is calculated and memoized, it's never recalculated
+  - The recursive calls always terminate at cells with value 0
+
+#### Rejected Approaches
+
+1. Brute Force approach:
+
+   - For each cell, check its distance to every 0 in the matrix
+   - Time complexity: O((mn)^2), which is inefficient for large matrices
+
+2. Single-source BFS from each 1:
+   - Perform a separate BFS starting from each 1 to find its nearest 0
+   - Time complexity: O((mn)^2) in the worst case, inefficient for matrices with many 1s
+
+These approaches are correct but not optimal due to their high time complexity, making them impractical for larger inputs.
+
+#### Final Recommendations
+
+The Multi-source BFS approach is the best solution to learn for this problem. It's intuitive, efficient, and demonstrates a good understanding of graph traversal algorithms. The DP solution is also worth learning as it showcases a different problem-solving paradigm and has the advantage of in-place modification. The DFS with memoization, while correct, is less intuitive and potentially less efficient due to the overhead of recursive calls.
+
+### Visualization(s)
+
+To visualize the Multi-source BFS approach, we can use a simple React component that shows the step-by-step process of the BFS algorithm on a sample matrix.
 
 ```tsx
 import React, { useState, useEffect } from "react";
 
-const BFSVisualization = () => {
+const BfsVisualization = () => {
   const [matrix, setMatrix] = useState([
-    [1, 1, 1, 1],
-    [1, 1, 0, 1],
-    [1, 1, 1, 1],
     [0, 1, 1, 1],
+    [1, 1, 1, 1],
+    [1, 1, 1, 0],
+    [1, 1, 1, 1],
   ]);
   const [step, setStep] = useState(0);
-
-  const colors = [
-    "#4CAF50",
-    "#8BC34A",
-    "#CDDC39",
-    "#FFEB3B",
-    "#FFC107",
-    "#FF9800",
-    "#FF5722",
-  ];
+  const [queue, setQueue] = useState([]);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setStep(
-        (prevStep) => (prevStep + 1) % (matrix.length * matrix[0].length),
-      );
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [matrix]);
+    const initialQueue = [];
+    const newMatrix = matrix.map((row, i) =>
+      row.map((cell, j) => {
+        if (cell === 0) {
+          initialQueue.push([i, j]);
+          return { value: 0, visited: true };
+        }
+        return { value: Infinity, visited: false };
+      }),
+    );
+    setMatrix(newMatrix);
+    setQueue(initialQueue);
+  }, []);
 
-  const getCellColor = (value) => {
-    if (value === 0) return "#2196F3";
-    return colors[Math.min(value - 1, colors.length - 1)];
+  const nextStep = () => {
+    if (queue.length === 0) return;
+
+    const [x, y] = queue.shift();
+    const directions = [
+      [1, 0],
+      [-1, 0],
+      [0, 1],
+      [0, -1],
+    ];
+
+    const newMatrix = [...matrix];
+    directions.forEach(([dx, dy]) => {
+      const nx = x + dx;
+      const ny = y + dy;
+      if (
+        nx >= 0 &&
+        nx < matrix.length &&
+        ny >= 0 &&
+        ny < matrix[0].length &&
+        !newMatrix[nx][ny].visited
+      ) {
+        newMatrix[nx][ny] = {
+          value: newMatrix[x][y].value + 1,
+          visited: true,
+        };
+        queue.push([nx, ny]);
+      }
+    });
+
+    setMatrix(newMatrix);
+    setQueue([...queue]);
+    setStep(step + 1);
   };
 
   return (
-    <div className="flex flex-col items-center">
-      <h2 className="text-xl font-bold mb-4">BFS Visualization</h2>
-      <div className="grid grid-cols-4 gap-1">
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-4">01 Matrix BFS Visualization</h2>
+      <div className="grid grid-cols-4 gap-2 mb-4">
         {matrix.map((row, i) =>
           row.map((cell, j) => (
             <div
               key={`${i}-${j}`}
-              className="w-12 h-12 flex items-center justify-center text-white font-bold"
-              style={{
-                backgroundColor: getCellColor(cell),
-                opacity: i * matrix[0].length + j <= step ? 1 : 0.3,
-              }}
+              className={`w-12 h-12 flex items-center justify-center border ${
+                cell.visited ? "bg-blue-200" : "bg-gray-200"
+              }`}
             >
-              {cell}
+              {cell.value === Infinity ? "∞" : cell.value}
             </div>
           )),
         )}
       </div>
-      <p className="mt-4">Step: {step + 1}</p>
+      <button
+        onClick={nextStep}
+        className="bg-blue-500 text-white px-4 py-2 rounded"
+        disabled={queue.length === 0}
+      >
+        Next Step
+      </button>
+      <p className="mt-2">Step: {step}</p>
     </div>
   );
 };
 
-export default BFSVisualization;
+export default BfsVisualization;
 ```
 
-This visualization shows how the BFS algorithm progresses through the matrix, updating the distances from 0 cells. The colors represent the distance from the nearest 0, with blue being 0 and warmer colors representing increasing distances. The visualization updates every second to show the progression of the algorithm.
+This visualization demonstrates how the BFS algorithm updates the matrix step by step, starting from the initial 0 cells and propagating the distances outward. The blue cells represent visited cells, and the numbers in each cell show the current distance from the nearest 0. You can click the "Next Step" button to see how the algorithm progresses.
