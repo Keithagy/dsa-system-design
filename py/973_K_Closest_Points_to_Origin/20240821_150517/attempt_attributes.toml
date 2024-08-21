@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 2                                    # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-21T15:05:17.617314+08:00
+attempt_end_time = 2024-08-21T15:12:17.617314+08:00
+reflections = """using fix-sized max heap as leaderboard""" # This is multiline!
