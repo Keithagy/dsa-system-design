@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 2                              # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-22T13:25:55.173596+08:00
+attempt_end_time = 2024-08-22T13:37:55.173596+08:00
+reflections = """Bubble up target values"""           # This is multiline!
