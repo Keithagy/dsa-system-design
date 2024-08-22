@@ -1,5 +1,5 @@
-success = false
-perceived_trickiness = 1 # 7-point scale: 1 is brain-dead, 7 is diabolical
+success = true
+perceived_trickiness = 2                                                                     # 7-point scale: 1 is brain-dead, 7 is diabolical
 attempt_start_time = 2024-08-22T11:37:51.980145+08:00
-attempt_end_time = 2024-08-22T11:37:51.980145+08:00
-reflections = """""" # This is multiline!
+attempt_end_time = 2024-08-22T11:42:51.980145+08:00
+reflections = """BFS with sentinel value is the way to model simultaneous events with BFS""" # This is multiline!
