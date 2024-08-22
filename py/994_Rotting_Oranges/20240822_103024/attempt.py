@@ -11,7 +11,7 @@ class Solution:
     # no fresh oranges >> return 0
     def orangesRotting(self, grid: List[List[int]]) -> int:
         fresh_count = 0
-        rot_q = deque()
+        rotten = set()
         directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
         for r in range(len(grid)):
             for c in range(len(grid[0])):
@@ -19,26 +19,12 @@ class Solution:
                     case 1:
                         fresh_count += 1
                     case 2:
-                        for rd, cd in directions:
-                            nr, nc = r + rd, c + cd
-                            if (
-                                0 <= nr < len(grid)
-                                and 0 <= nc < len(grid[0])
-                                and grid[nr][nc] == 1
-                            ):
-                                rot_q.append((nr, nc))
+                        rotten.add((r, c))
         mins = 0
-        while rot_q:
+        while rotten:
             # mins value marks the endpoint. so, if min == 0 then rotting_this_min denotes count rotting over the FIRST, not ZEROTH, minute, since 0th has already passed (which is why we have the initial rotten)
-            rotting_this_min = len(rot_q)
-            for _ in range(rotting_this_min):
-                (r, c) = rot_q.popleft()
-                if (
-                    grid[r][c] == 2
-                ):  # because queue might contain double entry >> accessing a square from mult diff sides
-                    continue
-                grid[r][c] = 2
-                fresh_count -= 1
+            new_rot = set()
+            for r, c in rotten:
                 for rd, cd in directions:
                     nr, nc = r + rd, c + cd
                     if (
@@ -46,7 +32,10 @@ class Solution:
                         and 0 <= nc < len(grid[0])
                         and grid[nr][nc] == 1
                     ):
-                        rot_q.append((nr, nc))
-            mins += 1
+                        grid[r][c] = 2
+                        fresh_count -= 1
+                        new_rot.add((nr, nc))
+            rotten = new_rot
+            mins += 1 if rotten else 0
         return mins if fresh_count == 0 else -1
 

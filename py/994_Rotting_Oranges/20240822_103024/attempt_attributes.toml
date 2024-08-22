@@ -1,5 +1,10 @@
-success = true
-perceived_trickiness = 3                            # 7-point scale: 1 is brain-dead, 7 is diabolical
+success = false
+perceived_trickiness = 7 # 7-point scale: 1 is brain-dead, 7 is diabolical
 attempt_start_time = 2024-08-22T10:30:24.4705+08:00
 attempt_end_time = 2024-08-22T10:51:24.4705+08:00
-reflections = """Cursed question"""                 # This is multiline!
+reflections = """Cursed question. Simulating this properly is full of traps.
+Don't use the intuitive way of using a global minutes counter, easy to wrongly mismodel since you can only process oranges one by one.
+You should enqueue the minute in which they rot as well, then skim for the max of these values as they come through the queue.
+Try again later. Remember this sentinel-value approach for all cases where you're using BFS to model simultaneous occurences.
+Also, tracking rotten oranges, not their neighbors, allows you to address the problem of double-counting oranges that are rotten from two sides.
+""" # This is multiline!
