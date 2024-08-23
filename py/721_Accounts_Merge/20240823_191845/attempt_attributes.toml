@@ -1,0 +1,8 @@
+success = true
+perceived_trickiness = 2 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-23T19:18:45.001537+08:00
+attempt_end_time = 2024-08-23T19:22:45.001537+08:00
+reflections = """using sets for graphs is a good idea.
+improving your familiarity around problems to the point where you can just sling out code in 5 minutes is crucial
+so is learning to be calm around new problems that you definitely have the tools to solve
+""" # This is multiline!
