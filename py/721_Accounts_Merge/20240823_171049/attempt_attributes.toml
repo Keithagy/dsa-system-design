@@ -1,0 +1,5 @@
+success = false
+perceived_trickiness = 1                                                                              # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-23T17:10:49.319806+08:00
+attempt_end_time = 2024-08-23T17:40:49.319806+08:00
+reflections = """Failed this. easier if you just use defaultdict(set) to represent graphs actually""" # This is multiline!

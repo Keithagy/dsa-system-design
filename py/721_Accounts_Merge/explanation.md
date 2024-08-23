@@ -1,372 +1,347 @@
-# Explanation: Accounts Merge
+## Explanation: Accounts Merge
 
-## Analysis of problem & input data
+### Analysis of problem & input data
 
-This problem is fundamentally about grouping related accounts based on shared emails. The key characteristics and challenges of this problem are:
+This problem is fundamentally about finding connected components in a graph, where each email address is a node and two email addresses are connected if they belong to the same account. The key insights are:
 
-1. Graph-like structure: The accounts and emails form a graph-like structure where emails are the connecting edges between accounts.
-2. Disjoint Set problem: We need to find connected components in this graph, which is a classic application of the Disjoint Set (Union-Find) data structure.
-3. Name collision: Multiple people can have the same name, so we can't merge accounts based on names alone.
-4. Email uniqueness: An email can only belong to one person, which is crucial for merging accounts.
-5. Sorting requirement: The final output requires emails to be sorted within each account.
-6. Variable input size: The number of accounts and emails per account can vary significantly.
+1. Email addresses are unique identifiers for accounts.
+2. The same person can have multiple email addresses.
+3. Different people can have the same name.
+4. The goal is to merge accounts belonging to the same person.
 
-The key principle that makes this question tractable is that we can use emails as unique identifiers to connect accounts, regardless of the names associated with them. This allows us to transform the problem into a graph connectivity problem, which can be efficiently solved using disjoint set operations.
+This problem maps well to the Union-Find (Disjoint Set) data structure, which is optimal for grouping elements into sets and efficiently finding which set an element belongs to. The key principle that makes this question simple is that Union-Find provides near-constant time operations for merging sets and checking if two elements belong to the same set.
+
+Alternatively, this can be solved using a graph-based approach with Depth-First Search (DFS) or Breadth-First Search (BFS), where we build an adjacency list representing connections between email addresses and then traverse the graph to find connected components.
 
 ### Test cases
 
-Let's define some test cases to cover various scenarios:
-
 1. Basic case with merging:
 
-```python
-accounts = [
-    ["John", "johnsmith@mail.com", "john_newyork@mail.com"],
-    ["John", "johnsmith@mail.com", "john00@mail.com"],
-    ["Mary", "mary@mail.com"],
-    ["John", "johnnybravo@mail.com"]
-]
-# Expected: [
-#     ["John", "john00@mail.com", "john_newyork@mail.com", "johnsmith@mail.com"],
-#     ["Mary", "mary@mail.com"],
-#     ["John", "johnnybravo@mail.com"]
-# ]
-```
+   ```python
+   accounts = [["John", "johnsmith@mail.com", "john_newyork@mail.com"],
+               ["John", "johnsmith@mail.com", "john00@mail.com"],
+               ["Mary", "mary@mail.com"],
+               ["John", "johnnybravo@mail.com"]]
+   ```
 
 2. No merging required:
 
-```python
-accounts = [
-    ["Gabe", "Gabe0@m.co", "Gabe3@m.co", "Gabe1@m.co"],
-    ["Kevin", "Kevin3@m.co", "Kevin5@m.co", "Kevin0@m.co"],
-    ["Ethan", "Ethan5@m.co", "Ethan4@m.co", "Ethan0@m.co"]
-]
-# Expected: (same as input, but with emails sorted)
-```
+   ```python
+   accounts = [["Gabe", "Gabe0@m.co", "Gabe3@m.co", "Gabe1@m.co"],
+               ["Kevin", "Kevin3@m.co", "Kevin5@m.co", "Kevin0@m.co"]]
+   ```
 
 3. All accounts merge into one:
 
-```python
-accounts = [
-    ["John", "a@mail.com", "b@mail.com"],
-    ["John", "b@mail.com", "c@mail.com"],
-    ["John", "c@mail.com", "d@mail.com"]
-]
-# Expected: [["John", "a@mail.com", "b@mail.com", "c@mail.com", "d@mail.com"]]
-```
+   ```python
+   accounts = [["John", "a@mail.com"],
+               ["John", "b@mail.com"],
+               ["John", "a@mail.com", "c@mail.com"]]
+   ```
 
 4. Same name, different people:
 
-```python
-accounts = [
-    ["David", "David0@m.co", "David1@m.co"],
-    ["David", "David3@m.co", "David4@m.co"],
-    ["David", "David4@m.co", "David5@m.co"],
-    ["David", "David2@m.co", "David3@m.co"],
-    ["David", "David1@m.co", "David2@m.co"]
-]
-# Expected: [
-#     ["David", "David0@m.co", "David1@m.co", "David2@m.co", "David3@m.co", "David4@m.co", "David5@m.co"]
-# ]
-```
+   ```python
+   accounts = [["David", "David0@m.co", "David1@m.co"],
+               ["David", "David3@m.co", "David4@m.co"],
+               ["David", "David4@m.co", "David5@m.co"],
+               ["David", "David2@m.co", "David3@m.co"],
+               ["David", "David1@m.co", "David2@m.co"]]
+   ```
 
-5. Edge case with single email:
+5. Large number of accounts (edge case for performance):
 
-```python
-accounts = [["Alex", "alex@m.co"], ["Bob", "bob@m.co"]]
-# Expected: (same as input)
-```
+   ```python
+   accounts = [["Person"+str(i), "email"+str(i)+"@domain.com"] for i in range(1000)]
+   ```
 
-Here's the Python code to run these test cases:
+Here's the executable Python code for these test cases:
 
 ```python
-def accountsMerge(accounts):
-    # Implementation goes here
-    pass
+def test_accounts_merge(merge_accounts_func):
+    test_cases = [
+        [["John", "johnsmith@mail.com", "john_newyork@mail.com"],
+         ["John", "johnsmith@mail.com", "john00@mail.com"],
+         ["Mary", "mary@mail.com"],
+         ["John", "johnnybravo@mail.com"]],
 
-test_cases = [
-    [
-        ["John", "johnsmith@mail.com", "john_newyork@mail.com"],
-        ["John", "johnsmith@mail.com", "john00@mail.com"],
-        ["Mary", "mary@mail.com"],
-        ["John", "johnnybravo@mail.com"]
-    ],
-    [
-        ["Gabe", "Gabe0@m.co", "Gabe3@m.co", "Gabe1@m.co"],
-        ["Kevin", "Kevin3@m.co", "Kevin5@m.co", "Kevin0@m.co"],
-        ["Ethan", "Ethan5@m.co", "Ethan4@m.co", "Ethan0@m.co"]
-    ],
-    [
-        ["John", "a@mail.com", "b@mail.com"],
-        ["John", "b@mail.com", "c@mail.com"],
-        ["John", "c@mail.com", "d@mail.com"]
-    ],
-    [
-        ["David", "David0@m.co", "David1@m.co"],
-        ["David", "David3@m.co", "David4@m.co"],
-        ["David", "David4@m.co", "David5@m.co"],
-        ["David", "David2@m.co", "David3@m.co"],
-        ["David", "David1@m.co", "David2@m.co"]
-    ],
-    [["Alex", "alex@m.co"], ["Bob", "bob@m.co"]]
-]
+        [["Gabe", "Gabe0@m.co", "Gabe3@m.co", "Gabe1@m.co"],
+         ["Kevin", "Kevin3@m.co", "Kevin5@m.co", "Kevin0@m.co"]],
 
-for i, case in enumerate(test_cases, 1):
-    print(f"Test Case {i}:")
-    print("Input:", case)
-    print("Output:", accountsMerge(case))
-    print()
+        [["John", "a@mail.com"],
+         ["John", "b@mail.com"],
+         ["John", "a@mail.com", "c@mail.com"]],
+
+        [["David", "David0@m.co", "David1@m.co"],
+         ["David", "David3@m.co", "David4@m.co"],
+         ["David", "David4@m.co", "David5@m.co"],
+         ["David", "David2@m.co", "David3@m.co"],
+         ["David", "David1@m.co", "David2@m.co"]],
+
+        [["Person"+str(i), "email"+str(i)+"@domain.com"] for i in range(1000)]
+    ]
+
+    for i, case in enumerate(test_cases):
+        result = merge_accounts_func(case)
+        print(f"Test case {i+1} result:")
+        for account in result:
+            print(account)
+        print()
+
+# Usage:
+# test_accounts_merge(your_merge_accounts_function)
 ```
 
-## Solutions
+### Solutions
 
-### Overview of solution approaches
+#### Overview of solution approaches
 
-#### Solutions worth learning
+##### Solutions worth learning
 
-1. Disjoint Set (Union-Find) with sorting
-2. Depth-First Search (DFS) with adjacency list
-3. Breadth-First Search (BFS) with adjacency list
+1. Union-Find (Disjoint Set) approach
+2. Graph-based approach with DFS
+3. Graph-based approach with BFS
 
 Count: 3 solutions
 
-#### Rejected solutions
+##### Rejected solutions
 
-1. Brute Force comparison of all accounts
-2. Hash-based grouping without graph structure
+1. Brute force comparison of all accounts
+2. Sorting and comparing adjacent accounts
 
-### Worthy Solutions
+#### Worthy Solutions
 
-#### 1. Disjoint Set (Union-Find) with sorting
-
-This approach uses a Disjoint Set data structure to efficiently group related emails.
+##### Union-Find (Disjoint Set) approach
 
 ```python
 from typing import List
 from collections import defaultdict
 
-class DisjointSet:
-    def __init__(self):
-        self.parent = {}
+class UnionFind:
+    def __init__(self, n):
+        self.parent = list(range(n))
+        self.rank = [0] * n
 
-    def find(self, item):
-        if item not in self.parent:
-            self.parent[item] = item
-        elif self.parent[item] != item:
-            self.parent[item] = self.find(self.parent[item])
-        return self.parent[item]
+    def find(self, x):
+        if self.parent[x] != x:
+            self.parent[x] = self.find(self.parent[x])  # Path compression
+        return self.parent[x]
 
-    def union(self, item1, item2):
-        root1, root2 = self.find(item1), self.find(item2)
-        if root1 != root2:
-            self.parent[root2] = root1
+    def union(self, x, y):
+        px, py = self.find(x), self.find(y)
+        if px == py:
+            return
+        if self.rank[px] < self.rank[py]:  # Union by rank
+            self.parent[px] = py
+        elif self.rank[px] > self.rank[py]:
+            self.parent[py] = px
+        else:
+            self.parent[py] = px
+            self.rank[px] += 1
 
 def accountsMerge(accounts: List[List[str]]) -> List[List[str]]:
-    disjoint_set = DisjointSet()
+    email_to_id = {}
     email_to_name = {}
 
-    # Step 1: Build the disjoint set
+    # Assign unique ID to each email
     for account in accounts:
         name = account[0]
-        # Union all emails in this account
         for email in account[1:]:
-            disjoint_set.union(account[1], email)
+            if email not in email_to_id:
+                email_to_id[email] = len(email_to_id)
             email_to_name[email] = name
 
-    # Step 2: Group emails by their root in the disjoint set
-    email_groups = defaultdict(list)
-    for email in email_to_name:
-        root = disjoint_set.find(email)
-        email_groups[root].append(email)
+    # Create UnionFind structure
+    uf = UnionFind(len(email_to_id))
 
-    # Step 3: Format the result
-    result = []
-    for emails in email_groups.values():
-        name = email_to_name[emails[0]]
-        result.append([name] + sorted(emails))
+    # Union emails belonging to the same account
+    for account in accounts:
+        first_email = account[1]
+        for email in account[2:]:
+            uf.union(email_to_id[first_email], email_to_id[email])
 
-    return result
+    # Group emails by their representative (root) in UnionFind
+    merged_accounts = defaultdict(list)
+    for email, id in email_to_id.items():
+        root = uf.find(id)
+        merged_accounts[root].append(email)
+
+    # Format the result
+    return [[email_to_name[emails[0]]] + sorted(emails) for emails in merged_accounts.values()]
 ```
 
-Time Complexity: O(N _K_ log(N \* K)), where N is the number of accounts and K is the maximum number of emails in an account. The log factor comes from the union and find operations in the disjoint set.
+Time Complexity: O(N \* α(N)), where N is the total number of emails and α is the inverse Ackermann function, which grows very slowly and is effectively constant for all practical values of N.
+Space Complexity: O(N), where N is the total number of emails.
 
-Space Complexity: O(N \* K) to store the disjoint set and email groups.
+Explanation:
+
+- The UnionFind operations (find and union) have an amortized time complexity of O(α(N)) due to path compression and union by rank optimizations.
+- We iterate through all emails once to create the UnionFind structure and once more to group them, both of which are O(N) operations.
+- Sorting the emails in each group adds a factor of O(M log M) where M is the number of emails in a group, but since ΣM = N, this is bounded by O(N log N).
 
 Intuitions and invariants:
 
-- Each email is a node in our disjoint set.
-- Emails in the same account are connected (unioned) in the disjoint set.
-- The root email of each set in the disjoint set represents a unique person.
-- We maintain a mapping from emails to names to reconstruct the final result.
+- Each email address is treated as a node in the UnionFind structure.
+- Emails belonging to the same account are unioned together.
+- The representative (root) of each set in UnionFind corresponds to a unique person.
+- Path compression and union by rank optimizations keep the tree structure flat, ensuring near-constant time operations.
 
-#### 2. Depth-First Search (DFS) with adjacency list
-
-This approach builds a graph where emails are nodes and accounts provide the edges.
+##### Graph-based approach with DFS
 
 ```python
 from typing import List
 from collections import defaultdict
 
 def accountsMerge(accounts: List[List[str]]) -> List[List[str]]:
-    # Build the graph
+    # Build the graph: email -> set of connected emails
     graph = defaultdict(set)
     email_to_name = {}
+
     for account in accounts:
         name = account[0]
+        # Connect all emails in this account
         for email in account[1:]:
             graph[account[1]].add(email)
             graph[email].add(account[1])
             email_to_name[email] = name
 
-    # DFS function to explore connected components
-    def dfs(email, component):
-        if email in visited:
+    # DFS function to collect all connected emails
+    def dfs(email, connected_emails):
+        if email in connected_emails:
             return
-        visited.add(email)
-        component.append(email)
+        connected_emails.add(email)
         for neighbor in graph[email]:
-            dfs(neighbor, component)
+            dfs(neighbor, connected_emails)
 
     # Perform DFS for each email
+    merged_accounts = []
     visited = set()
-    result = []
     for email in graph:
         if email not in visited:
-            component = []
-            dfs(email, component)
-            result.append([email_to_name[email]] + sorted(component))
+            connected_emails = set()
+            dfs(email, connected_emails)
+            merged_accounts.append([email_to_name[email]] + sorted(connected_emails))
+            visited.update(connected_emails)
 
-    return result
+    return merged_accounts
 ```
 
-Time Complexity: O(N _K_ log(N \* K)), where N is the number of accounts and K is the maximum number of emails in an account. The log factor comes from sorting the emails.
+Time Complexity: O(NE log(E)), where N is the number of accounts and E is the maximum number of emails in an account.
+Space Complexity: O(NE), where N is the number of accounts and E is the maximum number of emails in an account.
 
-Space Complexity: O(N \* K) to store the graph and visited set.
+Explanation:
+
+- Building the graph takes O(NE) time, where we iterate through each email in each account.
+- The DFS traversal visits each email once, which is O(NE) in total.
+- Sorting the emails for each merged account takes O(E log E) time.
+- In the worst case, if all emails belong to the same account, we would sort all NE emails, giving us O(NE log(NE)) time complexity.
 
 Intuitions and invariants:
 
-- Each email is a node in our graph.
-- Emails in the same account are connected by edges.
-- A connected component in this graph represents all emails belonging to one person.
-- DFS explores all connected emails, forming a single merged account.
+- The graph represents connections between emails, where connected emails belong to the same person.
+- DFS traversal ensures we find all connected components (i.e., all emails belonging to the same person).
+- Each connected component in the graph represents a unique person's account.
+- The first email encountered in a connected component is used to retrieve the person's name.
 
-#### 3. Breadth-First Search (BFS) with adjacency list
-
-This approach is similar to DFS but uses BFS to explore connected components.
+##### Graph-based approach with BFS
 
 ```python
 from typing import List
 from collections import defaultdict, deque
 
 def accountsMerge(accounts: List[List[str]]) -> List[List[str]]:
-    # Build the graph
+    # Build the graph: email -> set of connected emails
     graph = defaultdict(set)
     email_to_name = {}
+
     for account in accounts:
         name = account[0]
+        # Connect all emails in this account
         for email in account[1:]:
-      # This approach is correct, and here's why:
-      # Connectivity: By connecting all emails in an account to the first email (account[1]), we ensure that all emails in the account are connected in the graph. This is sufficient to create a connected component for all emails belonging to the same person.
-      # Bidirectional Edges: The line graph[email].add(account[1]) ensures that the connection is bidirectional. This means that even if an email appears as a non-first email in one account and as a first email in another, they will still be connected.
-      # Transitive Closure: Due to the nature of graph traversal (whether DFS or BFS), if two accounts share any email, they will end up in the same connected component. This is because the traversal will follow all connections, regardless of whether an email was the first in its original account or not.
-      # Efficiency: This approach is more efficient than connecting every email to every other email within an account, as it reduces the number of edges in the graph while still maintaining full connectivity.
             graph[account[1]].add(email)
             graph[email].add(account[1])
             email_to_name[email] = name
 
-    # BFS function to explore connected components
+    # BFS function to collect all connected emails
     def bfs(start_email):
         queue = deque([start_email])
-        component = []
+        connected_emails = set()
         while queue:
             email = queue.popleft()
-            if email in visited:
+            if email in connected_emails:
                 continue
-            visited.add(email)
-            component.append(email)
-            queue.extend(graph[email] - visited)
-        return component
+            connected_emails.add(email)
+            queue.extend(graph[email] - connected_emails)
+        return connected_emails
 
     # Perform BFS for each email
+    merged_accounts = []
     visited = set()
-    result = []
     for email in graph:
         if email not in visited:
-            component = bfs(email)
-            result.append([email_to_name[email]] + sorted(component))
+            connected_emails = bfs(email)
+            merged_accounts.append([email_to_name[email]] + sorted(connected_emails))
+            visited.update(connected_emails)
 
-    return result
+    return merged_accounts
 ```
 
-Time Complexity: O(N _K_ log(N \* K)), where N is the number of accounts and K is the maximum number of emails in an account. The log factor comes from sorting the emails.
+Time Complexity: O(NE log(E)), where N is the number of accounts and E is the maximum number of emails in an account.
+Space Complexity: O(NE), where N is the number of accounts and E is the maximum number of emails in an account.
 
-Space Complexity: O(N \* K) to store the graph and queue.
+Explanation:
+
+- Building the graph takes O(NE) time, iterating through each email in each account.
+- The BFS traversal visits each email once, which is O(NE) in total.
+- Sorting the emails for each merged account takes O(E log E) time.
+- In the worst case, if all emails belong to the same account, we would sort all NE emails, giving us O(NE log(NE)) time complexity.
 
 Intuitions and invariants:
 
-- Similar to DFS, but explores nodes level by level.
-- Guarantees shortest path exploration (though not needed for this problem).
-- May be more memory-efficient than DFS for very deep graphs (not a significant factor here).
+- The graph represents connections between emails, where connected emails belong to the same person.
+- BFS traversal ensures we find all connected components (i.e., all emails belonging to the same person) in a breadth-first manner.
+- Each connected component in the graph represents a unique person's account.
+- The queue in BFS ensures we explore all directly connected emails before moving to the next level of connections.
 
-### Rejected Approaches
+#### Rejected Approaches
 
-1. Brute Force comparison of all accounts:
+1. Brute force comparison of all accounts:
 
-   - Time Complexity: O(N^2 \* K^2), where N is the number of accounts and K is the max number of emails.
-   - Reason for rejection: Highly inefficient for large datasets, doesn't leverage the graph-like structure of the problem.
+   - This approach would involve comparing each account with every other account to find common emails.
+   - Time complexity would be O(N^2 \* E^2), where N is the number of accounts and E is the maximum number of emails in an account.
+   - This is highly inefficient for large datasets and doesn't leverage the structure of the problem.
 
-2. Hash-based grouping without graph structure:
-   - Approach: Use a hash map to group emails, then merge groups with common emails.
-   - Reason for rejection: While this could work, it's less intuitive and potentially less efficient than graph-based approaches for complex merging scenarios.
+2. Sorting and comparing adjacent accounts:
+   - This approach would sort all accounts based on email addresses and then compare adjacent accounts.
+   - While this might work, it has a time complexity of O(NE log(NE)) for sorting, which is less efficient than our accepted solutions.
+   - It also doesn't naturally capture the transitive property of account connections (if A is connected to B, and B to C, then A is connected to C).
 
-### Final Recommendations
+#### Final Recommendations
 
-The Disjoint Set (Union-Find) approach is recommended as the best solution to learn for this problem. Here's why:
+The Union-Find approach is the most recommended solution for this problem. Here's why:
 
-1. Efficiency: It provides near-constant time complexity for union and find operations, making it very efficient for large datasets.
-2. Intuitive mapping to the problem: The concept of merging accounts naturally maps to the union operation in disjoint sets.
-3. Widely applicable: Disjoint Set is a fundamental data structure used in many graph and set-related problems, making it valuable to master.
+1. Efficiency: It provides near-constant time operations for merging accounts and checking if two emails belong to the same account, making it the most efficient solution, especially for large datasets.
 
-The DFS and BFS approaches are also correct and worth understanding, as they provide insights into graph traversal techniques. However, they may be slightly less efficient due to the need for explicit graph construction and traversal.
+2. Intuitive: The concept of merging sets aligns well with the problem of merging accounts, making the solution conceptually clear.
 
-Approaches that might seem correct but aren't:
+3. Versatility: Union-Find is a fundamental data structure used in many graph and set-based problems, making it a valuable technique to master for coding interviews.
 
-1. Simply grouping by name: This fails because different people can have the same name.
-2. Merging accounts only if they share all emails: This is too strict and would miss partial overlaps.
+4. Space Efficiency: It uses less additional space compared to the graph-based approaches, as it doesn't need to store explicit connections between all emails.
 
-Solutions that are correct but less worth learning:
+While the DFS and BFS approaches are valid and demonstrate good problem-solving skills, they are slightly less efficient and require more complex data structures (graph representation). However, they are still worth understanding as they showcase different problem-solving paradigms and can be more intuitive for some people.
 
-1. Brute force comparison of all pairs of accounts: While correct, it's highly inefficient and doesn't scale well.
-2. Using a complex data structure like a Trie for email matching: While it could work, it's overly complicated for this problem and doesn't offer significant advantages over simpler approaches.
+### Visualization(s)
 
-## Visualization(s)
-
-To visualize the Disjoint Set approach, we can use a simple tree-like structure to represent the sets. Here's an ASCII representation of how the disjoint set might look for a simple case:
+For this problem, a visualization of the Union-Find structure or the graph of email connections would be helpful. Here's a simple ASCII representation of how emails might be connected:
 
 ```
-Initial state:
-John --- johnsmith@mail.com
- |
- +--- john_newyork@mail.com
- |
-John --- johnsmith@mail.com
- |
- +--- john00@mail.com
- |
-Mary --- mary@mail.com
- |
-John --- johnnybravo@mail.com
+         johnsmith@mail.com
+        /                  \
+john_newyork@mail.com    john00@mail.com
 
-After merging:
-John --- johnsmith@mail.com
- |       |
- |       +--- john_newyork@mail.com
- |       |
- |       +--- john00@mail.com
- |
-Mary --- mary@mail.com
- |
-John --- johnnybravo@mail.com
+         mary@mail.com
+
+         johnnybravo@mail.com
 ```
 
-This visualization shows how the Disjoint Set structure groups related emails under a common root, effectively merging the accounts.
+This visualization shows how emails are grouped together, with each connected component representing a unique person's account. The Union-Find structure would maintain these groupings efficiently, while the graph-based approaches would traverse these connections to merge accounts.
