@@ -1,0 +1,5 @@
+success = false
+perceived_trickiness = 1                                                                     # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-26T10:38:45.78224+08:00
+attempt_end_time = 2024-08-26T11:06:45.78224+08:00
+reflections = """I managed to get a correct answer but it was n^2 and exceeded time limit""" # This is multiline!
