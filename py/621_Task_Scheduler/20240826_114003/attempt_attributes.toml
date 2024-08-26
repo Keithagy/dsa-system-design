@@ -1,0 +1,13 @@
+success = false
+perceived_trickiness = 3 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-26T11:40:03.876067+08:00
+attempt_end_time = 2024-08-26T12:12:03.876067+08:00
+reflections = """Close, but no dice..
+Your solution does not work because it does not enforce that less-frequent tasks are 
+interleaved with more-frequent ones, which the efficient solution requires.
+I do not understand the solution at all. Need to try again.
+
+From neetcode:
+- Key idea is that you prefer to do the most frequent operation first, so as to minimize the number of idle slots
+- Use a queue to track if a given task has come off cooldown; if it has, you pop it from the queue and heappush it on so that you always process the most frequent task.
+""" # This is multiline!
