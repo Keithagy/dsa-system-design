@@ -100,4 +100,133 @@ The heap is represented using a Python list, where for any element at index `i`:
 
 This implementation ensures that the smallest element is always at the root (index 0) of the heap.
 
-Would you like me to explain any part of this implementation in more detail?
+Here's a concise overview of the simple Python syntax for using a heap:
+
+```python
+import heapq
+
+# Create an empty heap
+heap = []
+
+# Push elements onto the heap
+heapq.heappush(heap, 5)
+heapq.heappush(heap, 3)
+heapq.heappush(heap, 7)
+
+# Pop the smallest element
+smallest = heapq.heappop(heap)
+
+# Peek at the smallest element without removing it
+smallest = heap[0]
+
+# Convert a list to a heap in-place
+my_list = [5, 3, 7, 1, 9]
+heapq.heapify(my_list)
+
+# Push an item and pop the smallest in one operation
+next_item = heapq.heapreplace(heap, 6)
+```
+
+This covers the basic operations for a min-heap. Python's `heapq` module implements a min-heap by default. If you need a max-heap, you can negate the values when pushing and popping.
+
+Would you like me to explain any of these operations in more detail?
+Certainly, I'd be happy to remind you of the runtime complexities for heap operations. Here's a breakdown:
+
+1. Creation (heapify):
+
+   - O(n) where n is the number of elements
+
+2. Insertion (heappush):
+
+   - O(log n)
+
+3. Deletion of minimum/maximum element (heappop):
+
+   - O(log n)
+
+4. Peeking at the top element:
+
+   - O(1)
+
+5. Replacing the top element (heapreplace):
+
+   - O(log n)
+
+6. Removing and adding a new element (heappushpop):
+
+   - O(log n)
+
+7. Checking if the heap is empty:
+
+   - O(1)
+
+8. Getting the size of the heap:
+   - O(1)
+
+It's worth noting that these complexities assume a binary heap implementation, which is what Python's `heapq` module uses. The O(log n) complexity for insertion and deletion operations comes from the need to maintain the heap property by potentially swapping elements up or down the tree.
+
+The O(n) complexity for heapify is actually better than building a heap by n insertions (which would be O(n log n)). This is because heapify uses a clever bottom-up approach that's more efficient.
+
+Yes, you can specify a key to maintain the heap invariant in Python, although it requires a bit more work than the basic `heapq` operations. Python's `heapq` module doesn't directly support custom comparison keys, but you can achieve this functionality using a wrapper class or tuples. Here are two approaches:
+
+1. Using a wrapper class:
+
+```python
+import heapq
+
+class KeyWrapper:
+    def __init__(self, item, key_func):
+        self.item = item
+        self.key = key_func(item)
+
+    def __lt__(self, other):
+        return self.key < other.key
+
+class CustomKeyHeap:
+    def __init__(self, key_func):
+        self.key_func = key_func
+        self.heap = []
+
+    def push(self, item):
+        heapq.heappush(self.heap, KeyWrapper(item, self.key_func))
+
+    def pop(self):
+        return heapq.heappop(self.heap).item
+
+    def peek(self):
+        return self.heap[0].item if self.heap else None
+
+# Example usage:
+heap = CustomKeyHeap(key_func=lambda x: x['priority'])
+heap.push({'name': 'Task 1', 'priority': 3})
+heap.push({'name': 'Task 2', 'priority': 1})
+heap.push({'name': 'Task 3', 'priority': 2})
+
+print(heap.pop())  # {'name': 'Task 2', 'priority': 1}
+print(heap.pop())  # {'name': 'Task 3', 'priority': 2}
+print(heap.pop())  # {'name': 'Task 1', 'priority': 3}
+
+```
+
+2. Using tuples (simpler, but less flexible):
+
+```python
+import heapq
+
+# Create a list of tuples (priority, task)
+heap = []
+heapq.heappush(heap, (3, 'Task 1'))
+heapq.heappush(heap, (1, 'Task 2'))
+heapq.heappush(heap, (2, 'Task 3'))
+
+# Pop items
+print(heapq.heappop(heap)[1])  # 'Task 2'
+print(heapq.heappop(heap)[1])  # 'Task 3'
+print(heapq.heappop(heap)[1])  # 'Task 1'
+```
+
+The wrapper class approach is more flexible as it allows you to use complex objects and specify any comparison key. The tuple approach is simpler but limited to cases where you can easily represent your items as tuples with the key as the first element.
+
+Both methods maintain the same O(log n) time complexity for push and pop operations.
+
+Would you like me to explain either of these approaches in more detail?
