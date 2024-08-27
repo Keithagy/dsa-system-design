@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 3                                                                                       # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-27T10:26:11.057546+08:00
+attempt_end_time = 2024-08-27T10:45:11.057546+08:00
+reflections = """Crux is to always favor the most frequent task, because those need to be slotted in around""" # This is multiline!
