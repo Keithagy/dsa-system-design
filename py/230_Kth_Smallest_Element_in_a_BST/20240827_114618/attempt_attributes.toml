@@ -1,0 +1,6 @@
+success = true
+perceived_trickiness = 3 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-27T11:46:18.061706+08:00
+attempt_end_time = 2024-08-27T11:51:18.061706+08:00
+reflections = """in order traversal of a BST gives you a sorted progression.
+""" # This is multiline!
