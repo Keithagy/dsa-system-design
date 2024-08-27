@@ -1,0 +1,6 @@
+success = false
+perceived_trickiness = 1 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-27T11:08:21.984069+08:00
+attempt_end_time = 2024-08-27T11:32:21.984069+08:00
+reflections = """I tried to just search. should i have accumulated values? i think i should have
+O(h) time, O(h) space""" # This is multiline!
