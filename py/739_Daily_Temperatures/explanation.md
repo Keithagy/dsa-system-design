@@ -2,40 +2,86 @@
 
 ### Analysis of problem & input data
 
-This problem is a classic example of a monotonic stack application. The key characteristics of the problem that lead us to this solution are:
+This problem is a classic example of a monotonic stack application. The key characteristics of the problem that guide us towards this solution are:
 
 1. We're looking for the next greater element for each item in the array.
 2. We need to keep track of the number of days (indices) between the current temperature and the next warmer temperature.
-3. The order of the elements matters, as we're dealing with daily sequences.
+3. The order of the temperatures matters, as we're dealing with daily sequences.
 
-The input data has some noteworthy characteristics:
+The key principle that makes this question simple is the realization that we can use a stack to keep track of temperatures (and their indices) in a decreasing order. This allows us to efficiently find the next warmer temperature for each day.
+
+The input data has some notable characteristics:
 
 - The temperatures are integers, which allows for easy comparisons.
-- The range of temperatures is limited (30 to 100), which could potentially be exploited for optimization in certain solutions.
-- The array length can be quite large (up to 10^5), so we need to be mindful of time complexity.
+- The range of temperatures is limited (30 to 100), which doesn't significantly impact our approach but could be leveraged for optimization in certain solutions.
+- The length of the input array can be quite large (up to 10^5), so we need to be mindful of time complexity.
 
-The key principle that makes this question simple is the realization that we can process the array from right to left, maintaining a stack of temperatures. This stack will always be monotonically decreasing, allowing us to efficiently find the next warmer temperature for each day.
+Pattern-matching wise, this problem falls into the category of:
+
+1. Monotonic stack problems
+2. Next Greater Element problems
+3. Array traversal with lookback
+
+Understanding these patterns helps in quickly identifying the optimal approach for solving this and similar problems.
 
 ### Test cases
 
-Here are some relevant test cases, including edge cases and challenging inputs:
+Here are some relevant test cases to consider:
 
-1. Standard case: `[73,74,75,71,69,72,76,73]` → `[1,1,4,2,1,1,0,0]`
-2. All increasing: `[30,40,50,60]` → `[1,1,1,0]`
-3. All decreasing: `[60,50,40,30]` → `[0,0,0,0]`
-4. Single element: `[30]` → `[0]`
-5. Two elements, increasing: `[30,40]` → `[1,0]`
-6. Two elements, decreasing: `[40,30]` → `[0,0]`
-7. Large temperature difference: `[30,60,90]` → `[1,1,0]`
-8. Repeated temperatures: `[70,70,70,70]` → `[0,0,0,0]`
-9. Mixed repeated and increasing: `[70,70,75,70,80]` → `[2,1,1,1,0]`
-10. Maximum length array with random temperatures (not shown due to size)
+1. Standard case:
 
-Here's the Python code for these test cases:
+   ```python
+   temperatures = [73,74,75,71,69,72,76,73]
+   # Expected output: [1,1,4,2,1,1,0,0]
+   ```
+
+2. Monotonically increasing temperatures:
+
+   ```python
+   temperatures = [30,40,50,60]
+   # Expected output: [1,1,1,0]
+   ```
+
+3. Monotonically decreasing temperatures:
+
+   ```python
+   temperatures = [60,50,40,30]
+   # Expected output: [0,0,0,0]
+   ```
+
+4. Single temperature:
+
+   ```python
+   temperatures = [30]
+   # Expected output: [0]
+   ```
+
+5. Repeated temperatures:
+
+   ```python
+   temperatures = [30,30,30,30]
+   # Expected output: [0,0,0,0]
+   ```
+
+6. Alternating temperatures:
+
+   ```python
+   temperatures = [30,60,30,60]
+   # Expected output: [1,0,1,0]
+   ```
+
+7. Edge case with maximum length and temperature range:
+
+   ```python
+   temperatures = [30] * 100000 + [31]
+   # Expected output: [100000] + [0] * 100000
+   ```
+
+Here's the executable Python code for these test cases:
 
 ```python
 def dailyTemperatures(temperatures: List[int]) -> List[int]:
-    # Implementation goes here
+    # Implementation will go here
     pass
 
 # Test cases
@@ -44,23 +90,16 @@ test_cases = [
     [30,40,50,60],
     [60,50,40,30],
     [30],
-    [30,40],
-    [40,30],
-    [30,60,90],
-    [70,70,70,70],
-    [70,70,75,70,80],
+    [30,30,30,30],
+    [30,60,30,60],
+    [30] * 100000 + [31]
 ]
 
-for i, case in enumerate(test_cases, 1):
-    result = dailyTemperatures(case)
-    print(f"Test case {i}: {case}")
-    print(f"Result: {result}\n")
-
-# For the maximum length array, you would typically use a random number generator
-# import random
-# max_length_case = [random.randint(30, 100) for _ in range(10**5)]
-# result = dailyTemperatures(max_length_case)
-# print(f"Max length case result length: {len(result)}")
+for i, case in enumerate(test_cases):
+    print(f"Test case {i + 1}:")
+    print(f"Input: {case}")
+    print(f"Output: {dailyTemperatures(case)}")
+    print()
 ```
 
 ### Solutions
@@ -69,16 +108,17 @@ for i, case in enumerate(test_cases, 1):
 
 ##### Solutions worth learning
 
-1. Monotonic Stack (optimal)
-2. Two Pointers (next array)
-3. Brute Force with optimization
+1. Monotonic Stack (Neetcode solution)
+2. Optimized Monotonic Stack with array
+3. Two Pointers (Reverse Iteration)
+4. Brute Force
 
-Count: 3 solutions
+Count: 4 solutions (1 Neetcode solution)
 
 ##### Rejected solutions
 
-1. Sorting-based approach
-2. Binary Search approach
+1. Sorting-based approach: Sorting the temperatures would lose the original order, which is crucial for this problem.
+2. Binary Search Tree: While a BST could help find the next greater element, it wouldn't efficiently keep track of the number of days between temperatures.
 
 #### Worthy Solutions
 
@@ -90,38 +130,33 @@ from typing import List
 def dailyTemperatures(temperatures: List[int]) -> List[int]:
     n = len(temperatures)
     answer = [0] * n
-    stack = []
+    stack = []  # Stack to store indices of temperatures
 
-    for i in range(n - 1, -1, -1):
-        # Remove days from stack that are cooler than current day
-        while stack and temperatures[i] >= temperatures[stack[-1]]:
-            stack.pop()
-
-        # If stack is not empty, top of stack is next warmer day
-        if stack:
-            answer[i] = stack[-1] - i
-
-        # Add current day to stack
+    for i in range(n):
+        # While the stack is not empty and the current temperature is warmer
+        while stack and temperatures[i] > temperatures[stack[-1]]:
+            prev_index = stack.pop()
+            answer[prev_index] = i - prev_index
         stack.append(i)
 
     return answer
 ```
 
-Time Complexity: O(n), where n is the length of the temperatures array. Each element is pushed and popped at most once from the stack.
-Space Complexity: O(n) in the worst case, where temperatures are in descending order and all elements end up in the stack.
+Time Complexity: O(n), where n is the length of the temperatures array.
+Space Complexity: O(n) in the worst case, where temperatures are in descending order.
 
-Explanation of Big O:
+Explanation:
 
-- Time complexity is O(n) because we iterate through the array once, and each element is pushed and popped from the stack at most once. Even though we have a while loop inside the for loop, the total number of iterations of the while loop across all iterations of the for loop is at most n.
-- Space complexity is O(n) because in the worst case (temperatures in descending order), we might need to store all elements in the stack.
+- We iterate through the array once, and each element is pushed and popped from the stack at most once. This leads to a time complexity of O(n).
+- In the worst case (descending temperatures), we might end up storing all indices in the stack before we start popping, leading to a space complexity of O(n).
 
-Intuitions and invariants:
+Key intuitions and invariants:
 
-- The stack maintains indices of days with temperatures in decreasing order.
-- By processing the array from right to left, we ensure that the stack always contains future days relative to the current day.
-- The difference between the current index and the top of the stack (if exists) gives us the number of days to wait for a warmer temperature.
+- The stack maintains indices of temperatures in decreasing order.
+- When we find a warmer temperature, we can calculate the wait time for all cooler temperatures in the stack.
+- The stack always contains indices of temperatures that haven't found their next warmer day yet.
 
-##### Two Pointers (next array)
+##### Optimized Monotonic Stack with array
 
 ```python
 from typing import List
@@ -129,36 +164,74 @@ from typing import List
 def dailyTemperatures(temperatures: List[int]) -> List[int]:
     n = len(temperatures)
     answer = [0] * n
-    next_warmer = [float('inf')] * 101  # Next warmer day for each temperature
+    stack = [0] * n  # Pre-allocated array to use as a stack
+    top = -1  # Index of the top of the stack
 
-    for i in range(n - 1, -1, -1):
-        # Find the closest warmer day
-        warmer_index = min(next_warmer[t] for t in range(temperatures[i] + 1, 101))
-
-        if warmer_index < float('inf'):
-            answer[i] = warmer_index - i
-
-        # Update the next warmer day for the current temperature
-        next_warmer[temperatures[i]] = i
+    for i in range(n):
+        while top >= 0 and temperatures[i] > temperatures[stack[top]]:
+            prev_index = stack[top]
+            answer[prev_index] = i - prev_index
+            top -= 1
+        top += 1
+        stack[top] = i
 
     return answer
 ```
 
-Time Complexity: O(n \* m), where n is the length of the temperatures array and m is the range of temperatures (71 in this case, as temperatures are between 30 and 100).
-Space Complexity: O(m), where m is the range of temperatures.
+Time Complexity: O(n), where n is the length of the temperatures array.
+Space Complexity: O(n) for the pre-allocated array used as a stack.
 
-Explanation of Big O:
+Explanation:
 
-- Time complexity is O(n \* m) because for each of the n elements, we potentially check all m possible higher temperatures in the worst case.
-- Space complexity is O(m) for the `next_warmer` array, which has a fixed size based on the temperature range.
+- This solution is essentially the same as the previous one, but it uses a pre-allocated array as a stack instead of Python's built-in list.
+- The time complexity remains O(n) as we still process each element once.
+- The space complexity is O(n) for the pre-allocated array, but it might be slightly more efficient in practice due to better memory locality.
 
-Intuitions and invariants:
+Key intuitions and invariants:
 
-- We maintain an array `next_warmer` where `next_warmer[t]` represents the index of the next day with temperature t.
-- By processing the array from right to left, we ensure that `next_warmer` always contains information about future days relative to the current day.
-- The minimum index in `next_warmer` for temperatures higher than the current temperature gives us the next warmer day.
+- Same as the previous solution, but with manual stack management using an array.
+- This approach can be more efficient in languages with manual memory management or when dealing with very large inputs.
 
-##### Brute Force with optimization
+##### Two Pointers (Reverse Iteration)
+
+```python
+from typing import List
+
+def dailyTemperatures(temperatures: List[int]) -> List[int]:
+    n = len(temperatures)
+    answer = [0] * n
+    hottest = 0
+
+    for i in range(n - 1, -1, -1):
+        current_temp = temperatures[i]
+        if current_temp >= hottest:
+            hottest = current_temp
+            continue
+
+        days = 1
+        while temperatures[i + days] <= current_temp:
+            days += answer[i + days]
+        answer[i] = days
+
+    return answer
+```
+
+Time Complexity: O(n), where n is the length of the temperatures array.
+Space Complexity: O(1) extra space (not counting the output array).
+
+Explanation:
+
+- We iterate through the array in reverse, which allows us to use information from future days.
+- The `hottest` variable keeps track of the highest temperature seen so far.
+- For each temperature less than the hottest, we use the `answer` array to jump to the next warmer temperature efficiently.
+- Although there's a nested while loop, each element is processed at most twice (once in the outer loop, and at most once in all inner loops combined), leading to O(n) time complexity.
+
+Key intuitions and invariants:
+
+- Temperatures greater than or equal to the hottest seen don't need processing (they'll have 0 days to wait).
+- For other temperatures, we can use previously computed answers to "jump" to potential warmer days, reducing unnecessary comparisons.
+
+##### Brute Force
 
 ```python
 from typing import List
@@ -172,77 +245,94 @@ def dailyTemperatures(temperatures: List[int]) -> List[int]:
             if temperatures[j] > temperatures[i]:
                 answer[i] = j - i
                 break
-            # Optimization: if we've reached a day that didn't find a warmer temp,
-            # we know all days between won't find one either
-            if answer[j] == 0:
-                break
 
     return answer
 ```
 
-Time Complexity: O(n^2) in the worst case, where n is the length of the temperatures array.
-Space Complexity: O(1), excluding the output array.
+Time Complexity: O(n^2), where n is the length of the temperatures array.
+Space Complexity: O(1) extra space (not counting the output array).
 
-Explanation of Big O:
+Explanation:
 
-- Time complexity is O(n^2) because in the worst case (temperatures in descending order), for each element we might need to check all subsequent elements.
-- Space complexity is O(1) because we only use a constant amount of extra space, not counting the output array.
+- For each temperature, we iterate through the rest of the array to find the next warmer day.
+- In the worst case (descending temperatures), for each element, we might need to check all subsequent elements, leading to O(n^2) time complexity.
+- We only use a constant amount of extra space (the `answer` array is not counted as extra space as it's part of the problem requirements).
 
-Intuitions and invariants:
+Key intuitions and invariants:
 
-- We check each subsequent day for a warmer temperature.
-- The optimization breaks the inner loop if we reach a day that didn't find a warmer temperature, as we know all days between won't find one either.
-- This solution, while not optimal, demonstrates a straightforward approach to the problem.
+- This approach directly implements the problem statement without any optimizations.
+- It's intuitive and easy to understand but becomes inefficient for large inputs.
 
 #### Rejected Approaches
 
-1. Sorting-based approach: Sorting the temperatures would lose the original order, which is crucial for determining the number of days to wait. This approach is incorrect for this problem.
+1. Sorting-based approach: While sorting the temperatures might seem like a way to easily find the next greater temperature, it would lose the original order of the temperatures, which is crucial for determining the number of days to wait.
 
-2. Binary Search approach: While binary search can be efficient for finding elements, it doesn't suit this problem well because we need to find the next greater element in the original order, not just any greater element. The time complexity would likely be O(n log n) or worse, making it less efficient than the monotonic stack solution.
+2. Binary Search Tree: A BST could help find the next greater element efficiently, but it wouldn't keep track of the number of days between temperatures without additional complexity. The overhead of constructing and maintaining the BST would likely outweigh any benefits for this specific problem.
 
-3. Brute Force without optimization: While correct, this approach with O(n^2) time complexity without any optimization is not worth learning for interview settings due to its inefficiency for large inputs.
+3. Hash Map approach: Using a hash map to store temperatures and their indices might seem like a way to quickly look up temperatures, but it doesn't provide an efficient way to find the next greater temperature or calculate the number of days between temperatures.
 
 #### Final Recommendations
 
-The Monotonic Stack solution is the best to learn for this problem. It offers the optimal time complexity of O(n) and demonstrates a powerful technique applicable to many similar problems involving finding the next greater element. It's elegant, efficient, and showcases a deep understanding of data structures and algorithms.
+The Monotonic Stack solution (Neetcode solution) is the best to learn for this problem. It offers the optimal balance of time and space complexity while being relatively straightforward to understand and implement. Here's why:
 
-The Two Pointers (next array) solution is also worth understanding as it provides an alternative perspective on the problem and can be more intuitive for some. However, its time complexity is slightly worse than the Monotonic Stack solution.
+1. Time Efficiency: It solves the problem in O(n) time, which is optimal for this problem.
+2. Space Efficiency: While it uses O(n) space in the worst case, this is often better in practice than the O(n) space always used by the array-based optimized version.
+3. Versatility: The monotonic stack pattern is applicable to many similar problems, making it a valuable technique to master.
+4. Intuitive: Once understood, the logic behind the monotonic stack is quite intuitive and aligns well with the problem's requirements.
 
-The optimized Brute Force solution, while not optimal, is worth knowing as it demonstrates how to improve upon a naive approach and can be a good starting point in an interview before optimizing further.
+The Two Pointers (Reverse Iteration) solution is also worth understanding as it provides a different perspective on the problem and achieves O(1) extra space complexity. However, it might be slightly less intuitive at first glance.
+
+The Brute Force solution, while straightforward, is not recommended for interviews due to its poor time complexity. However, it's worth understanding as a starting point to appreciate the optimizations in other solutions.
 
 ### Visualization(s)
 
-For the Monotonic Stack solution, we can visualize the process using a simple ASCII art representation:
+To visualize the Monotonic Stack solution, we can use a simple ASCII art representation:
 
 ```
 Temperatures: [73, 74, 75, 71, 69, 72, 76, 73]
-Processing from right to left:
+Step-by-step process:
 
-Step 1: [73, 74, 75, 71, 69, 72, 76, 73]  Stack: [7]       Answer: [0, 0, 0, 0, 0, 0, 0, 0]
-                                    ^
+1. [73]
+2. [73, 74]
+3. [73, 74, 75]
+4. [73, 74, 75, 71]
+5. [73, 74, 75, 71, 69]
+6. [73, 74, 75, 72]
+7. [76]
+8. [76, 73]
 
-Step 2: [73, 74, 75, 71, 69, 72, 76, 73]  Stack: [6, 7]    Answer: [0, 0, 0, 0, 0, 0, 0, 0]
-                                 ^
-
-Step 3: [73, 74, 75, 71, 69, 72, 76, 73]  Stack: [6, 7]    Answer: [0, 0, 0, 0, 0, 1, 0, 0]
-                              ^
-
-Step 4: [73, 74, 75, 71, 69, 72, 76, 73]  Stack: [6, 7]    Answer: [0, 0, 0, 0, 1, 1, 0, 0]
-                           ^
-
-Step 5: [73, 74, 75, 71, 69, 72, 76, 73]  Stack: [6, 7]    Answer: [0, 0, 0, 2, 1, 1, 0, 0]
-                        ^
-
-Step 6: [73, 74, 75, 71, 69, 72, 76, 73]  Stack: [2, 6, 7] Answer: [0, 0, 4, 2, 1, 1, 0, 0]
-                     ^
-
-Step 7: [73, 74, 75, 71, 69, 72, 76, 73]  Stack: [1, 2, 6, 7] Answer: [0, 1, 4, 2, 1, 1, 0, 0]
-                  ^
-
-Step 8: [73, 74, 75, 71, 69, 72, 76, 73]  Stack: [0, 1, 2, 6, 7] Answer: [1, 1, 4, 2, 1, 1, 0, 0]
-               ^
-
-Final Answer: [1, 1, 4, 2, 1, 1, 0, 0]
+Final answer: [1, 1, 4, 2, 1, 1, 0, 0]
 ```
 
-This visualization shows how the stack is maintained and how the answer array is filled as we process the temperatures from right to left. The stack always contains indices of days with temperatures in decreasing order.
+Each line represents the state of the stack after processing the corresponding temperature. When a temperature is processed that's warmer than the top of the stack, we pop elements and calculate their wait times.
+
+For a more interactive visualization, we could create a simple React component that shows the stack's state and the answer array updating step-by-step as we process each temperature. However, as I cannot generate or display actual images or interactive components, I'll provide a conceptual description of what such a visualization might look like:
+
+```jsx
+import React, { useState } from "react";
+
+const DailyTemperaturesVisualizer = () => {
+  const [temperatures, setTemperatures] = useState([
+    73, 74, 75, 71, 69, 72, 76, 73,
+  ]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [stack, setStack] = useState([]);
+  const [answer, setAnswer] = useState(new Array(temperatures.length).fill(0));
+
+  // ... implementation details ...
+
+  return (
+    <div>
+      <div>Temperatures: {temperatures.join(", ")}</div>
+      <div>Current Index: {currentIndex}</div>
+      <div>Stack: {stack.join(", ")}</div>
+      <div>Answer: {answer.join(", ")}</div>
+      <button onClick={stepForward}>Step Forward</button>
+    </div>
+  );
+};
+
+export default DailyTemperaturesVisualizer;
+```
+
+This component would allow users to step through the algorithm, seeing how the stack and answer array change with each temperature processed. It would provide a clear, interactive demonstration of how the monotonic stack solution works.
