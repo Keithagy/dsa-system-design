@@ -1,0 +1,9 @@
+success = false
+perceived_trickiness = 5 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-28T13:40:50.410036+08:00
+attempt_end_time = 2024-08-28T14:00:50.410036+08:00
+reflections = """Failed to do better than brute force.
+this is actually a greedy problem. what are the hints that a problem is a greedy one?
+I guess it's if failing once means there's no chance you're on the right track...
+There is no long game to play
+""" # This is multiline!
