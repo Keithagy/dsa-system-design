@@ -1,0 +1,6 @@
+success = true
+perceived_trickiness = 2 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-29T10:59:24.785624+08:00
+attempt_end_time = 2024-08-29T11:17:24.785624+08:00
+reflections = """Finished in 18 minutes... but is solution optimal?
+There is a single pass hash set solution that makes 1/3 the iterations but costs 3x the space""" # This is multiline!
