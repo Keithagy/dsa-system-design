@@ -1,0 +1,10 @@
+success = true
+perceived_trickiness = 2 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-08-29T11:27:13.840751+08:00
+attempt_end_time = 2024-08-29T11:33:13.840751+08:00
+reflections = """Very easy...? 
+n*s solution exists if you take the signature in the form of character count 
+(works only if lowercase letters only) 
+in general, remember that lower case letters implies some kind of constant-time optimizability
+ask yourself if you have any upper bound on input size
+""" # This is multiline!
