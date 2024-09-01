@@ -1,0 +1,8 @@
+success = true
+perceived_trickiness = 3 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-01T13:41:07.612231+08:00
+attempt_end_time = 2024-09-01T13:51:07.612231+08:00
+reflections = """Binary search with patience sorting.
+bisect.bisect_left returns an index such that list.insert(num,idx) retains a sorted list.
+So, overwriting at that index would also preserve the sort.
+""" # This is multiline!
