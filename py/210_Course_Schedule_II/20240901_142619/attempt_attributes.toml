@@ -1,0 +1,7 @@
+success = true
+perceived_trickiness = 4 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-01T14:26:19.796899+08:00
+attempt_end_time = 2024-09-01T15:07:19.796899+08:00
+reflections = """A bit slow, but you ended up using a BFS topo sort. Quite a few moving parts but you figured it out. Nice.
+Need to get a bit more fast and effortless with setting up test case though.
+""" # This is multiline!
