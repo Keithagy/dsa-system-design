@@ -1,0 +1,9 @@
+success = false
+perceived_trickiness = 5 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-02T13:02:01.873904+08:00
+attempt_end_time = 2024-09-02T13:27:01.873904+08:00
+reflections = """Tricky array processing question... quite sure this calls for DP.
+Turns out DP isn't the most effective way to do it.
+Core intuition: for every imbalance score, if you have seen that imbalance score before, the intervening sequence has got to be balanced.
+because you are iterating forward, every latest balance score you encounter has got to be the longest possible balanced sequence
+""" # This is multiline!
