@@ -1,0 +1,7 @@
+success = true
+perceived_trickiness = 4 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-02T10:42:01.530619+08:00
+attempt_end_time = 2024-09-02T10:06:01.530619+08:00
+reflections = """Tried to use coutning sort but does not seem right... uses memory too sparsely
+Use a hash set to do sequential membership checks, starting only from nums which don't have a consecutive prior as member 
+That indicates they begin a new set""" # This is multiline!
