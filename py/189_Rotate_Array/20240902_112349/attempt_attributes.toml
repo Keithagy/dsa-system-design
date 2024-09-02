@@ -1,0 +1,8 @@
+success = false
+perceived_trickiness = 6 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-02T11:23:49.618505+08:00
+attempt_end_time = 2024-09-02T11:56:49.618505+08:00
+reflections = """close, good effort, no dice
+Cyclic replacements is too complex. You can just reverse subsections of the array.
+But, for your specific solution, you can just keep track of substitutions made and increment indices
+to make sure that you cyclic substitution visits every array element""" # This is multiline!
