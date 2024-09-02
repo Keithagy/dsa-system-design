@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 2                                                                                                               # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-02T12:07:01.585647+08:00
+attempt_end_time = 2024-09-02T12:27:01.585647+08:00
+reflections = """Keep two heads, make chains on lagging basis to ensure live reference to next node, break cycle at end of odd tail""" # This is multiline!
