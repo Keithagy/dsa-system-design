@@ -1,0 +1,6 @@
+success = false
+perceived_trickiness = 5 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-04T08:37:57.898734+08:00
+attempt_end_time = 2024-09-04T09:05:57.898734+08:00
+reflections = """There is probably a trick that i am not seeing. My chosen approach feels wrong.
+It's a sliding window involving character freqs, I was correct on that. But could get clearer""" # This is multiline!
