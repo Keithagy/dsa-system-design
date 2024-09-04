@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 3                                                                                                                # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-04T17:11:12.128029+08:00
+attempt_end_time = 2024-09-04T17:14:12.128029+08:00
+reflections = """Ask yourself always if a greedy solution exists for lists that deal with continuous elements + list-wise properties""" # This is multiline!
