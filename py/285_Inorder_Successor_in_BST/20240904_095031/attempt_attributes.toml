@@ -1,0 +1,6 @@
+success = true
+perceived_trickiness = 5 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-04T09:50:31.971873+08:00
+attempt_end_time = 2024-09-04T09:21:31.971873+08:00
+reflections = """You may have gotten the correct answer but you might not have leveraged the BST
+The core idea is that you search left if you are bigger than the target, otherwise you search left, so you always use h traversals""" # This is multiline!
