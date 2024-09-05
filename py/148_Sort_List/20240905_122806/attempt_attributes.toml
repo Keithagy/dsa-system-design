@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 3                                                                 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-05T12:28:06.790429+08:00
+attempt_end_time = 2024-09-05T12:48:06.790429+08:00
+reflections = """practice impl bottom up mergesort (iterative for constant extra mem)""" # This is multiline!
