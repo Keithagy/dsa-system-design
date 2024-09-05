@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 4                                                                                                                                # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-05T15:24:28.354078+08:00
+attempt_end_time = 2024-09-05T15:34:28.354078+08:00
+reflections = """Unintuitive, but the core idea is: for this some, is there something i can chop off from the front to be left over with a sum to k?""" # This is multiline!
