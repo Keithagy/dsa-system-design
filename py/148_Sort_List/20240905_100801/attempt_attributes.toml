@@ -1,5 +1,10 @@
 success = false
-perceived_trickiness = 5                              # 7-point scale: 1 is brain-dead, 7 is diabolical
+perceived_trickiness = 5 # 7-point scale: 1 is brain-dead, 7 is diabolical
 attempt_start_time = 2024-09-05T10:08:01.909918+08:00
 attempt_end_time = 2024-09-05T10:34:01.909918+08:00
-reflections = """tricky.."""                          # This is multiline!
+reflections = """tricky... Basically, if you can split the list while tracking where you split, and you can merge sorted list, then you can sort the list
+steps to do merge sort for list l:
+split the list down the middle and bind fracture point to r
+return the merge of the l and r
+in the constant space solution, you basically need to split iteratively and handle merging sorted 1-lists, then 2-lists, then 4-lists, and so on, until the fragment length you're sorting is the actual length
+""" # This is multiline!
