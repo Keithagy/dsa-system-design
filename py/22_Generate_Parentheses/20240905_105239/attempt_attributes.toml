@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 3                                                                                 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-05T10:52:39.240906+08:00
+attempt_end_time = 2024-09-05T11:09:39.240906+08:00
+reflections = """backtracking approach is right but easier if you track the open / close individually""" # This is multiline!
