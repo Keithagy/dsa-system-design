@@ -225,3 +225,50 @@ if __name__ == "__main__":
         print(f"Sorted: {improved_counting_sort(case)}")
         print()
 ```
+
+## Merge sort
+
+```python
+def merge_sort(arr):
+    if len(arr) <= 1:
+        return arr
+
+    mid = len(arr) // 2
+    left = merge_sort(arr[:mid])
+    right = merge_sort(arr[mid:])
+
+    return merge(left, right)
+
+def merge(left, right):
+    result = []
+    i, j = 0, 0
+
+    while i < len(left) and j < len(right):
+        if left[i] <= right[j]:
+            result.append(left[i])
+            i += 1
+        else:
+            result.append(right[j])
+            j += 1
+
+    result.extend(left[i:])
+    result.extend(right[j:])
+
+    return result
+
+# Example usage
+if __name__ == "__main__":
+    arr = [64, 34, 25, 12, 22, 11, 90]
+    sorted_arr = merge_sort(arr)
+    print("Sorted array:", sorted_arr)
+
+```
+
+This implementation includes two main functions:
+
+1. `merge_sort(arr)`: The main recursive function that divides the array and calls itself.
+2. `merge(left, right)`: A helper function that merges two sorted arrays.
+
+The code also includes an example of how to use the merge sort function.
+
+Would you like me to explain how the algorithm works or break down any part of the code?
