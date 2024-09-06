@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 3                                                                                       # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-06T17:11:02.135083+08:00
+attempt_end_time = 2024-09-06T17:23:02.135083+08:00
+reflections = """this is subtle. if you do randint, you mess up the distribution by making it discontinuous""" # This is multiline!
