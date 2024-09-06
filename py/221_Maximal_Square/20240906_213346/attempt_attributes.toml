@@ -1,0 +1,8 @@
+success = false
+perceived_trickiness = 1 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-06T21:33:46.615547+08:00
+attempt_end_time = 2024-09-06T22:03:46.615547+08:00
+reflections = """This is a very tricky DP question.
+You need to be careful about the propagation conditions. Even if a cell is 0, you still gotta do the recursive calls.
+But you figured out eventually. Try again before too long.
+""" # This is multiline!
