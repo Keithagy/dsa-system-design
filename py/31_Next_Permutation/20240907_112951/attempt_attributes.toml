@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 3                                                                                                                                            # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-07T11:29:51.028305+08:00
+attempt_end_time = 2024-09-07T11:29:51.028305+08:00
+reflections = """need to set up loop conditions such that you preserve that property of the sequence that largest permutation is the one sorted in reverse order""" # This is multiline!
