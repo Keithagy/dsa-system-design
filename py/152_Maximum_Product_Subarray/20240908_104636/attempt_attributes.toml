@@ -1,0 +1,6 @@
+success = true
+perceived_trickiness = 6 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-08T10:46:36.66671+08:00
+attempt_end_time = 2024-09-08T10:51:36.66671+08:00
+reflections = """You need to track max and min of this series separately from the global max. 
+And, by iterating forward you do consider all possible subarrays because you always also consider cur, which is just starting a new subarray at the current location.""" # This is multiline!
