@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 2                                                                     # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-08T10:54:03.08816+08:00
+attempt_end_time = 2024-09-08T10:41:03.08816+08:00
+reflections = """Today isn't your day huh... lost 1 hour on a silly variable naming issue""" # This is multiline!
