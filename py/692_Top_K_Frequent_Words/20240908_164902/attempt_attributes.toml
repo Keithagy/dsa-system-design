@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 5                                        # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-08T16:49:02.599578+08:00
+attempt_end_time = 2024-09-08T16:10:02.599578+08:00
+reflections = """remember that a heap is only weakly sorted.""" # This is multiline!
