@@ -1,0 +1,7 @@
+success = true
+perceived_trickiness = 5 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-09T12:11:30.192088+08:00
+attempt_end_time = 2024-09-09T12:17:30.192088+08:00
+reflections = """Application of prefix sums technique in a tree context.
+The key thing to understand with prefix sums is always that you build the hashmap of prefix sums as you go,
+SO THAT you always have the relevant map of past seen sums for that element you are visiting.""" # This is multiline!
