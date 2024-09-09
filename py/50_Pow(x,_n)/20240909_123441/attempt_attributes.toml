@@ -1,0 +1,7 @@
+success = true
+perceived_trickiness = 4 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-09T12:34:41.984127+08:00
+attempt_end_time = 2024-09-09T12:38:41.984127+08:00
+reflections = """In binary-repr squaring, you reduce the number of multiplications you make by accumulating squares of the result, applying the accumulator to the result only on odd powers.
+core intuition: 2^16 ==  4^8 == 16^4 == (16^2)^1 == answer, within 4 operations instead of 16.
+""" # This is multiline!
