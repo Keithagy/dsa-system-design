@@ -1,0 +1,5 @@
+success = false
+perceived_trickiness = 5                                                                             # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-09T12:19:14.201706+08:00
+attempt_end_time = 2024-09-09T12:26:14.201706+08:00
+reflections = """Completed the linear-time solution, but there is a way to solve it in log n time""" # This is multiline!
