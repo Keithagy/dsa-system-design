@@ -1,0 +1,5 @@
+success = false
+perceived_trickiness = 1                                                                                                                                                                                                               # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-09T09:54:21.475705+08:00
+attempt_end_time = 2024-09-09T09:54:21.475705+08:00
+reflections = """I used a binsrc approach which is better if you need to query timestamps looking back an indefinite period of time. If you need just the past 300 seconds always, then you should consider the bucketing solution.""" # This is multiline!
