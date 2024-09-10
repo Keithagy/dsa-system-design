@@ -1,0 +1,6 @@
+success = true
+perceived_trickiness = 3 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-10T11:15:32.103048+08:00
+attempt_end_time = 2024-09-10T11:19:32.103048+08:00
+reflections = """remember with intervals, sorting start and end times and then processing then piece by piece is always an option
+there is also a helpful heap-based solution you can look at""" # This is multiline!
