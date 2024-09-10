@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 3                              # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-10T12:35:23.649235+08:00
+attempt_end_time = 2024-09-10T12:43:23.649235+08:00
+reflections = """Linked List manipulation practice""" # This is multiline!
