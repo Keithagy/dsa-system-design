@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 3                                                                                                                   # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-10T12:28:32.944239+08:00
+attempt_end_time = 2024-09-10T12:33:32.944239+08:00
+reflections = """DP, but need to loop through all starting and collect max given that you are having your dp function return something.""" # This is multiline!
