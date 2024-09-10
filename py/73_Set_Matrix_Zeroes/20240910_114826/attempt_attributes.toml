@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 2                                                                                                                                                                                # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-10T11:48:26.504608+08:00
+attempt_end_time = 2024-09-10T12:01:26.504608+08:00
+reflections = """There is a second solution that makes use of the first row+col as flags (by preprocessing them first); you need one extra var because (0,0) overlaps at the first row and first col""" # This is multiline!
