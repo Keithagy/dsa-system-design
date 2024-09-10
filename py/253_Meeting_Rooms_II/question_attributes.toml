@@ -1,0 +1,9 @@
+difficulty = "Medium"
+topics = [
+  "Greedy",
+  "Array",
+  "Two Pointers",
+  "Prefix Sum",
+  "Sorting",
+  "Heap (Priority Queue)",
+]
