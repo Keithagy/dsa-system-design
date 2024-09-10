@@ -1,0 +1,6 @@
+success = true
+perceived_trickiness = 6 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-10T09:23:45.362963+08:00
+attempt_end_time = 2024-09-10T09:49:45.362963+08:00
+reflections = """Tricky question. You actualy got the concept but you need to learn the tools available for the language.
+In this case, you want functools cfalsemp_to_key""" # This is multiline!
