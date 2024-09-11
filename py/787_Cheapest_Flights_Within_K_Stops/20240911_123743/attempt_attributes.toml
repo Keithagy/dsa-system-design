@@ -1,0 +1,7 @@
+success = true
+perceived_trickiness = 5 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-11T12:37:43.956936+08:00
+attempt_end_time = 2024-09-11T12:43:43.956936+08:00
+reflections = """key intuition is to ask the question:
+What is the minimum cost to get to each port within [0..k] stops?
+And then you can build up the solution from there""" # This is multiline!
