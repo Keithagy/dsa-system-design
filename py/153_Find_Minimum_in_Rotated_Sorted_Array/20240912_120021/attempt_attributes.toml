@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 4                                                                          # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-12T12:00:21.599363+08:00
+attempt_end_time = 2024-09-12T13:31:21.599363+08:00
+reflections = """modified bin src where you narrow in on the unsorted half (where the wrap is)""" # This is multiline!
