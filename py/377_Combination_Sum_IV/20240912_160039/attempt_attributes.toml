@@ -1,0 +1,22 @@
+success = true
+perceived_trickiness = 5 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-12T16:00:39.504113+08:00
+attempt_end_time = 2024-09-12T17:20:39.504113+08:00
+reflections = """I solved it but i did not entirely understand how
+the basic idea, ultimately, is that you need to check adding a preceding element too because (1,2,1) is different from (1,1,2)
+the memoization helps you when you know you have accumulated amount x and are trying to add amount y.
+for each step you do n checks
+and each check spawns an additional n checks
+however, if you have seen 2 (however you got to 2, wheter it's 1 1 or 2), and you are at 1, then you can memoize that there are 2 ways you can get there with idx 0 (either 1 1 or 2).
+you visit every sub-t n times (once per num), and then it's constant lookup
+so, the runtime is O(t*n)
+
+if negative numbers, you can't terminate early upon reaching the target. you need to be able to use each number only finite number of times, else 
+there is no way to terminate (e.g. given target 0 and nums [-1,1], there would be an infinite number of combinations
+
+the dynamic programming approach is a lot simpler if, instead of asking the question:
+"how many ways to sum up to target given this coin subset?"
+
+you ask:
+"how many ways to sum up to subtarget given these coins?"
+""" # This is multiline!
