@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 3                                                                                              # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-12T18:15:13.904145+08:00
+attempt_end_time = 2024-09-12T18:20:13.904145+08:00
+reflections = """remember the trick of swapping element to end of list for constant time, not linear time, removal""" # This is multiline!
