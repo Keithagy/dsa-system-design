@@ -1,0 +1,5 @@
+success = false
+perceived_trickiness = 6                                            # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-12T17:41:47.043501+08:00
+attempt_end_time = 2024-09-12T18:10:47.043501+08:00
+reflections = """Completely unable to figure out how to approach""" # This is multiline!
