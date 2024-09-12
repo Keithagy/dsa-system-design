@@ -1,0 +1,12 @@
+success = true
+perceived_trickiness = 5 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-12T15:17:57.810362+08:00
+attempt_end_time = 2024-09-12T15:23:57.810362+08:00
+reflections = """This is a tricky question... it relies on you processing the operators on a lagging basis.
+because you need to visit the right operand first. You only know you have visited the right operand after you see the sign following the right operand.
+Until then you can only track that you need to process the sign you saw earlier.
+precedence is implicitly encoded by defering only add and subtraction to the stack.
+you process mult and div eagerly so that only add and subtract (which is just add neg), are left on stack.
+end by reducing via subtraction.
+i guess the key here is to take 2 passes, processing the higher precedence operation first.
+""" # This is multiline!
