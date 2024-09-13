@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 3                                                                                                                                                 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-13T19:35:49.117715+08:00
+attempt_end_time = 2024-09-13T19:38:49.117715+08:00
+reflections = """Intuition is that you want to eagerly slot in the ones that end earlier, so long as they don't overlap with something already in the eager-end line.""" # This is multiline!
