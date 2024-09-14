@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 4                                                # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-14T13:33:03.641129+08:00
+attempt_end_time = 2024-09-14T13:47:03.641129+08:00
+reflections = """Good training for mentally tracking stack semantics""" # This is multiline!
