@@ -1,0 +1,7 @@
+success = true
+perceived_trickiness = 5 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-16T11:04:35.793042+08:00
+attempt_end_time = 2024-09-16T12:58:35.793042+08:00
+reflections = """Basic principle is easy, but you need to know your trees that much more deeply in order to manipulate them in this way.
+In this case, you need to understand that if you have the level order representation of a tree, you can match parents up their children by going forward one way, and then going backward the other.
+""" # This is multiline!
