@@ -54,6 +54,8 @@ It is always a good idea to estimate the scale of the system we're going to desi
 This will also help later when we focus on scaling, partitioning, load balancing, and caching.
 Discuss not just the target scale of the system, but also the target lifespan of the system.
 
+You want to lay down all your observations about entity access patterns.
+
 - What scale is expected from the system (e.g., number of new tweets, number of tweet views, number of timeline generations per sec., etc.)?
 - How much storage will we need?
 - What network bandwidth usage are we expecting?
