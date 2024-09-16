@@ -1,4 +1,3 @@
-# leetcode-practice
+# DSA and System Design Practice Repo
 
-All my leetcode practice.
 Managed via [grindset](https://github.com/Keithagy/grindset?tab=readme-ov-file#grindset)
