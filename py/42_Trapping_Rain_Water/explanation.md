@@ -61,29 +61,23 @@ Count: 4 solutions (1 Neetcode solution)
 ##### Two Pointer Approach
 
 ```python
-def trap(height: List[int]) -> int:
-    if not height:
-        return 0
-
-    left, right = 0, len(height) - 1
-    left_max, right_max = 0, 0
-    water = 0
-
-    while left < right:
-        if height[left] < height[right]:
-            if height[left] >= left_max:
-                left_max = height[left]
+class Solution:
+    def trap(self, height: List[int]) -> int:
+        if not height:
+            return 0
+        left, right = 0, len(height) - 1
+        maxLeft, maxRight = height[left], height[right]
+        result = 0
+        while left < right:
+            if maxLeft < maxRight:
+                left += 1
+                maxLeft = max(maxLeft, height[left])
+                result += maxLeft - height[left]
             else:
-                water += left_max - height[left]
-            left += 1
-        else:
-            if height[right] >= right_max:
-                right_max = height[right]
-            else:
-                water += right_max - height[right]
-            right -= 1
-
-    return water
+                right -= 1
+                maxRight = max(maxRight, height[right])
+                result += maxRight - height[right]
+        return result
 ```
 
 Time Complexity: O(n), where n is the length of the height array. We traverse the array once with two pointers.
