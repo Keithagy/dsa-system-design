@@ -1,0 +1,15 @@
+success = true
+perceived_trickiness = 3 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-17T12:28:47.114599+08:00
+attempt_end_time = 2024-09-17T12:35:47.114599+08:00
+reflections = """Successfully did the bottom-up dynamic programming approach.
+You can calculate in linear time the max left and max right for all i,
+and you know that the water holdable at i is min of those - the floor (value at i),
+so summing those gives you the answer you want.
+
+two pointer works for two reasons:
+- you prefer the lower max because that will be the only one relevant to the volume calc
+- you always know that at best, the other side will be bounded by at least that larger other wall.
+  If you are operating on the left and you encounter an inbetween value on the right later,
+  It's not an increment, it's just a water over.
+""" # This is multiline!
