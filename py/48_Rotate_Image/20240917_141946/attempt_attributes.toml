@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 3                                            # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-17T14:19:46.193739+08:00
+attempt_end_time = 2024-09-17T14:35:46.193739+08:00
+reflections = """Array rotation using corners as pinning indices""" # This is multiline!
