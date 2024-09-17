@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 5                              # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-17T13:41:17.613668+08:00
+attempt_end_time = 2024-09-17T13:56:17.613668+08:00
+reflections = """Quickselect practice"""              # This is multiline!
