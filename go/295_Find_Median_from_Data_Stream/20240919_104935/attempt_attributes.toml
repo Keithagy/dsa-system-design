@@ -1,0 +1,15 @@
+success = true
+perceived_trickiness = 7 # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-19T10:49:35.559359+08:00
+attempt_end_time = 2024-09-19T11:37:35.559359+08:00
+reflections = """Long long way to go. keep going. take today's failure on the chin. do your best, and learn. jiayou keith!!!
+Today's learning:
+You can find the median of a list, without needing to keep the whole list sorted,
+by representing the list as two balanced heaps
+You have the smaller half, which is a max heap (so that peeking gives largest of small half)
+you have the larger half, which is a min heap (so that peeking gives smallest of large half)
+anytime you add an item, you add to the smaller half by default.
+if smaller half max exceeds larger half min, you need to pop from small and push to large.
+if either half exceeds ther other half in length by more than 1, your list representation is unbalanced you need to recitfy by pushing and popping respectively.
+median can then be calculated just by peeking either (or both, if they are equal length) of the lists
+""" # This is multiline!
