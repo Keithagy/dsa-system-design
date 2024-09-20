@@ -1,0 +1,5 @@
+success = true
+perceived_trickiness = 6                                                                                                                                                     # 7-point scale: 1 is brain-dead, 7 is diabolical
+attempt_start_time = 2024-09-20T11:27:56.867086+08:00
+attempt_end_time = 2024-09-20T11:27:56.867086+08:00
+reflections = """Probably exceed time limit, but can save it with the idea of representing the graph with a set and use alphabet to construct candidates in constant time""" # This is multiline!
