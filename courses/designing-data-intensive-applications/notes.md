@@ -638,7 +638,322 @@ To be fair, modern RPC frameworks are more explicit about the over-network natur
 Part 1 covered aspects of data systems that apply when data is stored on a single machine.
 Now we will consider the case of multiple machines being involved in storage and retrieval (and transformation) of data.
 
+Key Metrics:
+
+#### Scalability
+
+If your data volume, read load, or write load grows bigger than a single machine can handle, you can potentially spread the load across multiple machines
+
+#### Fault tolerance / High availability
+
+If your application needs to continue working even if one machine (or several machines, or the network, or an entire data-center) goes down, you can use multiple machines to give you redundancy. When one fails, another one can take over.
+
+#### Latency
+
+If you have users around the world, you might want to have servers at various locations worldwide so that each user can be served from a data-center that is geographically closer to them.
+That avoids the users having to wait for network packets to travel halfway around the world.
+
+#### Scaling to higher load
+
+Simplest approach is vertical scaling (throw a bigger machine at the problem). Shared-memory architecture >> all components can be treated as a single machine.
+
+Drawbacks:
+
+- Cost grows faster than linearly; You'll likely also encounter bottlenecks (usually on the transport layer) which gives diminishing marginal returns on vertical scaling, in addition to increasing marginal costs.
+- Fault-tolerance is limited, geographic redundancy is nonexistent
+- You also have the shared-disk architecture in which independent CPUs and RAM are networked (high-speed) to a shared storage container, but generally the overhead of locking and contention limit the broad applicability of this kind of architecture
+
+The alternative is to share nothing, or to scale out, or to horizontally scale. Use more machines operating in tandem. Distributed systems is about orchestrating these many systems (hard!)
+
+- You can achieve globally distributed low latency and redundancy by spacing your machines out.
+- Sometimes data models are off-limits if you need a shared-nothing architecture.
+
+Common ways data is distributed across multiple nodes:
+
+- _Replication_: Keep a copy of the same data on several different nodes, so that data survives some of those nodes going offline / getting destroyed.
+- **Partitioning**: Keep different subsets of the data on different nodes, so as to locate / organize the data sympathetically to the way that particular subset of the data is written / read.
+
 ### Chapter 5: Replication
+
+Keep a copy of the same data on multiple machines connected via a network.
+
+- Keep data close to where your users are
+- Allow system to remain functional even if some parts have failed (increasing availability)
+- Scale out number of machines that can serve _read_ queries (thus increasing read throughput)
+
+> Assume for now that dataset can fit in memory; Simplifies things to consider replication in isolation first (we relax this assumption in chapter 6)
+
+Suppose the data being replicated is immutable; replication is easy because you just copy the data to every node, and you're done.
+All difficulty lies in tracking and propagating changes to the replicated data; pay attention to the create / update / delete operations.
+
+Popular algorithms for replicating changes between nodes (each with their own tradeoffs):
+
+- Single-leader
+- Multi-leader
+- Leaderless
+
+#### Leaders and Followers
+
+Every write to the database needs to be processed by every replica, else the replicas would not be replicas!
+Most common setup is _leader-based replication_ (also called _master-slave replication_)
+
+1. We designate one of the replicas the leader / master / primary. Clients send write requests to the master, who first writes the new data to its local storage.
+2. Other replicas, the followers (also called _hot standbys_), it also sends the data change to all of its followers as part of a _replication log_ or _change stream_.
+   Each follower takes the log from the leader and updates its local copy of the database accordingly, by applying all writes in the same order as they were processed on the leader.
+3. When a client wants to read from the database, it can query either the leader or any of the followers. However, writes are only accepted on the leader (the followers are read-only from the client's point of view).
+
+#### Asynchronous vs Synchronous Replication
+
+Most relational databases let you configure replication to happen in the background or not.
+
+- The choice here, assuming that you don't have a network partition which prevents your replicas from syncing up, is between having a lower read latency (by letting the client query potentially stale data from a follower), and having strong consistency (by letting the client query wait until a change is confirmed across all replicas before processing it)
+- If you do have a network partition, then you can either tell your client that your replica is down (choose consistency) or you can accept serving your client stale data (choose availability)
+
+With respect to the write replication:
+
+- Synchronous replication has the benefit of guaranteeing that the follower has an up-to-date copy of the data before the leader responds to the user's write.
+- Stronger redundancy promise.
+- However, if the synchronous follower does not respond (because it has crashed, for instance), then the leader cannot respond with a successful write even though it has itself successfully written (because it is prioritizing a strong redundancy promise)
+- Thus, impractical for all followers to be synchronous; a single node outage would cause the system to break. In practice, "synchronous replication" usually means you have one synchronous follower and all others asynchronous
+
+Often, if the system wants to prioritize write throughput (availability / lower latency) and trade up consistency, it will replicate asynchronously.
+
+- Writes are not guaranteed to be durable, but leader continues to process writes even if all of its followers have fallen behind.
+- This is particularly helpful when dealing with replication lag due to replicas being geographically distributed.
+
+> It can be a serious problem for asynchronously replicated systems to lose data if the leader fails, so researchers have continued investigating methods that don't lose data but still provide good performance and availability.
+> One such approach is _chain replication_.
+>
+> There is a strong connection between consistency of replication and _consensus_ (getting several nodes to agree on a value), which will be explored more later.
+
+#### Setting up New Followers
+
+This is usually done in the background by using a leader snapshot / checkpoint as a starting point, then replaying the leader's replication log from the position that the snapshot is associated with.
+
+#### Follower failure: Catch-up recovery
+
+On its local disk, each follower keeps a log of the data changes it has received from the leader. It can use this log to sync up and replay changes so that it can catch up to the leader in the event of a network disruption.
+
+#### Leader failure: Failover
+
+Leader failure is tricker:
+
+- A follower needs to be promoted to leader
+- Client writes need to be rerouted to the new leader
+- Replications need to switch to the new leader for reference.
+
+Automatic failover detection:
+
+- Using a healthcheck timeout as an indicator that leader has gone down
+- Choosing a new leader
+- Reconfiguring the system to use the new leader
+  - In particular, getting the old leader (if it comes back) to recognize it is no longer the leader
+
+Things that can go wrong in failover:
+
+- New leader might be behind old leader in the event of async replication.
+  - If the former leader leader rejoins the cluster after a new leader has been chosen, what should happen to the divergent writes?
+  - Most commonly, old leader's unreplicated writes just get discarded which might not be okay.
+- If your new leader doesn't realize some IDs have already been assigned by the old leader (because unreplicated writes) and use those again, then you have a Redis store or something relying on those IDs, you might end up leaking users' data to other users.
+- Multiple nodes could believe they are the leader and both accept writes with no way to deconflict after (split brain).
+- What is a good leader timeout? Too short, then you have needless failovers. Too long, you have unnecessarily long time to recovery.
+
+Failover is hard to get right and dangerous to get wrong. So, many places actually choose to failover manually.
+
+#### Replication Log Implementations
+
+##### Statement-based replication
+
+Statement-based replication basically streams function calls and parameters, and they get parsed by followers as though they came from client.
+
+- Nondeterminstic functions like `NOW()` and `RAND()` need to be handled differently
+- Autoincrements must process in same exact order
+- Side-effects must be entirely deterministic
+
+You can generally handle these edge cases but there are so many of them that this is generally a bad idea
+
+##### Write-ahead log shipping
+
+Leader can stream its write ahead log over the network to replicas, and replicas can use that to reconstruct the data
+Main disadvantage is that storage engines get coupled, precluding ability to change versions across replicas
+
+##### Row-based (logical) log replication
+
+Same idea as with using the write-ahead log, but decouple from storage engine internals.
+Usually a sequence of records describing writes to database tables at the granularity of a row:
+
+- Describe the logical operations. E.g inserted row will describe the new values of all columns
+- delete row will contain enough info to uniquely identify the row that was deleted
+
+Idea is that the storage engine can resolve the query, much like statement-based, but the statement is preprocessed to already have the params evaluated
+These replications can all be triggered via arbitrary code that watches for changes to certain subsets of the data.
+
+#### Problems with Replication Lag
+
+Leader-based replication requires all writes to go through a single node, but read-only queries can go to any replica.
+If your app is read-heavy, then you can increase read throughput just by adding more followers.
+However, you need async replication for this to work.
+But then your followers might serve reads with stale data! A temporary inconsistency.
+
+If you're okay with _eventual consistency_, then okay.
+But this replication lag is potentially unbounded, and might be minutes in systems at capacity.
+What are some notable problems that arise with replication lag and how can we solve them?
+
+##### Reading Your Own Writes
+
+People generally are okay with waiting some time to see other people's writes, because they don't know about them.
+But they generally want to be able to read their own writes (_read-after-write consistency_)
+
+This is a guarantee that if the user reloads the page, they will always see any updates they submitted themselves.
+
+- Reassures the user that their own input has been saved correctly.
+
+Techniques to implement read-after-write consistency:
+
+- When reading something that the user may have modified, read it from the leader; else, read it from a follower
+  - Assumes some ability to know whether something might have been modified without actually querying it
+  - E.g. A user's own profile is generally editable only by the user themselves. So, queries by users for their own profile should always be served by the leader.
+- Doesn't work if most thing in the application are potentially editable by the user; search for other criteria
+  - Client-side state management / query caching
+  - Monitor replication lag on followers and prevent queries on any follower too arbitrarily far behind the leader
+- The client can remember the timestamp of its most recent write
+  - Then the system can ensure that the replica serving any reads for that user reflects updates at least until that timestamp
+  - Can also be a _logical timestamp_ (something that indicates ordering of writes, e.g. request ID or log sequence number)
+  - Possible to use actual system clock, of course, but then clock synchronization becomes critical
+    - E.g. if client machine is very far ahead, it might appear to system like none of the replicas can ever serve properly replicated data
+- If you want to use this most-recent-write approach, but want read-after-write consistency across all devices in use by the user, then this last-write timestamp would have to be tracked centrally by the server.
+
+##### Monotonic Reads
+
+When reading from asynchronous follows, it is also possible for a user to see things _moving backward in time_.
+
+This can happen if user makes several reads from different replicas; some reads might hit replicas with updated data, while some reads might hit replicas with stale data.
+
+_Monotonic reads_ is a weaker guarantee than strong consistency, but a stronger one than eventual consistency.
+It says that they will not read older data after having previous read newer data.
+One way to achieve this is to make sure that each user always makes their reads from the same replica (Different users can read from different replicas).
+
+Replicas can be chosen / routed based on a hash on the userID; If that replica fails, however, then there has to be a failover that points that user to another replica instead (with the same monotonic read guarantee for that user).
+
+##### Consistent Prefix Reads
+
+Network lags might result in causally-linked payloads arriving out of order.
+
+- E.g. response payloads coming before any request payloads observed to go out
+
+_Consistent Prefix Reads_ guarantees that if a sequence of writes happens in a certain order, then anyone reading those writes will see them appear in the same order.
+
+- Writes that are causally related to each other are written to the same partition
+- There are also algorithms that explicitly keep track of causal dependencies (more on this later)
+
+##### Solutions for Replication Lag
+
+If the application is fine with replication lag stretching to minutes or even hours, then you might not need to solve it, you can just favor eventual consistency.
+
+In most cases, that degrades the experience, so you should decide if the system wants to provide a stronger consistency guarantee (e.g. read-after-write).
+
+Database transactions would also be helpful in making sure that commits happen together or not at all.
+
+- Single-node transactions have existed for a long time.
+- However, in the move to distributed (replicated and partitioned) databases, many systems have abandoned them, claiming that transactions are too expensive in terms of performance and availability, and asserting that eventual consistency is inevitable in a scalable system.
+- That is oversimplified (will return to topic of transactions)
+
+#### Multi-leader replication
+
+Leader-based replication has one major downside: there is only one leader, and all writes must go through it.
+
+If you can't connect to the leader for any reason, you can't write to the database.
+
+A way to address this failure point is the allow for more than one node to accept writes.
+
+- Replication still happens in the same way
+- Each node that processes a write must forward that data change to all the other nodes.
+
+This kind of _active/active_ replication involves each leader simultaneous acting as a follower to the other leaders.
+
+##### Use-cases for Multi-Leader Replication
+
+- Multi-datacenter operation
+  - If your replicas are physically distributed, then each datacenter can have a local leader which replicates to its local followers
+  - Between datacenters, each datacenter's leader replicates its changes to the leaders of other datacenters
+  - More performant to distribute write load amongst multiple leaders
+  - More tolerant to outage of one datacenter, since other data centers still have leaders and not impacted
+  - More tolerant to network faults, since multiple possible locations to route a write to.
+- Rarely sensible to use multiple leaders within a single datacenter.
+- Multi-leader replication is generally to be regarded with caution, for the same reasons that failover of leaders can go wrong. If multiple sources of truth, important to ensure they do not conflict.
+
+##### Handling write conflicts
+
+In principle, you could make conflict detection synchronous -- i.e., wait for the write to be replicated to all replicas before telling the user that the write was successful.
+However, by doing so, you would lose the main advantage of the multi-leader replication: allowing each replica to accept writes independently.
+If you want synchronous conflict detection, you might as well just use single leader replication.
+
+Simple way is to avoid conflicts in the first place by mapping a given user to always route toward a particular leader.
+
+If you really want to have a true multi-leader setup, then you need to define convergence policy:
+
+- Last write wins
+- Log the conflict and resolve later (programmatically or otherwise)
+- Define a particular machine as the winner by default (e.g. robot is the source of truth)
+
+Multi-leader replication should follow a sufficiently dense path so that there is no single point of failure in a replication chain.
+
+Causal writes (e.g. referencing an update that depends on an insert), cannot be achieved with system clock alone, since it's not accurate enough to sync these payloads. You need _version vectors_
+
+#### Leaderless Replication (aka Dynamo-style)
+
+What if we get rid of this idea that only particular nodes can process a write?
+
+Notable examples:
+
+- Dynamo
+- Riak
+- Cassandra
+- Voldemort
+
+Writes need to be sent to all replicas, and the write is accepted if there is quorum.
+Reads are also sent to several nodes in parallel, and the read considered valid only if there is quorum.
+
+Version numbers also help with determining which value is more recent.
+So the client can write to the lagging node (_read repair_).
+You can also have a background anti-entropy process which looks for diffs in data copies between nodes.
+
+##### Quorums on reading and writing
+
+If there are `n` replicas, every write must be confirmed by `w` nodes and every read must be echoed by at least `r` nodes.
+
+As long as `w` + `r` > `n` we expect to get an up-to-date value when reading, because at least one of the `r` nodes we are reading must be up to date.
+
+You typically want an odd `n` so that you can have a tie-breaker.
+
+However there are many valid configurations:
+
+- If you have few writes and many reads, you might benefit from setting `w = n` and `r = 1`
+  - Faster reads, but a single failed node causes all database writes to fail.
+  - `w < n` gives you write fail redundancy
+  - `r < n` gives you read fail redundancy
+- Reads and writes are sent to all `n` replicas in parallel. `w` and `r` determine how many responses we wait for.
+- You can drop `w` and `r` such that the quorum condition isn't satisfied, then you trade consistency (knowing you read at least one accurate copy by the pidgeonhole principle), in exchange for lower latency / higher availability.
+- No widely accepted way right now to quantify staleness of data in leaderless systems
+- You basically want a combination of read repair + anti-entropy otherwise you accept possibility of (significant staleness)
+
+Quorums can be _sloppy_, in which the client cannot assemble the `n` nodes it needs for writing, and thus just writes to some collection of "refugee" nodes and allows them to hand along the value when the home nodes of the value come back online (a _hinted handoff_).
+
+- Increases write availability, provides some baseline assurance of durability (data is stored on w nodes somewhere, even though it's not the w nodes of the n home nodes for a given piece of data)
+- However, the tradeoff here would be that you have a divergence of your usual quorum condition, and in the meantime you deal with poorer data locality + additional copies of the data on stray nodes
+
+##### Handling concurrent writes in leaderless replications
+
+Suppose you have 3 nodes, each of which receives a different concurrent write. Due to a network distruption, 1 node thinks the value is B and 2 others think the value is A
+
+You need to converge the values or they will just stay inconsistent.
+
+- Last write wins
+  - Kind of arbitrary though; the correct write (majority one) might end up dropped
+  - The only safe way of using a database with LWW is to ensure that a key is only written once and thereafter treated as immutable, thus avoiding concurrent updates to the same key.
+- If you use a UUID as the write key, you can't mutate it, so you can safely use last write wins to deconflict.
+
+You consider writes concurrent if they happened without causal knowledge of each other. They are in contention for the same spot on the causal chain.
 
 ### Chapter 6: Partitioning
 
