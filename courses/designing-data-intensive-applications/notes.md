@@ -957,6 +957,158 @@ You consider writes concurrent if they happened without causal knowledge of each
 
 ### Chapter 6: Partitioning
 
+Also called _sharding_. Split dataset up by range (various ways to determine this range), so that different nodes can be responsible for keeping some subrange of the whole data.
+
+Usually critical for distributing a large dataset across many disks.
+
+Key concerns to walk through:
+
+- Different partitioning approaches
+- Interactions between partitions and indexes
+- Rebalancing partitions to accomodate node additions / removals
+- Request routing to the right partition to execute a query.
+
+#### Partitioning Schemes
+
+Goal of partitioning is generally to spread data, and thus query load, evenly across nodes.
+
+- How exactly "evenness" is measured is a matter of situational judgement
+- Need to respect data access patterns
+- Avoiding hot spots might mean that we need to handle high-write users specially somehow, for instance (e.g. celebrities on Twitter)
+
+##### Key-Value Data
+
+You can assign records to nodes randomly, which is simplest, but you wouldn't have any way ahead of time to know which node to query.
+
+You can partition by key range, doing as encyclopaedias are.
+
+- Ranges of keys would not necessarily be equal, since your data might not be evenly distributed
+- Within each partition, you can keep keys in sorted order using SSTables, which allows you to do range-based queries
+- However, the sort schema (and thus the partition schema), should be decided with thought to how reads and writes hit different partitions.
+  - If you have time series sensor data and you key by timestamp only, then partitioning might result in the most recent partition receiving the entire write load
+  - Instead, you probably want to key by sensor id, then by timestamp, so that writes are distributed to the partition for a given sensor first.
+  - It does mean, however, that if you want to aggregate multiple sensors within a time range, you need to perform a separate range query for each sensor name.
+
+You can also partition by a hash of the key.
+
+- Mainly done so as to avoid hot spots / skews.
+- Good hash function should take the skew data and make it uniformly distributed.
+  - Note that the same piece of data might resolve to a different hash depending on what the runtime environment does.
+- Each node just gets some range of the possible values of the hash.
+- This approach works well for distributing keys fairly among partitions (at least, in an unweighted way)
+- The partition boundaries can be evenly spaced, or they can be chosen pseudorandomly (_consistent hashing_)
+- However, partitioning by key hash trades up the ability to do range queries.
+  - MongoDB sends range queries to all partitions if you enable hash-based sharding
+  - Cassandra provides option for _compound primary key_ comprising several columns, and first part of the key is hashed to determine partition. However, the rest of the columns are used as a composite index for sorting the data.
+    - Thus, you can't range query over the first column of a compound key, since data close apart in the first column can be scattered in different partitions, but within each value of this first column you can do range queries onthe rest of the index columns (using SSTables).
+    - Allows, for instance, for efficient retrieval of timestamp-sorted updates for a given user, if the composite index is (userId, updateTimestamp).
+
+##### Skewed Workloads and Relieving Hotspots
+
+You can't really partition around the fact that some rows are more read/write-intensive than others.
+For instance, social media celebrities.
+
+Can consider if it makes sense to further sub-partition writes for a celebrity... Or you might just decide that your partitioning might be further weighted based on minimizing variance in predicted read/write.
+
+In the real world, it's a combination of predictive load-aware partitioning / rebalancing (dedicated shards for celebrities if needed), effective caching, and async processing / rate limiting.
+
+##### Handling Secondary Indexes in Partitioned Environments
+
+Records aren't accessed solely via their primary key.
+Partitioning techniques need to retain the utility of indexes too!
+
+- Partitioning secondary indexes by document
+  - You keep indexes local to a given shard
+  - These local indexes cover only the documents in that partition
+  - Situational utility only; there is no reason why all data relevant to your index-based query would be found in the partition of the index you're looking at, unless you have defined it to be so in the partitioning mechanism
+  - E.g. If you want to know all red cars, and you have partitioned by carId, and you only have partition-local indexes, you need to query all partitions and merge the results.
+  - _Scatter / gather_ is a common query pattern with shard-local indexes, but prone to tail latency amplification
+- Partition secondary indexes by term
+  - This represents a _global index_ that covers data in all partitions.
+  - However, you can't just store that index on one node, else that would become a bottleneck and defeat the purpose of partitioning.
+  - Global index must also be partitioned, but can be partitioned differently from the primary key index
+  - So you first hit the cluster for index traversal (which is served by only a subset of the nodes), then you hit the cluster for data retrieval (which is, again, served by only a subset of the nodes)
+  - You can, again, partition the index by term itself, which preserves ability to query ranges, or by hash of the term, which distributes the load more evenly.
+  - However, writes would be slower and more complicated, because a write to a single document will now likely hit multiple partitions of the index
+  - Also, notice that because the write is now multi-step, partitioned database writes with a term-partitioned index now requires a distributed transaction (assuming you want to enforce strong consistency between the index and the data).
+  - You also have the option, frequently adopted in practice, to accept eventually consistent indexes which update asynchronously following writes
+
+#### Rebalancing Partitions
+
+Over time, things change in a database:
+
+- Query throughput increases, so you want to add more CPUs to handle the load.
+- The dataset size increases, so you want to add more disks and RAM to store it.
+- A machine fails, and other machines need to take over the failed machine's responsibilities.
+
+They all need data and requests to be moved from one node to another -- this is called _rebalancing_ partitions.
+
+Some baseline requirements with rebalancing:
+
+- After rebalancing, load (storage, read / write requests) should be shared fairly between nodes in the cluster.
+- While rebalancing is happening, the database should continue accepting reads and writes.
+- Minimal data movement between nodes to minimize network and disk load, and to hasten the rebalancing operation.
+
+##### Rebalancing Strategies
+
+How not to do it: `hash mod N`
+
+- If you just hash the key and mod it by the number of nodes you have, seems like an easy way to redistribute the load
+- However if the number of nodes changes, likely means most if not all the keys need to relocated.
+
+Basic formula:
+
+```
+partition_count = node_count * partitions_per_node
+datasize_size = partition_size * partition_count
+```
+
+Potential approaches that are less wasteful
+
+- Fixed number of partitions (target fixed `partition_count`)
+  - Create many more partitions than there are nodes, and assign several partitions to each node
+  - E.g. A database running on a cluster of 10 nodes may be split into 1,000 partitions from the outset so that ~100 partitions are assigned to each node.
+  - If a new node is added to the cluster, then the new node gets some partitions from every existing nodes until partitions are fairly distributed again.
+  - Move partitions around without changing the partition count. This is attainable by varying the partition count per node.
+  - Can also assign more partitions to more powerful nodes to make good use of hardware asymmetries.
+  - Choosing the right number of partitions is difficult if the total size of the dataset if highly variable (e.g. data starts small but grow a lot over time).
+  - Since each partition contains a fixed fraction of the total data, the size of each partition grows with the total dataset size.
+  - Excessively large partitions make node recovery and rebalancing expensive.
+  - Excessively small partitions don't justify their management overhead (of having to rebalance and copy them from node to node and such)
+- Dynamic partitioning (target fixed `partition_size`)
+  - Key range-partitioned databases often create partitions dynamically
+  - When a partition grows to exceed a configured size, it is spilt into two partitions so that ~half of the data ends up on each side of the split
+  - Conversely, if lots of data is deleted and a partition shrinks below some threshold, it can be merged with an adjacent partition
+  - Much like what happens at the top level of a B-tree!
+  - Note however that this description fits only scaling of storage requirements, not read/write load. You could easily imagine that functionality, though!
+- Nodecount-proportionate partitioning (target fixed `partitions_per_node`)
+  - Size of each partition grows proportionate to the dataset size while the number of nodes remains unchanged
+  - But when you increase the number of nodes, the partitions become smaller again.
+- Not meaningful to target fixed `node_count`, because we're talking about a distributed system here.
+
+##### Automatic v. Manual Rebalancing
+
+Fully automated rebalancing might fail to account for network context, like if the system is actually at a peak and cannot support internally imposed copy load.
+
+Might be good to have human committing the rebalance.
+
+#### Request Routing
+
+_Service Discovery_ is a tough problem in general.
+
+Strategies:
+
+- Nodes keep full partition mapping and relay client requests for partitions they do not hold
+- Routing layer keeps knowledge of partition mapping and acts as central relay (partition-aware load balancer)
+- Client keeps full partition mapping and calls the correct node directly
+
+In each case, the question arises: How does the component making the routing decision learn about changes in the assignment of partitions to nodes?
+
+- Consensus protocols
+- Use a coordination service such as ZooKeeper
+- Gossip protocols among nodes to disseminate changes in cluster state
+  - Requests can be sent to any node, and that node forwards them to the appropriate node for the requested partition.
+
 ### Chapter 7: Transactions
 
 ### Chapter 8: The Trouble with Distributed Systems
