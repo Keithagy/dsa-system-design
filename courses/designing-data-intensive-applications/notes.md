@@ -109,9 +109,37 @@
       - [Faults and Partial Faults](#faults-and-partial-faults)
         - [Building a Reliable System from Unreliable Components](#building-a-reliable-system-from-unreliable-components)
       - [Unreliable Networks](#unreliable-networks)
+        - [Faulty Nodes](#faulty-nodes)
+        - [Timeouts and Unbounded Delays](#timeouts-and-unbounded-delays)
+        - [Network congestion and queueing](#network-congestion-and-queueing)
+        - [TCP vs UDP](#tcp-vs-udp)
+        - [Synchronous vs Asynchronous Networks](#synchronous-vs-asynchronous-networks)
       - [Unreliable clocks](#unreliable-clocks)
+        - [Timestamps for ordering events](#timestamps-for-ordering-events)
       - [Knowledge, Truth, and Lies](#knowledge-truth-and-lies)
+        - [Truth is defined by majority](#truth-is-defined-by-majority)
+        - [Byzantine Faults](#byzantine-faults)
+        - [System Model and Reality](#system-model-and-reality)
+        - [Safety and liveness](#safety-and-liveness)
     - [Chapter 9: Consistency and Consensus](#chapter-9-consistency-and-consensus)
+      - [Consistency Guarantees](#consistency-guarantees)
+      - [Linearizability](#linearizability)
+        - [What Makes a System Linearizable?](#what-makes-a-system-linearizable)
+          - [Linearizability vs Serializability](#linearizability-vs-serializability)
+        - [Relying on Linearizability](#relying-on-linearizability)
+        - [Implementing Linearizable Systems](#implementing-linearizable-systems)
+        - [The Cost of Linearizability](#the-cost-of-linearizability)
+          - [CAP Theorem](#cap-theorem)
+          - [Linearizability and network delays](#linearizability-and-network-delays)
+      - [Ordering Guarantees](#ordering-guarantees)
+        - [Ordering and Causality](#ordering-and-causality)
+        - [Sequence Number Ordering](#sequence-number-ordering)
+        - [Total Order Broadcast](#total-order-broadcast)
+      - [Distributed Transactions and Consensus](#distributed-transactions-and-consensus)
+        - [Atomic Commit and Two-Phase Commit (2PC)](#atomic-commit-and-two-phase-commit-2pc)
+        - [Distributed Transactions in Practice](#distributed-transactions-in-practice)
+        - [Fault-Tolerant Consensus](#fault-tolerant-consensus)
+        - [Membership and Coordination Services](#membership-and-coordination-services)
   - [Part 3: Derived Data](#part-3-derived-data) - [Chapter 10: Batch Processing](#chapter-10-batch-processing) - [Chapter 11: Stream Processing](#chapter-11-stream-processing) - [Chapter 12: Future of Data Systems](#chapter-12-future-of-data-systems)
   <!--toc:end-->
 
@@ -1994,6 +2022,290 @@ We generally _need_ safety to always hold in distributed systems; Even if entire
 However, we usually can consider compromises / caveats to liveness, in exchange for other things (e.g. eventual consistency allows lower latency).
 
 ### Chapter 9: Consistency and Consensus
+
+How should we handle distributed system faults?
+
+- Simplest way: let the entire service fail, show the user an error message.
+- Can we do better? As in, instead of just surfacing the fault, can we _tolerate_ it?
+
+Algorithms and protocols for building fault-tolerant distributed systems.
+
+Assume that all the problems can occur:
+
+- Packets lost
+- Packets reordered
+- Packets duplicated
+- Packets arbitrarily delayed
+- Clocks approximate at best
+- Nodes can pause or crash
+- Node writes can be corrupt
+
+Best way to build fault-tolerant systems is to find some general-purpose abstractions with useful guarantees, implement them once, then let applications rely on those guarantees.
+
+- E.g. transactions let an application pretend that there are no crashes (atomicity), nobody else is concurrently accessing the database (isolation), storage devices are perfectly reliable (durability).
+- Another important abstraction is _consensus_: getting all nodes to agree on something. Reliably reaching consensus in the face of network faults and process failures is a surprisingly tricky problem.
+  - Once you have it, you can use it for multiple purposes, e.g database leader failover and health checks and other things
+  - Wide range of problems are reducible to consensus and are equivalent to each other (in the sense that if you have a solution for one of them, you can easily transform it into a solution for one of the others)
+
+What are the limits of fault tolerance in distributed systems?
+
+#### Consistency Guarantees
+
+Replication lag is fact of life with replicated databases, regardless of what replication model you use.
+
+Eventual consistency is a weak consistency guarantee, because it says nothing about the convergence time bound.
+Until time of convergence, reads could return anything or nothing.
+
+Databases that provide only weak consistency guarantees break this mental model of databases as variables you can write to, because they suffer from concurrency-related interferences.
+So, it helps to to be aware of what the database is really doing.
+
+Stronger consistency guarantees generally come with a hit to performance or fault-tolerance.
+
+#### Linearizability
+
+Eventually consistent databases require to handle the possibility that two reads with the same params, but routed to different replicas, can return different values.
+
+**Linearizability** is also known as **atomic / strong / immediate / external consistency**, and it basically means to make a system appear as if there were only one copy of the data, and all operations on it are atomic.
+
+With this guarantee, even though there may be multiple replicas in reality, the application does not need to worry about them.
+
+- All clients reading from a database must be able to see the value of the write as soon as one client successfully completes this write.
+- Maintaining the illusion of a single copy of the data means guaranteeing that the value read is the most recent value.
+
+Linearizability is a _recency_ guarantee.
+
+In contrast, a non-linearizable sports website:
+
+- Alice and Bob are both in the same room, both checking scores on FIFA world cup website
+- After game end, Alice checks score to see a winner
+- After Bob sees that Alice has seen a winner, Bob refreshes website and still sees that game is in progress
+- Bob should have gotten a query result at least as recent as Alice's, considering that he initiated his query _after_ he heard Alice exclaim the final score.
+- The fact that his query returned a stale result is a violation of linearizability.
+
+##### What Makes a System Linearizable?
+
+Basic idea behind linearizability is simple: The system should look like it contains only a single copy of the data.
+All the benefits of replication without the drawbacks of replication lag.
+You can interact with the data like it's a variable in a single-threaded program.
+
+- All reads prior to a write show the pre-write value.
+- All reads post-write show the post-write value
+- Once some concurrent read shows the post-write value, all subsequent reads should show only the post-write value.
+
+Can all operations, given their start, end, and return value be arranged into a valid sequential order where chronological order AND checkpoint recency are both respected?
+
+###### Linearizability vs Serializability
+
+**Linearizability**: Recency guarantee on reads and writes of a register. No grouping operations together into transactions, so doesn't touch problems like read skew / write skew / dirty reads / dirty writes (unless you materialize conflicts using intermediate rows, and think in terms of whether reads and writes on those rows are Linearizable).
+
+**Serializability**: Isolation property on transactions, where every transaction may read / write multiple objects. Guarantees that transactions behave like they had executed in some serial order (which might be different from the order in which they were actually invoked).
+
+##### Relying on Linearizability
+
+Situations where being able to depend on linearizability is important:
+
+- Locking and Leader Election:
+  - Single-leader replicated system must make sure only one leader, not serveral (split brain).
+  - One way to elect a leader is to use a lock: every node that starts up tries to acquire the lock, and the one that succeeds becomes the leader.
+  - No matter how this lock is implemented, it must be linearizable: all nodes must agree which node owns the lock, or it is useless.
+  - Coordination services often used to implement distributed locks and leader election.
+  - Consensus algorithms to implement linearizable operations in a fault-tolerant way
+- Constraints and uniqueness guarantees
+  - Uniqueness constraints are common in databases.
+  - If you want to enforce this constraint as the data is written (such that if two people try to concurrently create a user or a file with the same name, one of them will be returned an error), you need linearizability.
+  - This situation is actually similar to a lock: when a user registers for your service, you can think of them acquiring a "lock" on their chosen username.
+  - Or you want to avoid bank account spending into negative
+  - Or avoid two people booking the same seat in a theatre.
+- Cross-channel timing dependencies
+  - Suppose you have a website where users can upload a photo, and a background process resizes the photos to lower resolution for faster download (thumbnails)
+  - Image resizer needs to be explicitly instructed to perform a resizing job, and this instruction is sent from the web server to the resizer via a message queue.
+  - The web server doesn't place the entire photo on the queue, since most message brokers are designed for small messages, and a photo may be several megabytes in size.
+  - Instead, the photo is first written to a file storage service, and once the write is complete, the instruction to the resizer is place on the queue.
+  - If the file storage service is linearizable, then this system should work fine.
+  - If not, there is a risk of race condition: the message queue might be faster than the internal replication inside the storage service.
+  - In this case, when the resizer fetches the image, it might see an old version of the image, or nothing at all.
+  - If it processes an old version of the image, the full-size and resized images in the file storage become permanently inconsistent.
+  - This problem arises because there are two different communication channels between the web server and the resizer: the file storage and the message queue
+  - Without the recency guarantee of linearizability, race conditions between these two channels are possible.
+  - Linearizability is not the only way of avoiding this race condition, but it's the simplest to understand.
+    - If you control the additional communication channel, you can use alternative approaches by adding more complex application code.
+
+##### Implementing Linearizable Systems
+
+Simplest answer: just actually really only use a single copy of the data (i.e give up replication).
+
+But we need replication, so let's see if/how we can make each replication model linearizable:
+
+- Single leader replication is potentially linearizable
+  - In a system with single-leader replication, the leader has the primary copy of the data that is used for writes, and the follows maintain backup copies of the data on other nodes.
+  - If you make reads from the leader, or from synchronously updated followers, they have the potential to be linearizable.
+  - However, not every single-leader database is actually linearizable, either by design (e.g. because it uses snapshot isolation) or due to concurrency bugs.
+  - Using the leader for reads relies on the assumption that you know for sure who the leader is.
+  - It is quite possible for the node to think it is the leader when it fact it is not!
+  - If the delusional leader continues to serve requests, likely to violate linearizability.
+  - With asynchronous replication, failover may even lose committed writes, which violates both durability and linearizability.
+- Consensus algorithms are linearizable
+  - Some of these bear a resemblance to single-leader replication.
+  - However, consensus protocols contain measures to prevent split brain and stale replicas.
+  - They can actually implement linearizable storage safely.
+- Multi-leader replication is not linearizable
+  - Systems with multi-leader replication are generally not linearizable
+  - Because they concurrently process writes on multiple nodes and asynchronously replicate them to other nodes
+  - For this reason, they can produce conflicting writes that require resolution
+- Leaderless replication is probably not linearizable
+  - People sometimes claim you can have "strong consistency" by requiring quorum reads and writes, but this isn't entirely true.
+  - "Last write wins" conflict resolution methods based on time-of-day clocks are almost certainly non-linearizable because clock timestamps are likely inconsistent with actual event ordering.
+  - Sloppy quorums also ruin any chance of linearizability.
+  - Even with strict quorums, non-linearizable behavior is possible when we have variable network delays
+    - As of a read, a write (even though the size of the write group has been defined to meet the quorum condition) can only have partially completed, such that the quorum condition isn't _actually_ fulfilled as of the concurrent read.
+    - If you want them to be linearizable, you essentially need synchronous read repair (so that you get the reader to help enforce the quorum) and a writer must read the latest state of a quorum before sending its writes.
+    - But the performance hit makes this prohibitive.
+
+##### The Cost of Linearizability
+
+Only synchronous single-leader replication is linearizable. What are the pros and cons of making this a goal?
+
+Consider the case where you have a DB replicated across two data centers.
+Clients can reach either one of them fine, but they cannot reach each other (network partition).
+
+If you're running a multi-leader database, each data center continues operating normally, since the replication happens asynchronously anyway. Replication writes to each other just get queued up and caught up on.
+Reads, however, would not be linearizable where they concern an object written over at the other instance.
+
+If we're running a single-leader setup, then the leader is in only one of the centers.
+Any writes and linearizable reads must be sent to the leader.
+Thus, for clients connected to a follower data center, those read and write requests must be sent synchronously over the network to the leader data center.
+
+If the network connection between datacenters is interrupted, then the follower can't reach the leader, so the clients connected to the follower can neither make writes nor linearizable reads.
+They can still make stale reads, of course.
+
+If clients can connect directly to the leader data center, then no problem. Else, the network partition results in an outage if the application requires linearizable reads.
+
+###### CAP Theorem
+
+Any linearizable database effectively encounters an outage if clients can only reach a follower.
+
+- If your application requires linearizability, and some replicas are disconnected, then some replicas cannot process requests, so they become unavailable.
+- If it doesn't, then your application can allow each replica to process requests independently, even if it's disconnected from other replicas (e.g. multi-leader). In that case, the application remains available, but it's behavior is not linearizable.
+
+**Applications that don't require linearizability can be more tolerant of network problems.**
+
+###### Linearizability and network delays
+
+Linearizability (being able to treat a replicated data source as a normal variable in a single threaded environment) is actually a rare guarantee.
+
+Even RAM on multi-core CPU isn't linearizable. If a thread running on one CPU core writes to a memory address, and a thread on another CPU core reads the same address shortly after, it is not guaranteed to read the value written by the first thread (unless a memory barrier or fence is used).
+
+- Because every CPU core has its own memory cache and store buffer.
+- Memory access first goes to the cache by default, and any changes are asynchronously written out to main memory.
+- Since accessing data in the cache is much faster than going to main memory, this feature is essential for good performance on modern CPUs.
+- However, there are now several copies of the data (one in main memory, perhaps several more in various caches), and these copies are asynchronously updated, so linearizability is lost.
+
+As with a computer, so with a network: we can drop linearizability for performance / availability.
+
+#### Ordering Guarantees
+
+Recap: A linearizable register behaves as if there is only a single copy of the data, and that every operation appears to take effect atomically at one point in time.
+
+Implies that operations are executed in some well-defined order.
+
+Order has been a recurring theme in this book:
+
+- Main purpose of leader in single-leader replication is to determine the _order of writes_ in the replication log (order in which to apply writes)
+  - Without a single leader, conflicts can occur due to concurrent operations.
+- Serializability is about ensuring that transactions behave as if they were execute in some sequential order, which can be achieved by actually executing transactions in that serial order, or by allowing concurrent execution while preventing serialization conflicts (by locking or aborting).
+- Use of timestamps and clocks in distributed systems is another attempt to introduce order into a disorderly world, for example to determine which one of two writes happened later.
+
+**There are deep theoretical connections between ordering, linearizability, and consensus.**
+
+##### Ordering and Causality
+
+If events are causally linked, they should have a certain ordering.
+Something must have come before something else, in order to have caused it.
+
+In a linearizable system, we have a _total order_ of operations: if the system behaves as if there is only a single copy of the data, and every operation is atomic, this means that for any two operations we can always say which one happened first.
+
+Two events are ordered if they are causally related (one happened before the other), but they are incomparable if they are concurrent. This means that causality defines a _partial order_ (sometimes we can say one is larger than the other, and sometimes they are comparable), not a total order: some operations are ordered with respect to each other, but some are incomparable.
+
+Thus, there are no concurrent operations in a linearizable datastore.
+There must be a single timeline along which all operations are totally ordered.
+There might be several requests waiting to be handled, but the datastore ensures that every request is handled atomically at a single point in time, acting on a single copy of the data, along a single timeline, without any concurrency.
+
+Concurrency necessitates branching and merging in the timeline. Literally as with git commit histories.
+
+Linearizability implies causality; there is a single linear sequence of developments.
+
+However, imputing causal consistency does not necessarily require implementing linearizability.
+
+- In order to maintain causality, you need to know which operation happened before which other operation.
+- This is a partial order: concurrent operations may be processed in any order, but if one operation happened before another, then they must be processed in that order on every replica.
+- Thus, when a replica processes an operation, it must ensure that all causally preceding operations (all operations that happened before) have already been processed
+- If some preceding operation is missing, the later operation operation must wait until the preceding operation has been processed.
+  - Need some way of describing this "knowledge of causality" of a node in the system.
+  - If a node had already seen the value X when it issued the write Y, then X and Y may be causally related.
+  - The analysis uses the kinds of questions you would expect in a criminal investigation of fraud charges (did the CEO _know_ about X at the time when they made the decision Y?)
+  - Version vectors are useful for generalizing this causality tracking to the whole database.
+- E.g. In Serializable Snapshot Isolation (SSI), when a transaction wants to commit, database checks whether the version of the data that it read is still up to date. To this end, the database keeps track of which data has been read by which transaction.
+
+##### Sequence Number Ordering
+
+Clients can read lots of data before writing something, and then it is not clear whether the write is causally dependent on all or only some of those prior reads.
+Explicitly tracking all the data that has been read would mean a large overhead.
+
+However, you can use _sequence numbers_ or _timestamps_ to order events.
+
+- Timestamps can come from a logical clock
+- They can provide a _total order_
+- We can create sequence numbers in a total order that is consistent with causality.
+  - We promise that if operation A causally happened before B, then A occurs before B in the total order
+  - A has a lower sequence than B
+  - Concurrent operations may be ordered arbitrarily.
+- In a database with single-leader replication, the replication log defines a total order of write operations that is consistent with causality.
+- The leader can simply increment a counter for each operation, and thus assign a monotonically increasing sequence number to each operation in the replication log.
+- If a follower applies the writes in the order they appear in the replication log, the state of the follower is always causally consistent (even if it is lagging behind the leader).
+
+You can apply this approach of having follows track and follow sequence to multi-leader setups too, by partitioning the assignable set of operation counters such that two leaders can never issue the same sequence number.
+This is the idea behind **Lamport timestamps**, which is really just a tuple of (nodeId, counter). With two counter values, the greater counter is the greater timestamp. Else, the greater nodeId is the greater timestamp.
+
+Version vectors let you distinguish whether two operations are concurrent or whether they are causally dependent.
+Lamport timestamps always enforce a total ordering and are more compact, but don't let you tell whether two operations are concurrent or causally dependent.
+
+##### Total Order Broadcast
+
+In order to implement something like a uniqueness constraint for usernames, having a total ordering to operations is not enough.
+You also need to know when that order is finalized.
+A node either needs to have a place to check the ordering of its operation against those of other nodes, or it needs to be able to query other nodes for this order.
+
+If every message represents a write to the database, and every replica processes the same writes in the same order, then the replicas will remain consistent with each other (aside from temporary replication lag).
+This is known as _state machine replication_.
+
+Total order broadcast is a way of creating a log: delivering a message is like appending to the log.
+Since all nodes must deliver the same messages in the same order, all nodes can read the log and see the same sequence of messages.
+
+- Useful for implementing a lock service that provides fencing tokens.
+- Every request to acquire the lock is appended as a message to the log
+- All messages are sequentially numbered in the order they appear in the log.
+- Sequence number can then serve as fencing token, because it is monotonically increasing.
+
+You can use this to build linearizable storage by having write operations check this log for whether it succeeded, or a concurrent write did.
+
+If you have linearizable storage already, you can implement total order broadcast in reverse, simply by passing the latest value of your monotonically increasing counter!
+
+Difficulty with these things is when there is network partitions
+
+- You can no longer uphold the promise that all nodes get the same sequence markers in the same order
+- Either you don't send to all nodes, or you don't track send order (same choice again between linearizability and availability)
+
+This problem ultimately has to be solved with a consensus algorithm.
+
+#### Distributed Transactions and Consensus
+
+##### Atomic Commit and Two-Phase Commit (2PC)
+
+##### Distributed Transactions in Practice
+
+##### Fault-Tolerant Consensus
+
+##### Membership and Coordination Services
 
 ## Part 3: Derived Data
 
