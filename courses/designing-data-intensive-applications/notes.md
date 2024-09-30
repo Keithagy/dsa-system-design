@@ -136,11 +136,29 @@
         - [Sequence Number Ordering](#sequence-number-ordering)
         - [Total Order Broadcast](#total-order-broadcast)
       - [Distributed Transactions and Consensus](#distributed-transactions-and-consensus)
+        - [Impossibility of Consensus](#impossibility-of-consensus)
         - [Atomic Commit and Two-Phase Commit (2PC)](#atomic-commit-and-two-phase-commit-2pc)
+          - [From single-node to distributed atomic commit](#from-single-node-to-distributed-atomic-commit)
+          - [Intro to two-phase commit](#intro-to-two-phase-commit)
+          - [A system of promises](#a-system-of-promises)
+          - [Coordinator Failure](#coordinator-failure)
+          - [Three-phase commit](#three-phase-commit)
         - [Distributed Transactions in Practice](#distributed-transactions-in-practice)
+          - [Exactly-once message processing](#exactly-once-message-processing)
+          - [XA Transactions](#xa-transactions)
+          - [Holding locks while in doubt](#holding-locks-while-in-doubt)
+          - [Recovering from coordinator failure](#recovering-from-coordinator-failure)
+          - [Limitations of distributed transactions](#limitations-of-distributed-transactions)
         - [Fault-Tolerant Consensus](#fault-tolerant-consensus)
+          - [Consensus Algorithms and total order broadcast](#consensus-algorithms-and-total-order-broadcast)
+          - [Single-leader replication and consensus](#single-leader-replication-and-consensus)
+          - [Epoch numbering and quorums](#epoch-numbering-and-quorums)
+          - [Limitations of Consensus](#limitations-of-consensus)
         - [Membership and Coordination Services](#membership-and-coordination-services)
-  - [Part 3: Derived Data](#part-3-derived-data) - [Chapter 10: Batch Processing](#chapter-10-batch-processing) - [Chapter 11: Stream Processing](#chapter-11-stream-processing) - [Chapter 12: Future of Data Systems](#chapter-12-future-of-data-systems)
+          - [Allocating work to nodes](#allocating-work-to-nodes)
+          - [Service discovery](#service-discovery)
+          - [Membership services](#membership-services)
+  - [Part 3: Derived Data](#part-3-derived-data) - [Systems of Record and Derived Data](#systems-of-record-and-derived-data) - [Chapter 10: Batch Processing](#chapter-10-batch-processing) - [Chapter 11: Stream Processing](#chapter-11-stream-processing) - [Chapter 12: Future of Data Systems](#chapter-12-future-of-data-systems)
   <!--toc:end-->
 
 ## Part 1: Foundations of Data Systems
@@ -2942,6 +2960,30 @@ But it is nevertheless very useful for a system to have agreement on which nodes
 - But this approach would not work if different nodes have divergent opinions on who the current members are.
 
 ## Part 3: Derived Data
+
+Real life distributed systems are architected as composites of dataflow and datastore paradigms, to collectively be able to serve a variety of tradeoffs.
+
+### Systems of Record and Derived Data
+
+Two broad categories of datastore:
+**System of record**
+
+- Also known as a source of truth.
+- Holds authoritative version of your data.
+- When new data comes in, e.g. as user input, it is first written here
+- Each fact is represented exactly once (representation typically normalized)
+- If there is any discrepancy between another system and the system of record, then the value here is by definition the correct one.
+
+**Derived data system**
+
+- Result of taking some existing data from another system and transforming or processing it.
+- If you lose derived data you can recreate it from the original source.
+- A classic example is a cache.
+  - Data can be served from the cache if present
+  - But if the cache doesn't contain what you need, you can fall back to the underlying database
+
+Derived data is technically redundant; it duplicates existing information.
+It can usually be thought of as denormalized precomputed request serving logic, or a certain view of the data.
 
 ### Chapter 10: Batch Processing
 
